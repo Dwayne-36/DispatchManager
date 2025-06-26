@@ -1,0 +1,41 @@
+﻿using System;
+
+namespace DispatchManager.Models
+{
+    public class DispatchRecord
+    {
+        public int WeekNo { get; set; }
+        public DateTime DispatchDate { get; set; }
+        public DateTime? MaterialsOrderedBy { get; set; }
+        public DateTime? BenchtopOrderedBy { get; set; }
+        public DateTime DesignDate { get; set; }
+        public int JobNo { get; set; }
+        public string MainContractor { get; set; }
+        public string ProjectName { get; set; }
+        public string ProjectColour { get; set; }
+        public int Qty { get; set; }
+        public string Installed { get; set; }
+        public string Freight { get; set; }
+        public string BenchTopSupplier { get; set; }
+        public string BenchTopColour { get; set; }
+        public string Installer { get; set; }
+        public string Comment { get; set; }
+        public string DeliveryAddress { get; set; }
+        public string Phone { get; set; }
+        public string M3 { get; set; }
+        public decimal Amount { get; set; }
+        public int OrderNumber { get; set; }
+        public DateTime DateOrdered { get; set; }
+        public string LeadTime { get; set; }
+
+        // NEW initials columns
+        public string ProdInput { get; set; }
+        public string MaterialsOrdered { get; set; }
+        public string ReleasedToFactory { get; set; }
+
+        // NEW tick-box columns
+        public bool FB { get; set; }
+        public bool EB { get; set; }
+        public bool AS { get; set; }
+    }
+}
