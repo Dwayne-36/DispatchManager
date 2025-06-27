@@ -37,4 +37,9 @@ namespace DispatchManager.Models
         public string LeadTime { get; set; }
 
     }
+    public class DispatchBlankRow : DispatchRecord
+    {
+        public bool IsSpacer { get; set; } = true;
+    }
+
 }
