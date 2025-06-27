@@ -51,7 +51,6 @@
             this.Controls.Add(this.dgvDispatch);
             this.Name = "FrmViewDispatch";
             this.Text = "FrmViewDispatch";
-            this.Load += new System.EventHandler(this.FrmViewDispatch_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvDispatch)).EndInit();
             this.ResumeLayout(false);
 

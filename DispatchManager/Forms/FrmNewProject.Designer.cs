@@ -70,7 +70,9 @@
             this.tbAmount = new System.Windows.Forms.TextBox();
             this.tbOrderNumber = new System.Windows.Forms.TextBox();
             this.tbDateOrdered = new System.Windows.Forms.TextBox();
-            this.btnSave = new System.Windows.Forms.Button();
+            this.btnEnterProject = new System.Windows.Forms.Button();
+            this.btnEnterClose = new System.Windows.Forms.Button();
+            this.btnClose = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblLeadTime
@@ -418,22 +420,41 @@
             this.tbDateOrdered.Size = new System.Drawing.Size(100, 20);
             this.tbDateOrdered.TabIndex = 41;
             // 
-            // btnSave
+            // btnEnterProject
             // 
-            this.btnSave.Location = new System.Drawing.Point(860, 229);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(75, 23);
-            this.btnSave.TabIndex = 42;
-            this.btnSave.Text = "Save";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            this.btnEnterProject.Location = new System.Drawing.Point(493, 183);
+            this.btnEnterProject.Name = "btnEnterProject";
+            this.btnEnterProject.Size = new System.Drawing.Size(255, 23);
+            this.btnEnterProject.TabIndex = 43;
+            this.btnEnterProject.Text = "Enter Project";
+            this.btnEnterProject.UseVisualStyleBackColor = true;
+            // 
+            // btnEnterClose
+            // 
+            this.btnEnterClose.Location = new System.Drawing.Point(493, 212);
+            this.btnEnterClose.Name = "btnEnterClose";
+            this.btnEnterClose.Size = new System.Drawing.Size(255, 23);
+            this.btnEnterClose.TabIndex = 44;
+            this.btnEnterClose.Text = "Enter && Close";
+            this.btnEnterClose.UseVisualStyleBackColor = true;
+            // 
+            // btnClose
+            // 
+            this.btnClose.Location = new System.Drawing.Point(493, 241);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(255, 23);
+            this.btnClose.TabIndex = 45;
+            this.btnClose.Text = "Cancel";
+            this.btnClose.UseVisualStyleBackColor = true;
             // 
             // FrmNewProject
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(985, 264);
-            this.Controls.Add(this.btnSave);
+            this.ClientSize = new System.Drawing.Size(985, 270);
+            this.Controls.Add(this.btnClose);
+            this.Controls.Add(this.btnEnterClose);
+            this.Controls.Add(this.btnEnterProject);
             this.Controls.Add(this.tbDateOrdered);
             this.Controls.Add(this.tbOrderNumber);
             this.Controls.Add(this.tbAmount);
@@ -527,6 +548,8 @@
         private System.Windows.Forms.TextBox tbAmount;
         private System.Windows.Forms.TextBox tbOrderNumber;
         private System.Windows.Forms.TextBox tbDateOrdered;
-        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.Button btnEnterProject;
+        private System.Windows.Forms.Button btnEnterClose;
+        private System.Windows.Forms.Button btnClose;
     }
 }

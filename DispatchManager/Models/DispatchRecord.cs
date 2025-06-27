@@ -4,16 +4,24 @@ namespace DispatchManager.Models
 {
     public class DispatchRecord
     {
+        public Guid ID { get; set; }
         public int WeekNo { get; set; }
         public DateTime DispatchDate { get; set; }
         public DateTime? MaterialsOrderedBy { get; set; }
         public DateTime? BenchtopOrderedBy { get; set; }
-        public DateTime DesignDate { get; set; }
+        public string Day { get; set; }
         public int JobNo { get; set; }
+        public string ProdInput { get; set; }
+        public string MaterialsOrdered { get; set; }
+        public string ReleasedToFactory { get; set; }
         public string MainContractor { get; set; }
         public string ProjectName { get; set; }
         public string ProjectColour { get; set; }
         public int Qty { get; set; }
+        public bool FB { get; set; }
+        public bool EB { get; set; }
+        public bool ASS { get; set; }
+        public string BoardETA { get; set; }
         public string Installed { get; set; }
         public string Freight { get; set; }
         public string BenchTopSupplier { get; set; }
@@ -28,14 +36,5 @@ namespace DispatchManager.Models
         public DateTime DateOrdered { get; set; }
         public string LeadTime { get; set; }
 
-        // NEW initials columns
-        public string ProdInput { get; set; }
-        public string MaterialsOrdered { get; set; }
-        public string ReleasedToFactory { get; set; }
-
-        // NEW tick-box columns
-        public bool FB { get; set; }
-        public bool EB { get; set; }
-        public bool AS { get; set; }
     }
 }
