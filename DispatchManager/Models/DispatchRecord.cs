@@ -40,6 +40,42 @@ namespace DispatchManager.Models
     public class DispatchBlankRow : DispatchRecord
     {
         public bool IsSpacer { get; set; } = true;
+
+        public DispatchBlankRow()
+        {
+            ID = Guid.NewGuid();  // Prevent binding issues
+            WeekNo = 0;
+            DispatchDate = DateTime.MinValue;
+            MaterialsOrderedBy = null;
+            BenchtopOrderedBy = null;
+            Day = "";
+            JobNo = 0;
+            ProdInput = "";
+            MaterialsOrdered = "";
+            ReleasedToFactory = "";
+            MainContractor = "";
+            ProjectName = "";
+            ProjectColour = "";
+            Qty = 0;
+            FB = false;
+            EB = false;
+            ASS = false;
+            BoardETA = "";
+            Installed = "";
+            Freight = "";
+            BenchTopSupplier = "";
+            BenchTopColour = "";
+            Installer = "";
+            Comment = "";
+            DeliveryAddress = "";
+            Phone = "";
+            M3 = "";
+            Amount = 0;
+            OrderNumber = 0;
+            DateOrdered = DateTime.MinValue;
+            LeadTime = "";
+        }
     }
+
 
 }

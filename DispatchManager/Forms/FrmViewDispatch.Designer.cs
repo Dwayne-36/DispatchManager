@@ -136,6 +136,7 @@
             this.Controls.Add(this.dgvSchedule);
             this.Name = "FrmViewDispatch";
             this.Text = "Haylo View";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

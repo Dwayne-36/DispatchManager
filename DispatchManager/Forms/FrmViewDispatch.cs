@@ -31,6 +31,16 @@ namespace DispatchManager.Forms
             // Load data and populate DataGridView
             LoadScheduleData();
 
+            // Disable tooltips (helps reduce flicker)
+            dgvSchedule.ShowCellToolTips = false;
+
+            // Optional: Apply double buffering to reduce flicker
+            typeof(DataGridView).InvokeMember("DoubleBuffered",
+                System.Reflection.BindingFlags.NonPublic |
+                System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.SetProperty,
+                null, dgvSchedule, new object[] { true });
+
             // Style blank rows if they are present
             dgvSchedule.RowPrePaint += (s, ev) =>
             {
