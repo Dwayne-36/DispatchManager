@@ -41,27 +41,7 @@ namespace DispatchManager.Forms
                 System.Reflection.BindingFlags.SetProperty,
                 null, dgvSchedule, new object[] { true });
 
-            // Style blank rows if they are present
-            dgvSchedule.RowPrePaint += (s, ev) =>
-            {
-                var row = dgvSchedule.Rows[ev.RowIndex];
-                if (row.DataBoundItem is DispatchBlankRow)
-                {
-                    row.DefaultCellStyle.BackColor = Color.LightGray;
-                    row.DefaultCellStyle.SelectionBackColor = Color.LightGray;
-                    row.DefaultCellStyle.ForeColor = Color.Transparent; // hide text
-                    row.ReadOnly = true; // make it uneditable
-                }
-            };
         }
-
-        //private void FrmViewDispatch_Load(object sender, EventArgs e)
-        //{
-        //    dtpFrom.Value = Properties.Settings.Default.dtpFromDate;
-        //    dtpTo.Value = Properties.Settings.Default.dtpToDate;
-
-        //    LoadScheduleData();
-        //}
         private void LoadScheduleData()
         {
             DateTime from = dtpFrom.Value;
@@ -74,24 +54,122 @@ namespace DispatchManager.Forms
                 .ThenBy(d => d.JobNo)
                 .ToList();
 
-            var withSpacers = new List<DispatchRecord>();
-            DateTime? currentDay = null;
+            var withWeeklyTotals = new List<DispatchRecord>();
 
-            foreach (var record in groupedList)
+            int? currentWeek = null;
+            int weeklyTotal = 0;
+
+            for (int i = 0; i < groupedList.Count; i++)
             {
-                if (currentDay != null && record.DispatchDate.Date != currentDay.Value.Date)
+                var record = groupedList[i];
+
+                int recordWeek = System.Globalization.CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                    record.DispatchDate,
+                    System.Globalization.CalendarWeekRule.FirstFourDayWeek,
+                    DayOfWeek.Monday);
+
+                // Insert total before new week starts
+                if (currentWeek != null && recordWeek != currentWeek)
                 {
-                    withSpacers.Add(new DispatchBlankRow()); // Insert blank row between days
+                    //MessageBox.Show($"Inserted total: Week {currentWeek} = Qty {weeklyTotal}", "DEBUG");
+
+                    withWeeklyTotals.Add(new DispatchBlankRow
+                    {
+                        Qty = weeklyTotal,
+                        Comment = $"Total for Week {currentWeek}",
+                        DispatchDate = record.DispatchDate // or lastWeekDate if you're tracking that
+
+                    });
+                    weeklyTotal = 0;
                 }
 
-                withSpacers.Add(record);
-                currentDay = record.DispatchDate.Date;
+                withWeeklyTotals.Add(record);
+                weeklyTotal += record.Qty;
+                currentWeek = recordWeek;
+
+                // Handle final record
+                bool isLast = (i == groupedList.Count - 1);
+                if (isLast && weeklyTotal > 0)
+                {
+                    //MessageBox.Show($"Inserted total: Week {currentWeek} = Qty {weeklyTotal}", "DEBUG");
+
+                    withWeeklyTotals.Add(new DispatchBlankRow
+                    {
+                        Qty = weeklyTotal,
+                        Comment = $"Total for Week {currentWeek}",
+                        DispatchDate = record.DispatchDate // or lastWeekDate if you're tracking that
+                    });
+                }
             }
 
-            dgvSchedule.DataSource = withSpacers;
+            // ✅ Add test total row to verify grid shows totals
+            withWeeklyTotals.Add(new DispatchBlankRow
+            {
+                Qty = 999,
+                Comment = "TEST TOTAL ROW",
+                DispatchDate = DateTime.Today
+            });
+
+            dgvSchedule.DataSource = null;
+            dgvSchedule.Rows.Clear(); // Just in case
+            dgvSchedule.Columns.Clear();
+
+            dgvSchedule.DataSource = withWeeklyTotals;
             dgvSchedule.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvSchedule.Refresh();
+
+
+            foreach (DataGridViewColumn column in dgvSchedule.Columns)
+            {
+                column.SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
+
+            // 🔍 Highlight total rows to make them stand out
+            foreach (DataGridViewRow row in dgvSchedule.Rows)
+            {
+                if (row.DataBoundItem is DispatchBlankRow)
+                {
+                    row.DefaultCellStyle.BackColor = Color.LightYellow;
+                    row.DefaultCellStyle.Font = new Font(dgvSchedule.Font, FontStyle.Bold);
+                    row.DefaultCellStyle.ForeColor = Color.DarkSlateGray;
+
+                    // 🧪 Debug output: write total to console
+                    Console.WriteLine($"Blank row - Qty: {row.Cells["Qty"].Value}, Comment: {row.Cells["Comment"].Value}");
+                }
+            }
+
         }
+
+        //private void LoadScheduleData()
+        //{
+        //    DateTime from = dtpFrom.Value;
+        //    DateTime to = dtpTo.Value;
+
+        //    fullDispatchList = DispatchData.GetDispatchByDateRange(from, to);
+
+        //    var groupedList = fullDispatchList
+        //        .OrderBy(d => d.DispatchDate)
+        //        .ThenBy(d => d.JobNo)
+        //        .ToList();
+
+        //    var withSpacers = new List<DispatchRecord>();
+        //    DateTime? currentDay = null;
+
+        //    foreach (var record in groupedList)
+        //    {
+        //        if (currentDay != null && record.DispatchDate.Date != currentDay.Value.Date)
+        //        {
+        //            withSpacers.Add(new DispatchBlankRow()); // Insert blank row between days
+        //        }
+
+        //        withSpacers.Add(record);
+        //        currentDay = record.DispatchDate.Date;
+        //    }
+
+        //    dgvSchedule.DataSource = withSpacers;
+        //    dgvSchedule.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+        //    dgvSchedule.Refresh();
+        //}
 
         //private void LoadScheduleData()
         //{
