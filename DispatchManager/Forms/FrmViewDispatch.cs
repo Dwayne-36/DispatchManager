@@ -29,7 +29,7 @@ namespace DispatchManager.Forms
             dtpTo.Value = Properties.Settings.Default.dtpToDate;
 
             dgvSchedule.CellFormatting += dgvSchedule_CellFormatting;
-
+            //dgvSchedule.DataError += (s, ev) => { ev.ThrowException = false; };
 
             // Load data and populate DataGridView
             LoadScheduleData();
@@ -118,8 +118,8 @@ namespace DispatchManager.Forms
             dgvSchedule.Refresh();
 
             dgvSchedule.Columns["ID"].Visible = false; // Hide ID column
-
-
+            dgvSchedule.Columns["MaterialsOrderedBy"].Visible = false; // Hide ID column
+            dgvSchedule.Columns["BenchtopOrderedBy"].Visible = false; // Hide ID column
 
             foreach (DataGridViewColumn column in dgvSchedule.Columns)
             {

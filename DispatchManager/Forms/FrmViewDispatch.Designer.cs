@@ -37,6 +37,8 @@
             this.lblSearch = new System.Windows.Forms.Label();
             this.btnSearch = new System.Windows.Forms.Button();
             this.btnNewProject = new System.Windows.Forms.Button();
+            this.lblTotalCainets = new System.Windows.Forms.Label();
+            this.lblTotal = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
             this.SuspendLayout();
             // 
@@ -50,7 +52,7 @@
             this.dgvSchedule.Location = new System.Drawing.Point(1, 126);
             this.dgvSchedule.Name = "dgvSchedule";
             this.dgvSchedule.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvSchedule.Size = new System.Drawing.Size(1190, 649);
+            this.dgvSchedule.Size = new System.Drawing.Size(1190, 624);
             this.dgvSchedule.TabIndex = 0;
             // 
             // dtpFrom
@@ -120,11 +122,30 @@
             this.btnNewProject.Text = "New Project";
             this.btnNewProject.UseVisualStyleBackColor = true;
             // 
+            // lblTotalCainets
+            // 
+            this.lblTotalCainets.AutoSize = true;
+            this.lblTotalCainets.Location = new System.Drawing.Point(1056, 753);
+            this.lblTotalCainets.Name = "lblTotalCainets";
+            this.lblTotalCainets.Size = new System.Drawing.Size(75, 13);
+            this.lblTotalCainets.TabIndex = 9;
+            this.lblTotalCainets.Text = "Total Cabinets";
+            // 
+            // lblTotal
+            // 
+            this.lblTotal.AutoSize = true;
+            this.lblTotal.Location = new System.Drawing.Point(1138, 752);
+            this.lblTotal.Name = "lblTotal";
+            this.lblTotal.Size = new System.Drawing.Size(0, 13);
+            this.lblTotal.TabIndex = 10;
+            // 
             // FrmViewDispatch
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1191, 775);
+            this.Controls.Add(this.lblTotal);
+            this.Controls.Add(this.lblTotalCainets);
             this.Controls.Add(this.btnNewProject);
             this.Controls.Add(this.btnSearch);
             this.Controls.Add(this.lblSearch);
@@ -154,5 +175,7 @@
         private System.Windows.Forms.Label lblSearch;
         private System.Windows.Forms.Button btnSearch;
         private System.Windows.Forms.Button btnNewProject;
+        private System.Windows.Forms.Label lblTotalCainets;
+        private System.Windows.Forms.Label lblTotal;
     }
 }
