@@ -28,6 +28,9 @@ namespace DispatchManager.Forms
             dtpFrom.Value = Properties.Settings.Default.dtpFromDate;
             dtpTo.Value = Properties.Settings.Default.dtpToDate;
 
+            dgvSchedule.CellFormatting += dgvSchedule_CellFormatting;
+
+
             // Load data and populate DataGridView
             LoadScheduleData();
 
@@ -76,8 +79,8 @@ namespace DispatchManager.Forms
                     withWeeklyTotals.Add(new DispatchBlankRow
                     {
                         Qty = weeklyTotal,
-                        Comment = $"Total for Week {currentWeek}",
-                        DispatchDate = record.DispatchDate // or lastWeekDate if you're tracking that
+                        BoardETA = $"Total for Week {currentWeek}",
+                        DispatchDate = DateTime.MinValue, // or lastWeekDate if you're tracking that
 
                     });
                     weeklyTotal = 0;
@@ -96,27 +99,26 @@ namespace DispatchManager.Forms
                     withWeeklyTotals.Add(new DispatchBlankRow
                     {
                         Qty = weeklyTotal,
-                        Comment = $"Total for Week {currentWeek}",
-                        DispatchDate = record.DispatchDate // or lastWeekDate if you're tracking that
+                        BoardETA = $"Total for Week {currentWeek}",
+                        WeekNo = -1,                       // Sentinel value to handle in cell formatting
+                        DispatchDate = DateTime.MinValue, // Will show as blank if formatted
+                        JobNo = -1,
+                        Amount = -1,
+                        OrderNumber = -1
                     });
                 }
             }
 
-            // ✅ Add test total row to verify grid shows totals
-            withWeeklyTotals.Add(new DispatchBlankRow
-            {
-                Qty = 999,
-                Comment = "TEST TOTAL ROW",
-                DispatchDate = DateTime.Today
-            });
-
             dgvSchedule.DataSource = null;
             dgvSchedule.Rows.Clear(); // Just in case
             dgvSchedule.Columns.Clear();
-
+           
             dgvSchedule.DataSource = withWeeklyTotals;
             dgvSchedule.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvSchedule.Refresh();
+
+            dgvSchedule.Columns["ID"].Visible = false; // Hide ID column
+
 
 
             foreach (DataGridViewColumn column in dgvSchedule.Columns)
@@ -129,7 +131,7 @@ namespace DispatchManager.Forms
             {
                 if (row.DataBoundItem is DispatchBlankRow)
                 {
-                    row.DefaultCellStyle.BackColor = Color.LightYellow;
+                    row.DefaultCellStyle.BackColor = Color.LightGray;
                     row.DefaultCellStyle.Font = new Font(dgvSchedule.Font, FontStyle.Bold);
                     row.DefaultCellStyle.ForeColor = Color.DarkSlateGray;
 
@@ -140,48 +142,36 @@ namespace DispatchManager.Forms
 
         }
 
-        //private void LoadScheduleData()
-        //{
-        //    DateTime from = dtpFrom.Value;
-        //    DateTime to = dtpTo.Value;
+        private void dgvSchedule_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            var row = dgvSchedule.Rows[e.RowIndex];
 
-        //    fullDispatchList = DispatchData.GetDispatchByDateRange(from, to);
+            if (row.DataBoundItem is DispatchBlankRow)
+            {
+                string columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
 
-        //    var groupedList = fullDispatchList
-        //        .OrderBy(d => d.DispatchDate)
-        //        .ThenBy(d => d.JobNo)
-        //        .ToList();
+                // Blank int or decimal values
+                if ((columnName == "WeekNo" || columnName == "JobNo" || columnName == "OrderNumber" || columnName == "Qty" || columnName == "Amount")
+                    && e.Value is int intVal && intVal <= 0)
+                {
+                    e.Value = "";
+                    e.FormattingApplied = true;
+                }
 
-        //    var withSpacers = new List<DispatchRecord>();
-        //    DateTime? currentDay = null;
+                if (columnName == "Amount" && e.Value is decimal decVal && decVal <= 0)
+                {
+                    e.Value = "";
+                    e.FormattingApplied = true;
+                }
 
-        //    foreach (var record in groupedList)
-        //    {
-        //        if (currentDay != null && record.DispatchDate.Date != currentDay.Value.Date)
-        //        {
-        //            withSpacers.Add(new DispatchBlankRow()); // Insert blank row between days
-        //        }
-
-        //        withSpacers.Add(record);
-        //        currentDay = record.DispatchDate.Date;
-        //    }
-
-        //    dgvSchedule.DataSource = withSpacers;
-        //    dgvSchedule.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-        //    dgvSchedule.Refresh();
-        //}
-
-        //private void LoadScheduleData()
-        //{
-        //    DateTime from = dtpFrom.Value;
-        //    DateTime to = dtpTo.Value;
-
-        //    fullDispatchList = DispatchData.GetDispatchByDateRange(from, to);
-        //    dgvSchedule.DataSource = fullDispatchList;
-
-        //    dgvSchedule.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-        //    dgvSchedule.Refresh();
-        //}
+                // Blank DispatchDate
+                if (columnName == "DispatchDate" && e.Value is DateTime dt && dt == DateTime.MinValue)
+                {
+                    e.Value = "";
+                    e.FormattingApplied = true;
+                }
+            }
+        }
 
         private void FrmViewDispatch_FormClosing(object sender, FormClosingEventArgs e)
         {
