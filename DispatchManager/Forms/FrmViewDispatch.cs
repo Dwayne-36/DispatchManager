@@ -46,18 +46,17 @@ namespace DispatchManager.Forms
 
         }
         private Dictionary<int, Color> weekColors = new Dictionary<int, Color>();
-        private Color[] palette = new Color[]
-        {
-    Color.LightYellow,
-    Color.LightBlue,
-    Color.LightGreen,
-    Color.MistyRose,
-    Color.LightCyan,
-    Color.Honeydew,
-    Color.Lavender,
-    Color.PeachPuff
-        };
-
+    //    private Color[] palette = new Color[]
+    //    {
+    //Color.LightYellow,
+    //Color.LightBlue,
+    //Color.LightGreen,
+    //Color.MistyRose,
+    //Color.LightCyan,
+    //Color.Honeydew,
+    //Color.Lavender,
+    //Color.PeachPuff
+    //    };
         private void LoadScheduleData()
         {
             DateTime from = dtpFrom.Value;
@@ -87,14 +86,11 @@ namespace DispatchManager.Forms
                 // Insert total before new week starts
                 if (currentWeek != null && recordWeek != currentWeek)
                 {
-                    //MessageBox.Show($"Inserted total: Week {currentWeek} = Qty {weeklyTotal}", "DEBUG");
-
                     withWeeklyTotals.Add(new DispatchBlankRow
                     {
                         Qty = weeklyTotal,
                         BoardETA = $"Total for Week {currentWeek}",
-                        DispatchDate = DateTime.MinValue, // or lastWeekDate if you're tracking that
-
+                        DispatchDate = DateTime.MinValue,
                     });
                     weeklyTotal = 0;
                 }
@@ -103,25 +99,16 @@ namespace DispatchManager.Forms
                 weeklyTotal += record.Qty;
                 currentWeek = recordWeek;
 
-                // Assign color for the week if not already assigned
-                if (!weekColors.ContainsKey(recordWeek))
-                {
-                    weekColors[recordWeek] = palette[weekColors.Count % palette.Length];
-                }
-
-
                 // Handle final record
                 bool isLast = (i == groupedList.Count - 1);
                 if (isLast && weeklyTotal > 0)
                 {
-                    //MessageBox.Show($"Inserted total: Week {currentWeek} = Qty {weeklyTotal}", "DEBUG");
-
                     withWeeklyTotals.Add(new DispatchBlankRow
                     {
                         Qty = weeklyTotal,
                         BoardETA = $"Total for Week {currentWeek}",
-                        WeekNo = -1,                       // Sentinel value to handle in cell formatting
-                        DispatchDate = DateTime.MinValue, // Will show as blank if formatted
+                        WeekNo = -1,
+                        DispatchDate = DateTime.MinValue,
                         JobNo = -1,
                         Amount = -1,
                         OrderNumber = -1
@@ -129,20 +116,43 @@ namespace DispatchManager.Forms
                 }
             }
 
+            // ✅ STEP 2: Assign colors to each week
+            Color[] palette = new Color[]
+            {
+        Color.FromArgb(0, 255, 255),   // Cyan
+        Color.FromArgb(255, 128, 128), // Light Red
+        Color.FromArgb(0, 255, 0),     // Green
+        Color.FromArgb(255, 255, 0),   // Yellow
+        Color.FromArgb(255, 0, 255)    // Magenta
+            };
+
+            weekColors.Clear();
+            int colorIndex = 0;
+            foreach (var record in withWeeklyTotals)
+            {
+                if (record is DispatchBlankRow) continue;
+
+                int week = record.WeekNo;
+                if (!weekColors.ContainsKey(week))
+                {
+                    weekColors[week] = palette[colorIndex % palette.Length];
+                    colorIndex++;
+                }
+            }
+
             dgvSchedule.DataSource = null;
-            dgvSchedule.Rows.Clear(); // Just in case
+            dgvSchedule.Rows.Clear();
             dgvSchedule.Columns.Clear();
-           
+
             dgvSchedule.DataSource = withWeeklyTotals;
             dgvSchedule.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvSchedule.Refresh();
 
-            dgvSchedule.Columns["ID"].Visible = false; // Hide ID column
-            dgvSchedule.Columns["MaterialsOrderedBy"].Visible = false; // Hide ID column
-            dgvSchedule.Columns["BenchtopOrderedBy"].Visible = false; // Hide ID column
+            dgvSchedule.Columns["ID"].Visible = false;
+            dgvSchedule.Columns["MaterialsOrderedBy"].Visible = false;
+            dgvSchedule.Columns["BenchtopOrderedBy"].Visible = false;
 
             dgvSchedule.SelectionChanged += dgvSchedule_SelectionChanged;
-
 
             foreach (DataGridViewColumn column in dgvSchedule.Columns)
             {
@@ -157,14 +167,119 @@ namespace DispatchManager.Forms
                     row.DefaultCellStyle.BackColor = Color.LightGray;
                     row.DefaultCellStyle.Font = new Font(dgvSchedule.Font, FontStyle.Bold);
                     row.DefaultCellStyle.ForeColor = Color.DarkSlateGray;
-
-                    // 🧪 Debug output: write total to console
-                    Console.WriteLine($"Blank row - Qty: {row.Cells["Qty"].Value}, Comment: {row.Cells["Comment"].Value}");
                 }
             }
-            UpdateTotalLabel(dgvSchedule.Rows.Cast<DataGridViewRow>());
 
+            UpdateTotalLabel(dgvSchedule.Rows.Cast<DataGridViewRow>());
         }
+
+        //private void LoadScheduleData()
+        //{
+        //    DateTime from = dtpFrom.Value;
+        //    DateTime to = dtpTo.Value;
+
+        //    fullDispatchList = DispatchData.GetDispatchByDateRange(from, to);
+
+        //    var groupedList = fullDispatchList
+        //        .OrderBy(d => d.DispatchDate)
+        //        .ThenBy(d => d.JobNo)
+        //        .ToList();
+
+        //    var withWeeklyTotals = new List<DispatchRecord>();
+
+        //    int? currentWeek = null;
+        //    int weeklyTotal = 0;
+
+        //    for (int i = 0; i < groupedList.Count; i++)
+        //    {
+        //        var record = groupedList[i];
+
+        //        int recordWeek = System.Globalization.CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+        //            record.DispatchDate,
+        //            System.Globalization.CalendarWeekRule.FirstFourDayWeek,
+        //            DayOfWeek.Monday);
+
+        //        // Insert total before new week starts
+        //        if (currentWeek != null && recordWeek != currentWeek)
+        //        {
+        //            //MessageBox.Show($"Inserted total: Week {currentWeek} = Qty {weeklyTotal}", "DEBUG");
+
+        //            withWeeklyTotals.Add(new DispatchBlankRow
+        //            {
+        //                Qty = weeklyTotal,
+        //                BoardETA = $"Total for Week {currentWeek}",
+        //                DispatchDate = DateTime.MinValue, // or lastWeekDate if you're tracking that
+
+        //            });
+        //            weeklyTotal = 0;
+        //        }
+
+        //        withWeeklyTotals.Add(record);
+        //        weeklyTotal += record.Qty;
+        //        currentWeek = recordWeek;
+
+        //        // Assign color for the week if not already assigned
+        //        if (!weekColors.ContainsKey(recordWeek))
+        //        {
+        //            weekColors[recordWeek] = palette[weekColors.Count % palette.Length];
+        //        }
+
+
+        //        // Handle final record
+        //        bool isLast = (i == groupedList.Count - 1);
+        //        if (isLast && weeklyTotal > 0)
+        //        {
+        //            //MessageBox.Show($"Inserted total: Week {currentWeek} = Qty {weeklyTotal}", "DEBUG");
+
+        //            withWeeklyTotals.Add(new DispatchBlankRow
+        //            {
+        //                Qty = weeklyTotal,
+        //                BoardETA = $"Total for Week {currentWeek}",
+        //                WeekNo = -1,                       // Sentinel value to handle in cell formatting
+        //                DispatchDate = DateTime.MinValue, // Will show as blank if formatted
+        //                JobNo = -1,
+        //                Amount = -1,
+        //                OrderNumber = -1
+        //            });
+        //        }
+        //    }
+
+        //    dgvSchedule.DataSource = null;
+        //    dgvSchedule.Rows.Clear(); // Just in case
+        //    dgvSchedule.Columns.Clear();
+
+        //    dgvSchedule.DataSource = withWeeklyTotals;
+        //    dgvSchedule.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+        //    dgvSchedule.Refresh();
+
+        //    dgvSchedule.Columns["ID"].Visible = false; // Hide ID column
+        //    dgvSchedule.Columns["MaterialsOrderedBy"].Visible = false; // Hide ID column
+        //    dgvSchedule.Columns["BenchtopOrderedBy"].Visible = false; // Hide ID column
+
+        //    dgvSchedule.SelectionChanged += dgvSchedule_SelectionChanged;
+
+
+        //    foreach (DataGridViewColumn column in dgvSchedule.Columns)
+        //    {
+        //        column.SortMode = DataGridViewColumnSortMode.NotSortable;
+        //    }
+
+        //    // 🔍 Highlight total rows to make them stand out
+        //    foreach (DataGridViewRow row in dgvSchedule.Rows)
+        //    {
+        //        if (row.DataBoundItem is DispatchBlankRow)
+        //        {
+        //            row.DefaultCellStyle.BackColor = Color.LightGray;
+        //            row.DefaultCellStyle.Font = new Font(dgvSchedule.Font, FontStyle.Bold);
+        //            row.DefaultCellStyle.ForeColor = Color.DarkSlateGray;
+
+        //            // 🧪 Debug output: write total to console
+        //            Console.WriteLine($"Blank row - Qty: {row.Cells["Qty"].Value}, Comment: {row.Cells["Comment"].Value}");
+        //        }
+        //    }
+        //    UpdateTotalLabel(dgvSchedule.Rows.Cast<DataGridViewRow>());
+
+        //}
         private void dgvSchedule_SelectionChanged(object sender, EventArgs e)
         {
             var selectedRows = dgvSchedule.SelectedRows.Cast<DataGridViewRow>()
