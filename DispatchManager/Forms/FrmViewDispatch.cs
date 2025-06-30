@@ -258,6 +258,87 @@ namespace DispatchManager.Forms
             }
         }
 
+        //private void dgvSchedule_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        //{
+        //    var row = dgvSchedule.Rows[e.RowIndex];
+        //    string columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
+
+        //    // Format DispatchDate for all rows
+        //    if (columnName == "DispatchDate" && e.Value is DateTime dtValue && dtValue != DateTime.MinValue)
+        //    {
+        //        e.Value = dtValue.ToString("dd-MMM");
+        //        e.FormattingApplied = true;
+        //        return; // Optional: skip other logic
+        //    }
+
+        //    // Only apply blanking logic to total rows
+        //    if (row.DataBoundItem is DispatchBlankRow)
+        //    {
+        //        // Blank int or decimal values
+        //        if ((columnName == "WeekNo" || columnName == "JobNo" || columnName == "OrderNumber" || columnName == "Qty" || columnName == "Amount")
+        //            && e.Value is int intVal && intVal <= 0)
+        //        {
+        //            e.Value = "";
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        if (columnName == "Amount" && e.Value is decimal decVal && decVal <= 0)
+        //        {
+        //            e.Value = "";
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        // Blank DispatchDate if it's MinValue
+        //        if (columnName == "DispatchDate" && e.Value is DateTime dt && dt == DateTime.MinValue)
+        //        {
+        //            e.Value = "";
+        //            e.FormattingApplied = true;
+        //        }
+        //    }
+
+        //    // Apply week color to "Day" column based on WeekNo
+        //    if (dgvSchedule.Columns[e.ColumnIndex].Name == "Day")
+        //    {
+        //        // Ensure we only apply week color to normal data rows
+        //        if (row.DataBoundItem is DispatchBlankRow)
+        //        {
+        //            // Force grey styling for blank row Day cell
+        //            row.Cells[e.ColumnIndex].Style.BackColor = Color.LightGray;
+        //            row.Cells[e.ColumnIndex].Style.SelectionBackColor = Color.LightGray;
+        //            row.Cells[e.ColumnIndex].Style.ForeColor = Color.DarkSlateGray;
+        //            row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.DarkSlateGray;
+        //            return;
+        //        }
+
+        //        // Normal row — apply week-based background color
+        //        var weekObj = row.Cells["WeekNo"].Value;
+        //        if (weekObj is int week && weekColors.TryGetValue(week, out var color))
+        //        {
+        //            row.Cells[e.ColumnIndex].Style.BackColor = color;
+        //            row.Cells[e.ColumnIndex].Style.SelectionBackColor = color;
+        //            row.Cells[e.ColumnIndex].Style.ForeColor = Color.Black;
+        //            row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.Black;
+        //        }
+        //    }
+
+
+        //    //if (dgvSchedule.Columns[e.ColumnIndex].Name == "Day")
+        //    //{
+        //    //    var weekProp = row.Cells["WeekNo"].Value;
+        //    //    if (weekProp is int week && weekColors.TryGetValue(week, out var color))
+        //    //    {
+        //    //        row.Cells[e.ColumnIndex].Style.BackColor = color;
+        //    //        row.Cells[e.ColumnIndex].Style.SelectionBackColor = color;
+        //    //        row.Cells[e.ColumnIndex].Style.ForeColor = Color.Black;
+        //    //        row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.Black;
+        //    //    }
+        //    //}
+
+
+
+
+        //}
+
         private void FrmViewDispatch_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.dtpFromDate = dtpFrom.Value;
