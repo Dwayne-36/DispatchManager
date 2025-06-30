@@ -30,6 +30,7 @@ namespace DispatchManager.Forms
             dtpFrom.Value = Properties.Settings.Default.dtpFromDate;
             dtpTo.Value = Properties.Settings.Default.dtpToDate;
 
+
             dgvSchedule.CellFormatting += dgvSchedule_CellFormatting;
             //dgvSchedule.DataError += (s, ev) => { ev.ThrowException = false; };
 
@@ -48,14 +49,15 @@ namespace DispatchManager.Forms
 
         }
         private Dictionary<int, Color> weekColors = new Dictionary<int, Color>();
-   
+
+
         private void LoadScheduleData()
         {
-            //DateTime from = dtpFrom.Value;
-            //DateTime to = dtpTo.Value;
+            DateTime from = dtpFrom.Value;
+            DateTime to = dtpTo.Value;
 
-            DateTime from = new DateTime(2025, 4, 25);
-            DateTime to = new DateTime(2025, 6, 15);
+            //DateTime from = new DateTime(2025, 4, 25);
+            //DateTime to = new DateTime(2025, 6, 15);
 
             fullDispatchList = DispatchData.GetDispatchByDateRange(from, to);
 
@@ -140,7 +142,7 @@ namespace DispatchManager.Forms
             dgvSchedule.Columns.Clear();
 
             dgvSchedule.DataSource = withWeeklyTotals;
-            dgvSchedule.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            //dgvSchedule.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvSchedule.Refresh();
 
             dgvSchedule.Columns["ID"].Visible = false;
@@ -159,9 +161,15 @@ namespace DispatchManager.Forms
             {
                 if (row.DataBoundItem is DispatchBlankRow)
                 {
-                    row.DefaultCellStyle.BackColor = Color.LightGray;
+                    //row.DefaultCellStyle.BackColor = Color.LightGray;
+                    //row.DefaultCellStyle.Font = new Font(dgvSchedule.Font, FontStyle.Bold);
+                    //row.DefaultCellStyle.ForeColor = Color.DarkSlateGray;
                     row.DefaultCellStyle.Font = new Font(dgvSchedule.Font, FontStyle.Bold);
                     row.DefaultCellStyle.ForeColor = Color.DarkSlateGray;
+
+                    // Change only the Qty cell's background color
+                    int qtyColumnIndex = dgvSchedule.Columns["Qty"].Index;
+                    row.Cells[qtyColumnIndex].Style.BackColor = Color.FromArgb(255, 204, 0); // Gold
                 }
             }
 
@@ -196,6 +204,7 @@ namespace DispatchManager.Forms
             }
 
             lblTotal.Text = $"Total Cabinets: {totalQty:N0}";
+            
         }
 
         //Cell formatting to apply custom styles and blanking logic
