@@ -45,6 +45,19 @@ namespace DispatchManager.Forms
                 null, dgvSchedule, new object[] { true });
 
         }
+        private Dictionary<int, Color> weekColors = new Dictionary<int, Color>();
+        private Color[] palette = new Color[]
+        {
+    Color.LightYellow,
+    Color.LightBlue,
+    Color.LightGreen,
+    Color.MistyRose,
+    Color.LightCyan,
+    Color.Honeydew,
+    Color.Lavender,
+    Color.PeachPuff
+        };
+
         private void LoadScheduleData()
         {
             DateTime from = dtpFrom.Value;
@@ -89,6 +102,13 @@ namespace DispatchManager.Forms
                 withWeeklyTotals.Add(record);
                 weeklyTotal += record.Qty;
                 currentWeek = recordWeek;
+
+                // Assign color for the week if not already assigned
+                if (!weekColors.ContainsKey(recordWeek))
+                {
+                    weekColors[recordWeek] = palette[weekColors.Count % palette.Length];
+                }
+
 
                 // Handle final record
                 bool isLast = (i == groupedList.Count - 1);
@@ -211,45 +231,49 @@ namespace DispatchManager.Forms
                     e.FormattingApplied = true;
                 }
             }
+
+            // Apply week color to "Day" column based on WeekNo
+            if (dgvSchedule.Columns[e.ColumnIndex].Name == "Day")
+            {
+                // Ensure we only apply week color to normal data rows
+                if (row.DataBoundItem is DispatchBlankRow)
+                {
+                    // Force grey styling for blank row Day cell
+                    row.Cells[e.ColumnIndex].Style.BackColor = Color.LightGray;
+                    row.Cells[e.ColumnIndex].Style.SelectionBackColor = Color.LightGray;
+                    row.Cells[e.ColumnIndex].Style.ForeColor = Color.DarkSlateGray;
+                    row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.DarkSlateGray;
+                    return;
+                }
+
+                // Normal row — apply week-based background color
+                var weekObj = row.Cells["WeekNo"].Value;
+                if (weekObj is int week && weekColors.TryGetValue(week, out var color))
+                {
+                    row.Cells[e.ColumnIndex].Style.BackColor = color;
+                    row.Cells[e.ColumnIndex].Style.SelectionBackColor = color;
+                    row.Cells[e.ColumnIndex].Style.ForeColor = Color.Black;
+                    row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.Black;
+                }
+            }
+
+
+            //if (dgvSchedule.Columns[e.ColumnIndex].Name == "Day")
+            //{
+            //    var weekProp = row.Cells["WeekNo"].Value;
+            //    if (weekProp is int week && weekColors.TryGetValue(week, out var color))
+            //    {
+            //        row.Cells[e.ColumnIndex].Style.BackColor = color;
+            //        row.Cells[e.ColumnIndex].Style.SelectionBackColor = color;
+            //        row.Cells[e.ColumnIndex].Style.ForeColor = Color.Black;
+            //        row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.Black;
+            //    }
+            //}
+
+
+
+
         }
-
-        //private void dgvSchedule_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        //{
-        //    var row = dgvSchedule.Rows[e.RowIndex];
-
-        //    if (row.DataBoundItem is DispatchBlankRow)
-        //    {
-        //        string columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
-
-        //        // Blank int or decimal values
-        //        if ((columnName == "WeekNo" || columnName == "JobNo" || columnName == "OrderNumber" || columnName == "Qty" || columnName == "Amount")
-        //            && e.Value is int intVal && intVal <= 0)
-        //        {
-        //            e.Value = "";
-        //            e.FormattingApplied = true;
-        //        }
-
-        //        if (columnName == "Amount" && e.Value is decimal decVal && decVal <= 0)
-        //        {
-        //            e.Value = "";
-        //            e.FormattingApplied = true;
-        //        }
-
-        //        // Blank DispatchDate
-        //        if (columnName == "DispatchDate" && e.Value is DateTime dt && dt == DateTime.MinValue)
-        //        {
-        //            e.Value = "";
-        //            e.FormattingApplied = true;
-        //        }
-
-        //        // Format DispatchDate
-        //        if (dgvSchedule.Columns[e.ColumnIndex].Name == "DispatchDate" && e.Value is DateTime dtValue && dtValue != DateTime.MinValue)
-        //        {
-        //            e.Value = dtValue.ToString("dd-MMM");
-        //            e.FormattingApplied = true;
-        //        }
-        //    }
-        //}
 
         private void FrmViewDispatch_FormClosing(object sender, FormClosingEventArgs e)
         {
