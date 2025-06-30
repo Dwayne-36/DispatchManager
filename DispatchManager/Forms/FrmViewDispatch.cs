@@ -121,6 +121,9 @@ namespace DispatchManager.Forms
             dgvSchedule.Columns["MaterialsOrderedBy"].Visible = false; // Hide ID column
             dgvSchedule.Columns["BenchtopOrderedBy"].Visible = false; // Hide ID column
 
+            dgvSchedule.SelectionChanged += dgvSchedule_SelectionChanged;
+
+
             foreach (DataGridViewColumn column in dgvSchedule.Columns)
             {
                 column.SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -139,17 +142,54 @@ namespace DispatchManager.Forms
                     Console.WriteLine($"Blank row - Qty: {row.Cells["Qty"].Value}, Comment: {row.Cells["Comment"].Value}");
                 }
             }
+            UpdateTotalLabel(dgvSchedule.Rows.Cast<DataGridViewRow>());
 
         }
+        private void dgvSchedule_SelectionChanged(object sender, EventArgs e)
+        {
+            var selectedRows = dgvSchedule.SelectedRows.Cast<DataGridViewRow>()
+                .Where(row => row.DataBoundItem is DispatchRecord && !(row.DataBoundItem is DispatchBlankRow));
 
+            if (selectedRows.Count() > 1)
+            {
+                UpdateTotalLabel(selectedRows);
+            }
+            else
+            {
+                // Use all rows if 1 or 0 selected
+                UpdateTotalLabel(dgvSchedule.Rows.Cast<DataGridViewRow>());
+            }
+        }
+        private void UpdateTotalLabel(IEnumerable<DataGridViewRow> rows)
+        {
+            int totalQty = 0;
+
+            foreach (var row in rows)
+            {
+                if (row.DataBoundItem is DispatchRecord record && !(record is DispatchBlankRow))
+                {
+                    totalQty += record.Qty;
+                }
+            }
+
+            lblTotal.Text = $"Total Cabinets: {totalQty:N0}";
+        }
         private void dgvSchedule_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             var row = dgvSchedule.Rows[e.RowIndex];
+            string columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
 
+            // Format DispatchDate for all rows
+            if (columnName == "DispatchDate" && e.Value is DateTime dtValue && dtValue != DateTime.MinValue)
+            {
+                e.Value = dtValue.ToString("dd-MMM");
+                e.FormattingApplied = true;
+                return; // Optional: skip other logic
+            }
+
+            // Only apply blanking logic to total rows
             if (row.DataBoundItem is DispatchBlankRow)
             {
-                string columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
-
                 // Blank int or decimal values
                 if ((columnName == "WeekNo" || columnName == "JobNo" || columnName == "OrderNumber" || columnName == "Qty" || columnName == "Amount")
                     && e.Value is int intVal && intVal <= 0)
@@ -164,7 +204,7 @@ namespace DispatchManager.Forms
                     e.FormattingApplied = true;
                 }
 
-                // Blank DispatchDate
+                // Blank DispatchDate if it's MinValue
                 if (columnName == "DispatchDate" && e.Value is DateTime dt && dt == DateTime.MinValue)
                 {
                     e.Value = "";
@@ -172,6 +212,44 @@ namespace DispatchManager.Forms
                 }
             }
         }
+
+        //private void dgvSchedule_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        //{
+        //    var row = dgvSchedule.Rows[e.RowIndex];
+
+        //    if (row.DataBoundItem is DispatchBlankRow)
+        //    {
+        //        string columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
+
+        //        // Blank int or decimal values
+        //        if ((columnName == "WeekNo" || columnName == "JobNo" || columnName == "OrderNumber" || columnName == "Qty" || columnName == "Amount")
+        //            && e.Value is int intVal && intVal <= 0)
+        //        {
+        //            e.Value = "";
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        if (columnName == "Amount" && e.Value is decimal decVal && decVal <= 0)
+        //        {
+        //            e.Value = "";
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        // Blank DispatchDate
+        //        if (columnName == "DispatchDate" && e.Value is DateTime dt && dt == DateTime.MinValue)
+        //        {
+        //            e.Value = "";
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        // Format DispatchDate
+        //        if (dgvSchedule.Columns[e.ColumnIndex].Name == "DispatchDate" && e.Value is DateTime dtValue && dtValue != DateTime.MinValue)
+        //        {
+        //            e.Value = dtValue.ToString("dd-MMM");
+        //            e.FormattingApplied = true;
+        //        }
+        //    }
+        //}
 
         private void FrmViewDispatch_FormClosing(object sender, FormClosingEventArgs e)
         {
