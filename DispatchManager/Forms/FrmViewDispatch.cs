@@ -22,6 +22,8 @@ namespace DispatchManager.Forms
             this.dtpFrom.ValueChanged += dtpFrom_ValueChanged;
             this.dtpTo.ValueChanged += dtpTo_ValueChanged;
             this.btnSearch.Click += btnSearch_Click;
+            this.menuEmployeesAddNew.Click += new System.EventHandler(this.menuEmployeesAddNew_Click);
+
 
         }
         private void FrmViewDispatch_Load(object sender, EventArgs e)

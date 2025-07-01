@@ -171,6 +171,7 @@
             this.menuEmployeesAddNew.Name = "menuEmployeesAddNew";
             this.menuEmployeesAddNew.Size = new System.Drawing.Size(180, 22);
             this.menuEmployeesAddNew.Text = "Add New Employee";
+            this.menuEmployeesAddNew.Click += new System.EventHandler(this.menuEmployeesAddNew_Click);
             // 
             // menuEmployeesEdit
             // 

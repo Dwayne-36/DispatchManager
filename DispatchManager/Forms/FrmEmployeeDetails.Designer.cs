@@ -34,7 +34,7 @@
             this.lblInitials = new System.Windows.Forms.Label();
             this.txtEmailWork = new System.Windows.Forms.TextBox();
             this.lblEmailWork = new System.Windows.Forms.Label();
-            this.txtEmailPersonal = new System.Windows.Forms.TextBox();
+            this.txtEmailPrivate = new System.Windows.Forms.TextBox();
             this.lblEmailPrivate = new System.Windows.Forms.Label();
             this.txtPhone = new System.Windows.Forms.TextBox();
             this.lblPhone = new System.Windows.Forms.Label();
@@ -94,12 +94,12 @@
             this.lblEmailWork.TabIndex = 4;
             this.lblEmailWork.Text = "Work Email:";
             // 
-            // txtEmailPersonal
+            // txtEmailPrivate
             // 
-            this.txtEmailPersonal.Location = new System.Drawing.Point(92, 160);
-            this.txtEmailPersonal.Name = "txtEmailPersonal";
-            this.txtEmailPersonal.Size = new System.Drawing.Size(220, 20);
-            this.txtEmailPersonal.TabIndex = 7;
+            this.txtEmailPrivate.Location = new System.Drawing.Point(92, 160);
+            this.txtEmailPrivate.Name = "txtEmailPrivate";
+            this.txtEmailPrivate.Size = new System.Drawing.Size(220, 20);
+            this.txtEmailPrivate.TabIndex = 7;
             // 
             // lblEmailPrivate
             // 
@@ -191,7 +191,7 @@
             this.Controls.Add(this.lblAddress);
             this.Controls.Add(this.txtPhone);
             this.Controls.Add(this.lblPhone);
-            this.Controls.Add(this.txtEmailPersonal);
+            this.Controls.Add(this.txtEmailPrivate);
             this.Controls.Add(this.lblEmailPrivate);
             this.Controls.Add(this.txtEmailWork);
             this.Controls.Add(this.lblEmailWork);
@@ -215,7 +215,7 @@
         private System.Windows.Forms.Label lblInitials;
         private System.Windows.Forms.TextBox txtEmailWork;
         private System.Windows.Forms.Label lblEmailWork;
-        private System.Windows.Forms.TextBox txtEmailPersonal;
+        private System.Windows.Forms.TextBox txtEmailPrivate;
         private System.Windows.Forms.Label lblEmailPrivate;
         private System.Windows.Forms.TextBox txtPhone;
         private System.Windows.Forms.Label lblPhone;
