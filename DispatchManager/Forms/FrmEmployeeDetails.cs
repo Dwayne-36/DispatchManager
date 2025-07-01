@@ -7,9 +7,13 @@ namespace DispatchManager.Forms
 {
     public partial class FrmEmployeeDetails : Form
     {
-        private int? employeeId;
 
-        public FrmEmployeeDetails(int? employeeId = null)
+        //private int? employeeId;
+        private Guid? employeeId;
+
+
+        public FrmEmployeeDetails(Guid? employeeId = null)
+
         {
             InitializeComponent();
             this.employeeId = employeeId;
@@ -23,7 +27,7 @@ namespace DispatchManager.Forms
             }
         }
 
-        private void LoadEmployeeData(int id)
+        private void LoadEmployeeData(Guid id)
         {
             string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connStr))

@@ -47,11 +47,27 @@ namespace DispatchManager.Forms
         {
             if (dgvEmployees.CurrentRow != null)
             {
-                int selectedId = Convert.ToInt32(dgvEmployees.CurrentRow.Cells["ID"].Value);
+                Guid selectedId = (Guid)dgvEmployees.CurrentRow.Cells["ID"].Value;
                 FrmEmployeeDetails frm = new FrmEmployeeDetails(selectedId);
                 frm.ShowDialog();
                 LoadEmployees(); // Refresh after edit
             }
+        }
+
+        private void btnEditSelected_Click_1(object sender, EventArgs e)
+        {
+            if (dgvEmployees.CurrentRow != null)
+            {
+                Guid selectedId = (Guid)dgvEmployees.CurrentRow.Cells["ID"].Value;
+                FrmEmployeeDetails frm = new FrmEmployeeDetails(selectedId);          // Pass selected ID
+                frm.ShowDialog();
+                LoadEmployees(); // Refresh list after editing
+            }
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }
