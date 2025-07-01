@@ -38,7 +38,13 @@
             this.btnSearch = new System.Windows.Forms.Button();
             this.btnNewProject = new System.Windows.Forms.Button();
             this.lblTotal = new System.Windows.Forms.Label();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.menuEmployees = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuEmployeesViewAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuEmployeesAddNew = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuEmployeesEdit = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // dgvSchedule
@@ -56,7 +62,7 @@
             // 
             // dtpFrom
             // 
-            this.dtpFrom.Location = new System.Drawing.Point(97, 15);
+            this.dtpFrom.Location = new System.Drawing.Point(97, 25);
             this.dtpFrom.Name = "dtpFrom";
             this.dtpFrom.Size = new System.Drawing.Size(200, 20);
             this.dtpFrom.TabIndex = 1;
@@ -64,7 +70,7 @@
             // lblFrom
             // 
             this.lblFrom.AutoSize = true;
-            this.lblFrom.Location = new System.Drawing.Point(16, 19);
+            this.lblFrom.Location = new System.Drawing.Point(16, 29);
             this.lblFrom.Name = "lblFrom";
             this.lblFrom.Size = new System.Drawing.Size(66, 13);
             this.lblFrom.TabIndex = 2;
@@ -72,7 +78,7 @@
             // 
             // dtpTo
             // 
-            this.dtpTo.Location = new System.Drawing.Point(97, 42);
+            this.dtpTo.Location = new System.Drawing.Point(97, 52);
             this.dtpTo.Name = "dtpTo";
             this.dtpTo.Size = new System.Drawing.Size(200, 20);
             this.dtpTo.TabIndex = 3;
@@ -80,7 +86,7 @@
             // lblTo
             // 
             this.lblTo.AutoSize = true;
-            this.lblTo.Location = new System.Drawing.Point(26, 46);
+            this.lblTo.Location = new System.Drawing.Point(26, 56);
             this.lblTo.Name = "lblTo";
             this.lblTo.Size = new System.Drawing.Size(56, 13);
             this.lblTo.TabIndex = 4;
@@ -88,7 +94,7 @@
             // 
             // tbSearch
             // 
-            this.tbSearch.Location = new System.Drawing.Point(97, 78);
+            this.tbSearch.Location = new System.Drawing.Point(97, 88);
             this.tbSearch.Name = "tbSearch";
             this.tbSearch.Size = new System.Drawing.Size(200, 20);
             this.tbSearch.TabIndex = 5;
@@ -96,7 +102,7 @@
             // lblSearch
             // 
             this.lblSearch.AutoSize = true;
-            this.lblSearch.Location = new System.Drawing.Point(38, 83);
+            this.lblSearch.Location = new System.Drawing.Point(38, 93);
             this.lblSearch.Name = "lblSearch";
             this.lblSearch.Size = new System.Drawing.Size(44, 13);
             this.lblSearch.TabIndex = 6;
@@ -104,7 +110,7 @@
             // 
             // btnSearch
             // 
-            this.btnSearch.Location = new System.Drawing.Point(304, 77);
+            this.btnSearch.Location = new System.Drawing.Point(304, 87);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(75, 23);
             this.btnSearch.TabIndex = 7;
@@ -114,7 +120,7 @@
             // 
             // btnNewProject
             // 
-            this.btnNewProject.Location = new System.Drawing.Point(499, 15);
+            this.btnNewProject.Location = new System.Drawing.Point(499, 25);
             this.btnNewProject.Name = "btnNewProject";
             this.btnNewProject.Size = new System.Drawing.Size(70, 59);
             this.btnNewProject.TabIndex = 8;
@@ -133,6 +139,45 @@
             this.lblTotal.TabIndex = 10;
             this.lblTotal.Text = "Total";
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuEmployees});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1191, 24);
+            this.menuStrip1.TabIndex = 11;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // menuEmployees
+            // 
+            this.menuEmployees.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuEmployeesViewAll,
+            this.menuEmployeesAddNew,
+            this.menuEmployeesEdit});
+            this.menuEmployees.Name = "menuEmployees";
+            this.menuEmployees.Size = new System.Drawing.Size(76, 20);
+            this.menuEmployees.Text = "Employees";
+            // 
+            // menuEmployeesViewAll
+            // 
+            this.menuEmployeesViewAll.Name = "menuEmployeesViewAll";
+            this.menuEmployeesViewAll.Size = new System.Drawing.Size(180, 22);
+            this.menuEmployeesViewAll.Text = "View All Employees";
+            this.menuEmployeesViewAll.Click += new System.EventHandler(this.menuEmployeesViewAll_Click);
+            // 
+            // menuEmployeesAddNew
+            // 
+            this.menuEmployeesAddNew.Name = "menuEmployeesAddNew";
+            this.menuEmployeesAddNew.Size = new System.Drawing.Size(180, 22);
+            this.menuEmployeesAddNew.Text = "Add New Employee";
+            // 
+            // menuEmployeesEdit
+            // 
+            this.menuEmployeesEdit.Name = "menuEmployeesEdit";
+            this.menuEmployeesEdit.Size = new System.Drawing.Size(180, 22);
+            this.menuEmployeesEdit.Text = "Edit Selected";
+            // 
             // FrmViewDispatch
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -148,9 +193,13 @@
             this.Controls.Add(this.lblFrom);
             this.Controls.Add(this.dtpFrom);
             this.Controls.Add(this.dgvSchedule);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "FrmViewDispatch";
             this.Text = "Haylo View";
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -168,5 +217,10 @@
         private System.Windows.Forms.Button btnSearch;
         private System.Windows.Forms.Button btnNewProject;
         private System.Windows.Forms.Label lblTotal;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem menuEmployees;
+        private System.Windows.Forms.ToolStripMenuItem menuEmployeesViewAll;
+        private System.Windows.Forms.ToolStripMenuItem menuEmployeesAddNew;
+        private System.Windows.Forms.ToolStripMenuItem menuEmployeesEdit;
     }
 }

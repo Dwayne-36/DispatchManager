@@ -57,6 +57,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FrmEmployeeDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FrmEmployeeDetails.Designer.cs">
+      <DependentUpon>FrmEmployeeDetails.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FrmNewProject.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -69,14 +75,26 @@
     <Compile Include="Forms\FrmViewDispatch.Designer.cs">
       <DependentUpon>FrmViewDispatch.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FrmEmployeesList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FrmEmployeesList.Designer.cs">
+      <DependentUpon>FrmEmployeesList.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\DispatchRecord.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Forms\FrmEmployeeDetails.resx">
+      <DependentUpon>FrmEmployeeDetails.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FrmNewProject.resx">
       <DependentUpon>FrmNewProject.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FrmViewDispatch.resx">
       <DependentUpon>FrmViewDispatch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FrmEmployeesList.resx">
+      <DependentUpon>FrmEmployeesList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
