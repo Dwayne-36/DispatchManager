@@ -63,6 +63,12 @@
     <Compile Include="Forms\FrmEmployeeDetails.Designer.cs">
       <DependentUpon>FrmEmployeeDetails.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FrmLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FrmLogin.Designer.cs">
+      <DependentUpon>FrmLogin.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FrmNewProject.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -84,8 +90,12 @@
     <Compile Include="Models\DispatchRecord.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Session.cs" />
     <EmbeddedResource Include="Forms\FrmEmployeeDetails.resx">
       <DependentUpon>FrmEmployeeDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FrmLogin.resx">
+      <DependentUpon>FrmLogin.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FrmNewProject.resx">
       <DependentUpon>FrmNewProject.cs</DependentUpon>
