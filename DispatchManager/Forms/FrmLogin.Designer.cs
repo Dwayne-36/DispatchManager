@@ -89,6 +89,7 @@
             this.Controls.Add(this.txtUsername);
             this.Controls.Add(this.lblUserName);
             this.Name = "FrmLogin";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "FrmLogin";
             this.ResumeLayout(false);
             this.PerformLayout();

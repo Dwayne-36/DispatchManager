@@ -11,5 +11,6 @@ namespace DispatchManager
         public static Guid? CurrentUserId { get; set; }
         public static string CurrentInitials { get; set; }
         public static string CurrentFullName { get; set; }
+        public static string CurrentUsername { get; set; }
     }
 }
