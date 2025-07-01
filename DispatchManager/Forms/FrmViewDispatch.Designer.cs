@@ -41,6 +41,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.menuEmployees = new System.Windows.Forms.ToolStripMenuItem();
             this.menuEmployeesViewAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.lblLoggedInUser = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -158,15 +159,27 @@
             // menuEmployeesViewAll
             // 
             this.menuEmployeesViewAll.Name = "menuEmployeesViewAll";
-            this.menuEmployeesViewAll.Size = new System.Drawing.Size(180, 22);
+            this.menuEmployeesViewAll.Size = new System.Drawing.Size(176, 22);
             this.menuEmployeesViewAll.Text = "View All Employees";
             this.menuEmployeesViewAll.Click += new System.EventHandler(this.menuEmployeesViewAll_Click);
+            // 
+            // lblLoggedInUser
+            // 
+            this.lblLoggedInUser.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblLoggedInUser.AutoSize = true;
+            this.lblLoggedInUser.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblLoggedInUser.Location = new System.Drawing.Point(934, 24);
+            this.lblLoggedInUser.Name = "lblLoggedInUser";
+            this.lblLoggedInUser.Size = new System.Drawing.Size(92, 13);
+            this.lblLoggedInUser.TabIndex = 12;
+            this.lblLoggedInUser.Text = "Logged in as...";
             // 
             // FrmViewDispatch
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1191, 775);
+            this.Controls.Add(this.lblLoggedInUser);
             this.Controls.Add(this.lblTotal);
             this.Controls.Add(this.btnNewProject);
             this.Controls.Add(this.btnSearch);
@@ -204,5 +217,6 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem menuEmployees;
         private System.Windows.Forms.ToolStripMenuItem menuEmployeesViewAll;
+        private System.Windows.Forms.Label lblLoggedInUser;
     }
 }

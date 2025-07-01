@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Diagnostics;
+using DispatchManager;
+
 
 
 namespace DispatchManager.Forms
@@ -23,8 +25,6 @@ namespace DispatchManager.Forms
             this.dtpTo.ValueChanged += dtpTo_ValueChanged;
             this.btnSearch.Click += btnSearch_Click;
             
-
-
         }
         private void FrmViewDispatch_Load(object sender, EventArgs e)
         {
@@ -32,6 +32,7 @@ namespace DispatchManager.Forms
             dtpFrom.Value = Properties.Settings.Default.dtpFromDate;
             dtpTo.Value = Properties.Settings.Default.dtpToDate;
 
+            lblLoggedInUser.Text = $"{Session.CurrentFullName} is logged in";
 
             dgvSchedule.CellFormatting += dgvSchedule_CellFormatting;
             //dgvSchedule.DataError += (s, ev) => { ev.ThrowException = false; };
