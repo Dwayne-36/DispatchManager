@@ -22,7 +22,7 @@ namespace DispatchManager.Forms
             this.dtpFrom.ValueChanged += dtpFrom_ValueChanged;
             this.dtpTo.ValueChanged += dtpTo_ValueChanged;
             this.btnSearch.Click += btnSearch_Click;
-            this.menuEmployeesAddNew.Click += new System.EventHandler(this.menuEmployeesAddNew_Click);
+            
 
 
         }
@@ -393,6 +393,7 @@ namespace DispatchManager.Forms
 
         private void menuEmployeesAddNew_Click(object sender, EventArgs e)
         {
+           
             FrmEmployeeDetails frm = new FrmEmployeeDetails(); // No ID = Add Mode
             frm.ShowDialog();
         }
