@@ -391,18 +391,9 @@ namespace DispatchManager.Forms
             frm.ShowDialog();
         }
 
-        private void menuEmployeesAddNew_Click(object sender, EventArgs e)
-        {
-           
-            FrmEmployeeDetails frm = new FrmEmployeeDetails(); // No ID = Add Mode
-            frm.ShowDialog();
-        }
+       
 
-        private void menuEmployeesEdit_Click(object sender, EventArgs e)
-        {
-            FrmEmployeesList frm = new FrmEmployeesList(editMode: true);
-            frm.ShowDialog();
-        }
+       
     }
 }
 

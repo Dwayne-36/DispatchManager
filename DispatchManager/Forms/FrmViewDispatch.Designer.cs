@@ -41,8 +41,6 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.menuEmployees = new System.Windows.Forms.ToolStripMenuItem();
             this.menuEmployeesViewAll = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuEmployeesAddNew = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuEmployeesEdit = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -152,9 +150,7 @@
             // menuEmployees
             // 
             this.menuEmployees.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuEmployeesViewAll,
-            this.menuEmployeesAddNew,
-            this.menuEmployeesEdit});
+            this.menuEmployeesViewAll});
             this.menuEmployees.Name = "menuEmployees";
             this.menuEmployees.Size = new System.Drawing.Size(76, 20);
             this.menuEmployees.Text = "Employees";
@@ -165,19 +161,6 @@
             this.menuEmployeesViewAll.Size = new System.Drawing.Size(180, 22);
             this.menuEmployeesViewAll.Text = "View All Employees";
             this.menuEmployeesViewAll.Click += new System.EventHandler(this.menuEmployeesViewAll_Click);
-            // 
-            // menuEmployeesAddNew
-            // 
-            this.menuEmployeesAddNew.Name = "menuEmployeesAddNew";
-            this.menuEmployeesAddNew.Size = new System.Drawing.Size(180, 22);
-            this.menuEmployeesAddNew.Text = "Add New Employee";
-            this.menuEmployeesAddNew.Click += new System.EventHandler(this.menuEmployeesAddNew_Click);
-            // 
-            // menuEmployeesEdit
-            // 
-            this.menuEmployeesEdit.Name = "menuEmployeesEdit";
-            this.menuEmployeesEdit.Size = new System.Drawing.Size(180, 22);
-            this.menuEmployeesEdit.Text = "Edit Selected";
             // 
             // FrmViewDispatch
             // 
@@ -221,7 +204,5 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem menuEmployees;
         private System.Windows.Forms.ToolStripMenuItem menuEmployeesViewAll;
-        private System.Windows.Forms.ToolStripMenuItem menuEmployeesAddNew;
-        private System.Windows.Forms.ToolStripMenuItem menuEmployeesEdit;
     }
 }

@@ -69,5 +69,12 @@ namespace DispatchManager.Forms
         {
             this.Close();
         }
+
+        private void btnAddEmployee_Click(object sender, EventArgs e)
+        {
+            FrmEmployeeDetails frm = new FrmEmployeeDetails(); // Add mode
+            frm.ShowDialog();
+            LoadEmployees(); // Refresh after adding
+        }
     }
 }
