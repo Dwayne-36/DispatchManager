@@ -18,6 +18,8 @@ namespace DispatchManager.Forms
     {
         private List<DispatchRecord> fullDispatchList = new List<DispatchRecord>();
         private Dictionary<Guid, Dictionary<string, string>> dispatchColors;
+        private DataGridViewCell lastDoubleClickedCell = null;
+
 
         public FrmViewDispatch()
         {
@@ -28,6 +30,7 @@ namespace DispatchManager.Forms
             this.dtpTo.ValueChanged += dtpTo_ValueChanged;
             this.btnSearch.Click += btnSearch_Click;
             this.dgvSchedule.CellDoubleClick += dgvSchedule_CellDoubleClick;
+
         }
         
         private void FrmViewDispatch_Load(object sender, EventArgs e)
@@ -52,6 +55,8 @@ namespace DispatchManager.Forms
 
             
             dgvSchedule.CellBeginEdit += dgvSchedule_CellBeginEdit;
+            
+
 
 
             // Optional: Apply double buffering to reduce flicker
@@ -71,6 +76,9 @@ namespace DispatchManager.Forms
             var row = dgvSchedule.Rows[e.RowIndex];
             var column = dgvSchedule.Columns[e.ColumnIndex];
             var cell = row.Cells[e.ColumnIndex];
+            // Store the last double-clicked cell for potential future use
+            lastDoubleClickedCell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
 
             if (row.DataBoundItem is DispatchRecord record)
             {
@@ -84,16 +92,15 @@ namespace DispatchManager.Forms
                 else if (columnName == "MaterialsOrdered") colorColumn = "MaterialsOrderedColor";
                 else if (columnName == "ReleasedToFactory") colorColumn = "ReleasedToFactoryColor";
                 else if (columnName == "MainContractor") colorColumn = "MainContractorColor";
-                else if (columnName == "ProjectName") colorColumn = "ProjectNameColor";
                 else if (columnName == "Freight") colorColumn = "FreightColor";
                 else if (columnName == "Amount") colorColumn = "AmountColor";
 
                 Color red = Color.Red;
                 Color green = Color.FromArgb(146, 208, 80);
                 Color white = Color.White;
-                Color orange = Color.FromArgb(255, 140, 0); // Step 4 orange
+                Color orange = Color.FromArgb(255, 140, 0);  // For ReleasedToFactory & MainContractor
+                Color purple = Color.FromArgb(153, 0, 204);  // For Amount
 
-                // 🔸 Special logic for ReleasedToFactory
                 if (columnName == "ReleasedToFactory")
                 {
                     if (string.IsNullOrWhiteSpace(oldValue))
@@ -119,7 +126,6 @@ namespace DispatchManager.Forms
                     cell.Style.SelectionForeColor = Color.Black;
                     SaveInitialsToDispatch(record.ID, columnName, cell.Value?.ToString());
                 }
-                // 🔸 Special logic for MainContractor (Step 4)
                 else if (columnName == "MainContractor")
                 {
                     if (currentColor.ToArgb() == white.ToArgb())
@@ -143,9 +149,45 @@ namespace DispatchManager.Forms
                     cell.Style.SelectionForeColor = Color.Black;
                     // No initials change
                 }
+                else if (columnName == "Freight")
+                {
+                    if (currentColor.ToArgb() == white.ToArgb())
+                    {
+                        cell.Style.BackColor = orange;
+                        SaveCellColorToDatabase(record.ID, colorColumn, $"{orange.R},{orange.G},{orange.B}");
+                    }
+                    else
+                    {
+                        cell.Style.BackColor = white;
+                        SaveCellColorToDatabase(record.ID, colorColumn, "White");
+                    }
+
+                    cell.Style.ForeColor = Color.Black;
+                    cell.Style.SelectionBackColor = cell.Style.BackColor;
+                    cell.Style.SelectionForeColor = Color.Black;
+                }
+                else if (columnName == "Amount")
+                {
+                    if (currentColor.ToArgb() == white.ToArgb())
+                    {
+                        cell.Style.BackColor = purple;
+                        SaveCellColorToDatabase(record.ID, colorColumn, $"{purple.R},{purple.G},{purple.B}");
+                    }
+                    else
+                    {
+                        cell.Style.BackColor = white;
+                        SaveCellColorToDatabase(record.ID, colorColumn, "White");
+                    }
+
+                    cell.Style.ForeColor = Color.Black;
+                    cell.Style.SelectionBackColor = cell.Style.BackColor;
+                    cell.Style.SelectionForeColor = Color.Black;
+                    // ✅ Leave cell.Value alone to keep it user-editable
+                }
+
                 else
                 {
-                    // 🔁 Normal 3-state logic (ProdInput, MaterialsOrdered, etc.)
+                    // Steps 1–2 logic (ProdInput, MaterialsOrdered)
                     if (string.IsNullOrWhiteSpace(oldValue))
                     {
                         cell.Value = initials;
@@ -194,13 +236,154 @@ namespace DispatchManager.Forms
                 else if (colorColumn == "MaterialsOrderedColor") record.MaterialsOrderedColor = colorString;
                 else if (colorColumn == "ReleasedToFactoryColor") record.ReleasedToFactoryColor = colorString;
                 else if (colorColumn == "MainContractorColor") record.MainContractorColor = colorString;
-                else if (colorColumn == "ProjectNameColor") record.ProjectNameColor = colorString;
-                else if (colorColumn == "FreightColor") record.FreightColor = colorString;
+                 else if (colorColumn == "FreightColor") record.FreightColor = colorString;
                 else if (colorColumn == "AmountColor") record.AmountColor = colorString;
 
                 this.BeginInvoke((MethodInvoker)(() => dgvSchedule.InvalidateCell(cell)));
             }
         }
+
+
+
+
+
+        //private void dgvSchedule_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        //{
+        //    if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+
+        //    var row = dgvSchedule.Rows[e.RowIndex];
+        //    var column = dgvSchedule.Columns[e.ColumnIndex];
+        //    var cell = row.Cells[e.ColumnIndex];
+
+        //    if (row.DataBoundItem is DispatchRecord record)
+        //    {
+        //        string columnName = column.Name;
+        //        string initials = Session.CurrentInitials;
+        //        string oldValue = cell.Value?.ToString();
+        //        Color currentColor = cell.Style.BackColor;
+
+        //        string colorColumn = null;
+        //        if (columnName == "ProdInput") colorColumn = "ProdInputColor";
+        //        else if (columnName == "MaterialsOrdered") colorColumn = "MaterialsOrderedColor";
+        //        else if (columnName == "ReleasedToFactory") colorColumn = "ReleasedToFactoryColor";
+        //        else if (columnName == "MainContractor") colorColumn = "MainContractorColor";
+        //        else if (columnName == "ProjectName") colorColumn = "ProjectNameColor";
+        //        else if (columnName == "Freight") colorColumn = "FreightColor";
+        //        else if (columnName == "Amount") colorColumn = "AmountColor";
+
+        //        Color red = Color.Red;
+        //        Color green = Color.FromArgb(146, 208, 80);
+        //        Color white = Color.White;
+        //        Color orange = Color.FromArgb(255, 140, 0); // Step 4 orange
+
+        //        // 🔸 Special logic for ReleasedToFactory
+        //        if (columnName == "ReleasedToFactory")
+        //        {
+        //            if (string.IsNullOrWhiteSpace(oldValue))
+        //            {
+        //                cell.Value = "REL";
+        //                cell.Style.BackColor = white;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{white.R},{white.G},{white.B}");
+        //            }
+        //            else if (oldValue == "REL" && currentColor.ToArgb() == white.ToArgb())
+        //            {
+        //                cell.Style.BackColor = orange;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{orange.R},{orange.G},{orange.B}");
+        //            }
+        //            else
+        //            {
+        //                cell.Value = "";
+        //                cell.Style.BackColor = white;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
+        //            }
+
+        //            cell.Style.ForeColor = Color.Black;
+        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
+        //            cell.Style.SelectionForeColor = Color.Black;
+        //            SaveInitialsToDispatch(record.ID, columnName, cell.Value?.ToString());
+        //        }
+        //        // 🔸 Special logic for MainContractor (Step 4)
+        //        else if (columnName == "MainContractor")
+        //        {
+        //            if (currentColor.ToArgb() == white.ToArgb())
+        //            {
+        //                cell.Style.BackColor = orange;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{orange.R},{orange.G},{orange.B}");
+        //            }
+        //            else if (currentColor.ToArgb() == orange.ToArgb())
+        //            {
+        //                cell.Style.BackColor = green;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
+        //            }
+        //            else
+        //            {
+        //                cell.Style.BackColor = white;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
+        //            }
+
+        //            cell.Style.ForeColor = Color.Black;
+        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
+        //            cell.Style.SelectionForeColor = Color.Black;
+        //            // No initials change
+        //        }
+        //        else
+        //        {
+        //            // 🔁 Normal 3-state logic (ProdInput, MaterialsOrdered, etc.)
+        //            if (string.IsNullOrWhiteSpace(oldValue))
+        //            {
+        //                cell.Value = initials;
+        //                cell.Style.BackColor = red;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{red.R},{red.G},{red.B}");
+        //            }
+        //            else if (oldValue == initials)
+        //            {
+        //                if (currentColor.ToArgb() == red.ToArgb())
+        //                {
+        //                    cell.Style.BackColor = green;
+        //                    SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
+        //                }
+        //                else
+        //                {
+        //                    cell.Value = "";
+        //                    cell.Style.BackColor = white;
+        //                    SaveCellColorToDatabase(record.ID, colorColumn, "White");
+        //                }
+        //            }
+        //            else
+        //            {
+        //                if (currentColor.ToArgb() == red.ToArgb())
+        //                {
+        //                    cell.Value = initials;
+        //                    cell.Style.BackColor = green;
+        //                    SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
+        //                }
+        //                else
+        //                {
+        //                    cell.Value = "";
+        //                    cell.Style.BackColor = white;
+        //                    SaveCellColorToDatabase(record.ID, colorColumn, "White");
+        //                }
+        //            }
+
+        //            cell.Style.ForeColor = Color.Black;
+        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
+        //            cell.Style.SelectionForeColor = Color.Black;
+        //            SaveInitialsToDispatch(record.ID, columnName, cell.Value?.ToString());
+        //        }
+
+        //        // ✅ Update in-memory record color
+        //        string colorString = cell.Style.BackColor == white ? null : $"{cell.Style.BackColor.R},{cell.Style.BackColor.G},{cell.Style.BackColor.B}";
+        //        if (colorColumn == "ProdInputColor") record.ProdInputColor = colorString;
+        //        else if (colorColumn == "MaterialsOrderedColor") record.MaterialsOrderedColor = colorString;
+        //        else if (colorColumn == "ReleasedToFactoryColor") record.ReleasedToFactoryColor = colorString;
+        //        else if (colorColumn == "MainContractorColor") record.MainContractorColor = colorString;
+        //        else if (colorColumn == "ProjectNameColor") record.ProjectNameColor = colorString;
+        //        else if (colorColumn == "FreightColor") record.FreightColor = colorString;
+        //        else if (colorColumn == "AmountColor") record.AmountColor = colorString;
+
+        //        this.BeginInvoke((MethodInvoker)(() => dgvSchedule.InvalidateCell(cell)));
+        //    }
+        //}
 
 
         private void SaveCellColorToDatabase(Guid linkId, string columnName, string colorValue)
@@ -298,7 +481,6 @@ namespace DispatchManager.Forms
                     record.MaterialsOrderedColor = cellColours.TryGetValue("MaterialsOrderedColor", out string v2) ? v2 : null;
                     record.ReleasedToFactoryColor = cellColours.TryGetValue("ReleasedToFactoryColor", out string v3) ? v3 : null;
                     record.MainContractorColor = cellColours.TryGetValue("MainContractorColor", out string v4) ? v4 : null;
-                    record.ProjectNameColor = cellColours.TryGetValue("ProjectNameColor", out string v5) ? v5 : null;
                     record.FreightColor = cellColours.TryGetValue("FreightColor", out string v6) ? v6 : null;
                     record.AmountColor = cellColours.TryGetValue("AmountColor", out string v7) ? v7 : null;
                 }
@@ -489,8 +671,6 @@ namespace DispatchManager.Forms
                     colorValue = rec.ReleasedToFactoryColor;
                 else if (columnName == "MainContractor")
                     colorValue = rec.MainContractorColor;
-                else if (columnName == "ProjectName")
-                    colorValue = rec.ProjectNameColor;
                 else if (columnName == "Freight")
                     colorValue = rec.FreightColor;
                 else if (columnName == "Amount")
@@ -670,14 +850,42 @@ namespace DispatchManager.Forms
             FrmEmployeesList frm = new FrmEmployeesList();
             frm.ShowDialog();
         }
+        //private void dgvSchedule_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        //{
+        //    var columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
+
+        //    // Cancel edit mode for the custom-handled columns
+        //    if (columnName == "ProdInput" || columnName == "MaterialsOrdered" || columnName == "ReleasedToFactory" || columnName == "MainContractor" || columnName == "Amount" || columnName == "Freight")
+        //    {
+        //        e.Cancel = true;
+        //    }
+        //}
         private void dgvSchedule_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
+            var cell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
             var columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
 
-            // Cancel edit mode for the custom-handled columns
-            if (columnName == "ProdInput" || columnName == "MaterialsOrdered" || columnName == "ReleasedToFactory" || columnName == "MainContractor")
+            bool isCustomColumn = columnName == "ProdInput"
+                               || columnName == "MaterialsOrdered"
+                               || columnName == "ReleasedToFactory"
+                               || columnName == "MainContractor";
+
+            bool isColorClickOnlyColumn = columnName == "Freight"
+                                       || columnName == "Amount";
+
+            if (isCustomColumn)
             {
+                // Fully block editing
                 e.Cancel = true;
+            }
+            else if (isColorClickOnlyColumn)
+            {
+                // Block editing only on the double-click
+                if (lastDoubleClickedCell == cell)
+                {
+                    e.Cancel = true;
+                    lastDoubleClickedCell = null; // reset after blocking
+                }
             }
         }
 
