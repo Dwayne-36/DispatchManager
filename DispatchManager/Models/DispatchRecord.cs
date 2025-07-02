@@ -35,6 +35,13 @@ namespace DispatchManager.Models
         public int OrderNumber { get; set; }
         public DateTime DateOrdered { get; set; }
         public string LeadTime { get; set; }
+        public string ProdInputColor { get; set; }
+        public string MaterialsOrderedColor { get; set; }
+        public string ReleasedtoFactoryColor { get; set; }
+        public string MainContractorColor { get; set; }
+        public string ProjectNameColor { get; set; }
+        public string FreightColor { get; set; }
+        public string AmountColor { get; set; }
 
     }
     public class DispatchBlankRow : DispatchRecord

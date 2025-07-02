@@ -193,6 +193,7 @@
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "FrmViewDispatch";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Haylo View";
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).EndInit();
             this.menuStrip1.ResumeLayout(false);

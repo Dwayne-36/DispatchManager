@@ -87,6 +87,7 @@
     <Compile Include="Forms\FrmEmployeesList.Designer.cs">
       <DependentUpon>FrmEmployeesList.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\DispatchColourRecord.cs" />
     <Compile Include="Models\DispatchRecord.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

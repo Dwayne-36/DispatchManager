@@ -82,6 +82,40 @@ namespace DispatchManager.DataAccess
             return records;
         }
 
+        public static Dictionary<Guid, Dictionary<string, string>> GetDispatchColours()
+        {
+            var dispatchColors = new Dictionary<Guid, Dictionary<string, string>>();
+
+            string query = "SELECT * FROM DispatchColours";
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Guid linkId = reader["LinkID"] != DBNull.Value ? (Guid)reader["LinkID"] : Guid.Empty;
+                        if (!dispatchColors.ContainsKey(linkId))
+                            dispatchColors[linkId] = new Dictionary<string, string>();
+
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            string columnName = reader.GetName(i);
+                            if (columnName != "LinkID")
+                            {
+                                dispatchColors[linkId][columnName] = reader[columnName]?.ToString();
+                            }
+                        }
+                    }
+                }
+            }
+
+            return dispatchColors;
+        }
+
+
         private static T SafeRead<T>(SqlDataReader reader, string column)
         {
             object value = reader[column];
