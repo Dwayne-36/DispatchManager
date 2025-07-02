@@ -84,33 +84,106 @@ namespace DispatchManager.Forms
                 else if (columnName == "Freight") colorColumn = "FreightColor";
                 else if (columnName == "Amount") colorColumn = "AmountColor";
 
-
-                // Toggle initials and background color
                 if (oldValue == initials)
                 {
+                    // ✅ Clear initials and color
                     cell.Value = "";
                     cell.Style.BackColor = Color.White;
 
-                    // Save white color only if it's a valid column
                     if (colorColumn != null)
+                    {
                         SaveCellColorToDatabase(record.ID, colorColumn, "White");
+
+                        // ✅ Clear from in-memory object
+                        if (colorColumn == "ProdInputColor") record.ProdInputColor = null;
+                        else if (colorColumn == "MaterialsOrderedColour") record.MaterialsOrderedColor = null;
+                        else if (colorColumn == "RelesedtoFactoryColour") record.ReleasedtoFactoryColor = null;
+                        else if (colorColumn == "MainContractorColor") record.MainContractorColor = null;
+                        else if (colorColumn == "ProjectNameColour") record.ProjectNameColor = null;
+                        else if (colorColumn == "FreightColor") record.FreightColor = null;
+                        else if (colorColumn == "AmountColor") record.AmountColor = null;
+                    }
                 }
                 else
                 {
+                    // ✅ Set initials and cycle color
                     cell.Value = initials;
-
-                    // 🔁 First click: Red, second click: Green
                     Color newColor = oldValue == "" ? Color.Red : Color.FromArgb(146, 208, 80);
                     cell.Style.BackColor = newColor;
 
                     if (colorColumn != null)
-                        SaveCellColorToDatabase(record.ID, colorColumn, $"{newColor.R},{newColor.G},{newColor.B}");
+                    {
+                        string colorString = $"{newColor.R},{newColor.G},{newColor.B}";
+                        SaveCellColorToDatabase(record.ID, colorColumn, colorString);
+
+                        // ✅ Update in-memory object with new color
+                        if (colorColumn == "ProdInputColor") record.ProdInputColor = colorString;
+                        else if (colorColumn == "MaterialsOrderedColour") record.MaterialsOrderedColor = colorString;
+                        else if (colorColumn == "RelesedtoFactoryColour") record.ReleasedtoFactoryColor = colorString;
+                        else if (colorColumn == "MainContractorColor") record.MainContractorColor = colorString;
+                        else if (colorColumn == "ProjectNameColour") record.ProjectNameColor = colorString;
+                        else if (colorColumn == "FreightColor") record.FreightColor = colorString;
+                        else if (colorColumn == "AmountColor") record.AmountColor = colorString;
+                    }
                 }
 
                 // ✅ Always update initials in Dispatch table
                 SaveInitialsToDispatch(record.ID, columnName, cell.Value?.ToString());
             }
         }
+
+
+        //private void dgvSchedule_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        //{
+        //    if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+
+        //    var row = dgvSchedule.Rows[e.RowIndex];
+        //    var column = dgvSchedule.Columns[e.ColumnIndex];
+        //    var cell = row.Cells[e.ColumnIndex];
+
+        //    if (row.DataBoundItem is DispatchRecord record)
+        //    {
+        //        string columnName = column.Name;
+        //        string initials = Session.CurrentInitials;
+        //        string oldValue = cell.Value?.ToString();
+
+        //        // ✅ Map to matching color column name in DispatchColours table
+        //        string colorColumn = null;
+        //        if (columnName == "ProdInput") colorColumn = "ProdInputColor";
+        //        else if (columnName == "MaterialsOrdered") colorColumn = "MaterialsOrderedColour";
+        //        else if (columnName == "ReleasedtoFactory") colorColumn = "RelesedtoFactoryColour";
+        //        else if (columnName == "MainContractor") colorColumn = "MainContractorColor";
+        //        else if (columnName == "ProjectName") colorColumn = "ProjectNameColour";
+        //        else if (columnName == "Freight") colorColumn = "FreightColor";
+        //        else if (columnName == "Amount") colorColumn = "AmountColor";
+
+
+        //        // Toggle initials and background color
+        //        if (oldValue == initials)
+        //        {
+        //            cell.Value = "";
+        //            cell.Style.BackColor = Color.White;
+
+        //            // Save white color only if it's a valid column
+        //            if (colorColumn != null)
+        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
+        //        }
+        //        else
+        //        {
+        //            cell.Value = initials;
+
+        //            // 🔁 First click: Red, second click: Green
+        //            Color newColor = oldValue == "" ? Color.Red : Color.FromArgb(146, 208, 80);
+        //            cell.Style.BackColor = newColor;
+
+        //            if (colorColumn != null)
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{newColor.R},{newColor.G},{newColor.B}");
+        //        }
+
+        //        // ✅ Always update initials in Dispatch table
+        //        SaveInitialsToDispatch(record.ID, columnName, cell.Value?.ToString());
+        //    }
+        //}
 
 
         private void SaveCellColorToDatabase(Guid linkId, string columnName, string colorValue)
