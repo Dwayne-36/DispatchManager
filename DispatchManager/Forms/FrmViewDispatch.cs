@@ -73,8 +73,9 @@ namespace DispatchManager.Forms
                 string columnName = column.Name;
                 string initials = Session.CurrentInitials;
                 string oldValue = cell.Value?.ToString();
+                Color currentColor = cell.Style.BackColor;
 
-                // ✅ Map to matching color column name in DispatchColours table
+                // ✅ Map to color column
                 string colorColumn = null;
                 if (columnName == "ProdInput") colorColumn = "ProdInputColor";
                 else if (columnName == "MaterialsOrdered") colorColumn = "MaterialsOrderedColour";
@@ -84,53 +85,145 @@ namespace DispatchManager.Forms
                 else if (columnName == "Freight") colorColumn = "FreightColor";
                 else if (columnName == "Amount") colorColumn = "AmountColor";
 
-                if (oldValue == initials)
+                Color red = Color.Red;
+                Color green = Color.FromArgb(146, 208, 80);
+                Color white = Color.White;
+
+                // ✅ Apply 3-state logic
+                if (string.IsNullOrWhiteSpace(oldValue))
                 {
-                    // ✅ Clear initials and color
-                    cell.Value = "";
-                    cell.Style.BackColor = Color.White;
-
-                    if (colorColumn != null)
+                    // 1. Empty → RED
+                    cell.Value = initials;
+                    cell.Style.BackColor = red;
+                    SaveCellColorToDatabase(record.ID, colorColumn, $"{red.R},{red.G},{red.B}");
+                }
+                else if (oldValue == initials)
+                {
+                    if (currentColor.ToArgb() == red.ToArgb())
                     {
+                        // 2. Red + same initials → GREEN
+                        cell.Style.BackColor = green;
+                        SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
+                    }
+                    else
+                    {
+                        // 3. Green + same initials → CLEAR
+                        cell.Value = "";
+                        cell.Style.BackColor = white;
                         SaveCellColorToDatabase(record.ID, colorColumn, "White");
-
-                        // ✅ Clear from in-memory object
-                        if (colorColumn == "ProdInputColor") record.ProdInputColor = null;
-                        else if (colorColumn == "MaterialsOrderedColour") record.MaterialsOrderedColor = null;
-                        else if (colorColumn == "RelesedtoFactoryColour") record.ReleasedtoFactoryColor = null;
-                        else if (colorColumn == "MainContractorColor") record.MainContractorColor = null;
-                        else if (colorColumn == "ProjectNameColour") record.ProjectNameColor = null;
-                        else if (colorColumn == "FreightColor") record.FreightColor = null;
-                        else if (colorColumn == "AmountColor") record.AmountColor = null;
                     }
                 }
                 else
                 {
-                    // ✅ Set initials and cycle color
-                    cell.Value = initials;
-                    Color newColor = oldValue == "" ? Color.Red : Color.FromArgb(146, 208, 80);
-                    cell.Style.BackColor = newColor;
-
-                    if (colorColumn != null)
+                    if (currentColor.ToArgb() == red.ToArgb())
                     {
-                        string colorString = $"{newColor.R},{newColor.G},{newColor.B}";
-                        SaveCellColorToDatabase(record.ID, colorColumn, colorString);
-
-                        // ✅ Update in-memory object with new color
-                        if (colorColumn == "ProdInputColor") record.ProdInputColor = colorString;
-                        else if (colorColumn == "MaterialsOrderedColour") record.MaterialsOrderedColor = colorString;
-                        else if (colorColumn == "RelesedtoFactoryColour") record.ReleasedtoFactoryColor = colorString;
-                        else if (colorColumn == "MainContractorColor") record.MainContractorColor = colorString;
-                        else if (colorColumn == "ProjectNameColour") record.ProjectNameColor = colorString;
-                        else if (colorColumn == "FreightColor") record.FreightColor = colorString;
-                        else if (colorColumn == "AmountColor") record.AmountColor = colorString;
+                        // 4. Red + different initials → GREEN + overwrite
+                        cell.Value = initials;
+                        cell.Style.BackColor = green;
+                        SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
+                    }
+                    else
+                    {
+                        // 5. Green + different initials → CLEAR
+                        cell.Value = "";
+                        cell.Style.BackColor = white;
+                        SaveCellColorToDatabase(record.ID, colorColumn, "White");
                     }
                 }
 
-                // ✅ Always update initials in Dispatch table
+                // ✅ Update initials in Dispatch table
                 SaveInitialsToDispatch(record.ID, columnName, cell.Value?.ToString());
+
+                // ✅ Update in-memory DispatchRecord color property
+                if (colorColumn != null)
+                {
+                    string colorString = cell.Style.BackColor == white ? null : $"{cell.Style.BackColor.R},{cell.Style.BackColor.G},{cell.Style.BackColor.B}";
+                    switch (colorColumn)
+                    {
+                        case "ProdInputColor": record.ProdInputColor = colorString; break;
+                        case "MaterialsOrderedColour": record.MaterialsOrderedColor = colorString; break;
+                        case "RelesedtoFactoryColour": record.ReleasedtoFactoryColor = colorString; break;
+                        case "MainContractorColor": record.MainContractorColor = colorString; break;
+                        case "ProjectNameColour": record.ProjectNameColor = colorString; break;
+                        case "FreightColor": record.FreightColor = colorString; break;
+                        case "AmountColor": record.AmountColor = colorString; break;
+                    }
+                }
             }
         }
+
+
+        //private void dgvSchedule_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        //{
+        //    if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+
+        //    var row = dgvSchedule.Rows[e.RowIndex];
+        //    var column = dgvSchedule.Columns[e.ColumnIndex];
+        //    var cell = row.Cells[e.ColumnIndex];
+
+        //    if (row.DataBoundItem is DispatchRecord record)
+        //    {
+        //        string columnName = column.Name;
+        //        string initials = Session.CurrentInitials;
+        //        string oldValue = cell.Value?.ToString();
+
+        //        // ✅ Map to matching color column name in DispatchColours table
+        //        string colorColumn = null;
+        //        if (columnName == "ProdInput") colorColumn = "ProdInputColor";
+        //        else if (columnName == "MaterialsOrdered") colorColumn = "MaterialsOrderedColour";
+        //        else if (columnName == "ReleasedtoFactory") colorColumn = "RelesedtoFactoryColour";
+        //        else if (columnName == "MainContractor") colorColumn = "MainContractorColor";
+        //        else if (columnName == "ProjectName") colorColumn = "ProjectNameColour";
+        //        else if (columnName == "Freight") colorColumn = "FreightColor";
+        //        else if (columnName == "Amount") colorColumn = "AmountColor";
+
+        //        if (oldValue == initials)
+        //        {
+        //            // ✅ Clear initials and color
+        //            cell.Value = "";
+        //            cell.Style.BackColor = Color.White;
+
+        //            if (colorColumn != null)
+        //            {
+        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
+
+        //                // ✅ Clear from in-memory object
+        //                if (colorColumn == "ProdInputColor") record.ProdInputColor = null;
+        //                else if (colorColumn == "MaterialsOrderedColour") record.MaterialsOrderedColor = null;
+        //                else if (colorColumn == "RelesedtoFactoryColour") record.ReleasedtoFactoryColor = null;
+        //                else if (colorColumn == "MainContractorColor") record.MainContractorColor = null;
+        //                else if (colorColumn == "ProjectNameColour") record.ProjectNameColor = null;
+        //                else if (colorColumn == "FreightColor") record.FreightColor = null;
+        //                else if (colorColumn == "AmountColor") record.AmountColor = null;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            // ✅ Set initials and cycle color
+        //            cell.Value = initials;
+        //            Color newColor = oldValue == "" ? Color.Red : Color.FromArgb(146, 208, 80);
+        //            cell.Style.BackColor = newColor;
+
+        //            if (colorColumn != null)
+        //            {
+        //                string colorString = $"{newColor.R},{newColor.G},{newColor.B}";
+        //                SaveCellColorToDatabase(record.ID, colorColumn, colorString);
+
+        //                // ✅ Update in-memory object with new color
+        //                if (colorColumn == "ProdInputColor") record.ProdInputColor = colorString;
+        //                else if (colorColumn == "MaterialsOrderedColour") record.MaterialsOrderedColor = colorString;
+        //                else if (colorColumn == "RelesedtoFactoryColour") record.ReleasedtoFactoryColor = colorString;
+        //                else if (colorColumn == "MainContractorColor") record.MainContractorColor = colorString;
+        //                else if (colorColumn == "ProjectNameColour") record.ProjectNameColor = colorString;
+        //                else if (colorColumn == "FreightColor") record.FreightColor = colorString;
+        //                else if (colorColumn == "AmountColor") record.AmountColor = colorString;
+        //            }
+        //        }
+
+        //        // ✅ Always update initials in Dispatch table
+        //        SaveInitialsToDispatch(record.ID, columnName, cell.Value?.ToString());
+        //    }
+        //}
 
 
         //private void dgvSchedule_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
