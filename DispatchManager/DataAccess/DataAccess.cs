@@ -45,7 +45,7 @@ namespace DispatchManager.DataAccess
                                 JobNo = SafeRead<int>(reader, "JobNo"),
                                 ProdInput = SafeRead<string>(reader, "ProdInput"),
                                 MaterialsOrdered = SafeRead<string>(reader, "MaterialsOrdered"),
-                                ReleasedToFactory = SafeRead<string>(reader, "ReleasedtoFactory"),
+                                ReleasedToFactory = SafeRead<string>(reader, "ReleasedToFactory"),
                                 MainContractor = SafeRead<string>(reader, "MainContractor"),
                                 ProjectName = SafeRead<string>(reader, "ProjectName"),
                                 ProjectColour = SafeRead<string>(reader, "ProjectColour"),

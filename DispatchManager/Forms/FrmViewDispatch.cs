@@ -79,10 +79,10 @@ namespace DispatchManager.Forms
                 // ✅ Map to color column
                 string colorColumn = null;
                 if (columnName == "ProdInput") colorColumn = "ProdInputColor";
-                else if (columnName == "MaterialsOrdered") colorColumn = "MaterialsOrderedColour";
-                else if (columnName == "ReleasedtoFactory") colorColumn = "RelesedtoFactoryColour";
+                else if (columnName == "MaterialsOrdered") colorColumn = "MaterialsOrderedColor";
+                else if (columnName == "ReleasedToFactory") colorColumn = "ReleasedToFactoryColor";
                 else if (columnName == "MainContractor") colorColumn = "MainContractorColor";
-                else if (columnName == "ProjectName") colorColumn = "ProjectNameColour";
+                else if (columnName == "ProjectName") colorColumn = "ProjectNameColor";
                 else if (columnName == "Freight") colorColumn = "FreightColor";
                 else if (columnName == "Amount") colorColumn = "AmountColor";
 
@@ -148,10 +148,10 @@ namespace DispatchManager.Forms
                 // ✅ Update in-memory record color
                 string colorString = cell.Style.BackColor == white ? null : $"{cell.Style.BackColor.R},{cell.Style.BackColor.G},{cell.Style.BackColor.B}";
                 if (colorColumn == "ProdInputColor") record.ProdInputColor = colorString;
-                else if (colorColumn == "MaterialsOrderedColour") record.MaterialsOrderedColor = colorString;
-                else if (colorColumn == "RelesedtoFactoryColour") record.ReleasedtoFactoryColor = colorString;
+                else if (colorColumn == "MaterialsOrderedColor") record.MaterialsOrderedColor = colorString;
+                else if (colorColumn == "ReleasedToFactoryColor") record.ReleasedToFactoryColor = colorString;
                 else if (colorColumn == "MainContractorColor") record.MainContractorColor = colorString;
-                else if (colorColumn == "ProjectNameColour") record.ProjectNameColor = colorString;
+                else if (colorColumn == "ProjectNameColor") record.ProjectNameColor = colorString;
                 else if (colorColumn == "FreightColor") record.FreightColor = colorString;
                 else if (colorColumn == "AmountColor") record.AmountColor = colorString;
 
@@ -159,100 +159,6 @@ namespace DispatchManager.Forms
                 this.BeginInvoke((MethodInvoker)(() => dgvSchedule.InvalidateCell(cell)));
             }
         }
-
-
-        //private void dgvSchedule_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        //{
-        //    if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
-
-        //    var row = dgvSchedule.Rows[e.RowIndex];
-        //    var column = dgvSchedule.Columns[e.ColumnIndex];
-        //    var cell = row.Cells[e.ColumnIndex];
-
-        //    if (row.DataBoundItem is DispatchRecord record)
-        //    {
-        //        string columnName = column.Name;
-        //        string initials = Session.CurrentInitials;
-        //        string oldValue = cell.Value?.ToString();
-        //        Color currentColor = cell.Style.BackColor;
-
-        //        // ✅ Map to color column
-        //        string colorColumn = null;
-        //        if (columnName == "ProdInput") colorColumn = "ProdInputColor";
-        //        else if (columnName == "MaterialsOrdered") colorColumn = "MaterialsOrderedColour";
-        //        else if (columnName == "ReleasedtoFactory") colorColumn = "RelesedtoFactoryColour";
-        //        else if (columnName == "MainContractor") colorColumn = "MainContractorColor";
-        //        else if (columnName == "ProjectName") colorColumn = "ProjectNameColour";
-        //        else if (columnName == "Freight") colorColumn = "FreightColor";
-        //        else if (columnName == "Amount") colorColumn = "AmountColor";
-
-        //        Color red = Color.Red;
-        //        Color green = Color.FromArgb(146, 208, 80);
-        //        Color white = Color.White;
-
-        //        // ✅ Apply 3-state logic
-        //        if (string.IsNullOrWhiteSpace(oldValue))
-        //        {
-        //            // 1. Empty → RED
-        //            cell.Value = initials;
-        //            cell.Style.BackColor = red;
-        //            SaveCellColorToDatabase(record.ID, colorColumn, $"{red.R},{red.G},{red.B}");
-        //        }
-        //        else if (oldValue == initials)
-        //        {
-        //            if (currentColor.ToArgb() == red.ToArgb())
-        //            {
-        //                // 2. Red + same initials → GREEN
-        //                cell.Style.BackColor = green;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
-        //            }
-        //            else
-        //            {
-        //                // 3. Green + same initials → CLEAR
-        //                cell.Value = "";
-        //                cell.Style.BackColor = white;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if (currentColor.ToArgb() == red.ToArgb())
-        //            {
-        //                // 4. Red + different initials → GREEN + overwrite
-        //                cell.Value = initials;
-        //                cell.Style.BackColor = green;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
-        //            }
-        //            else
-        //            {
-        //                // 5. Green + different initials → CLEAR
-        //                cell.Value = "";
-        //                cell.Style.BackColor = white;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
-        //            }
-        //        }
-
-        //        // ✅ Update initials in Dispatch table
-        //        SaveInitialsToDispatch(record.ID, columnName, cell.Value?.ToString());
-
-        //        // ✅ Update in-memory DispatchRecord color property
-        //        if (colorColumn != null)
-        //        {
-        //            string colorString = cell.Style.BackColor == white ? null : $"{cell.Style.BackColor.R},{cell.Style.BackColor.G},{cell.Style.BackColor.B}";
-        //            switch (colorColumn)
-        //            {
-        //                case "ProdInputColor": record.ProdInputColor = colorString; break;
-        //                case "MaterialsOrderedColour": record.MaterialsOrderedColor = colorString; break;
-        //                case "RelesedtoFactoryColour": record.ReleasedtoFactoryColor = colorString; break;
-        //                case "MainContractorColor": record.MainContractorColor = colorString; break;
-        //                case "ProjectNameColour": record.ProjectNameColor = colorString; break;
-        //                case "FreightColor": record.FreightColor = colorString; break;
-        //                case "AmountColor": record.AmountColor = colorString; break;
-        //            }
-        //        }
-        //    }
-        //}
-
 
         private void SaveCellColorToDatabase(Guid linkId, string columnName, string colorValue)
         {
@@ -306,50 +212,6 @@ namespace DispatchManager.Forms
             }
         }
 
-
-
-        //private void dgvSchedule_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        //{
-        //    if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
-
-        //    DataGridViewCell cell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
-        //    string columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
-
-        //    if (columnName == "ProdInput") // Change this later to support more columns
-        //    {
-        //        var row = dgvSchedule.Rows[e.RowIndex];
-        //        if (row.DataBoundItem is DispatchRecord record)
-        //        {
-        //            string currentValue = cell.Value?.ToString();
-        //            Color currentColor = cell.Style.BackColor;
-
-        //            if (!string.IsNullOrEmpty(currentValue) && currentValue != Session.CurrentInitials)
-        //            {
-        //                // Step 1: Clear unrelated text and reset color
-        //                cell.Value = null;
-        //                cell.Style.BackColor = dgvSchedule.DefaultCellStyle.BackColor;
-        //            }
-        //            else if (string.IsNullOrEmpty(currentValue))
-        //            {
-        //                // Step 2: Add initials, mark as red
-        //                cell.Value = Session.CurrentInitials;
-        //                cell.Style.BackColor = Color.FromArgb(255, 0, 0);
-        //            }
-        //            else if (currentValue == Session.CurrentInitials && currentColor == Color.FromArgb(255, 0, 0))
-        //            {
-        //                // Step 3: Confirm with green
-        //                cell.Style.BackColor = Color.FromArgb(146, 208, 80);
-        //            }
-        //            else if (currentValue == Session.CurrentInitials && currentColor == Color.FromArgb(146, 208, 80))
-        //            {
-        //                // Step 4: Undo everything
-        //                cell.Value = null;
-        //                cell.Style.BackColor = dgvSchedule.DefaultCellStyle.BackColor;
-        //            }
-        //        }
-        //    }
-        //}
-
         private void LoadScheduleData()
         {
             DateTime from = dtpFrom.Value;
@@ -391,7 +253,7 @@ namespace DispatchManager.Forms
                 {
                     record.ProdInputColor = cellColours.TryGetValue("ProdInputColor", out string v1) ? v1 : null;
                     record.MaterialsOrderedColor = cellColours.TryGetValue("MaterialsOrderedColor", out string v2) ? v2 : null;
-                    record.ReleasedtoFactoryColor = cellColours.TryGetValue("ReleasedtoFactoryColor", out string v3) ? v3 : null;
+                    record.ReleasedToFactoryColor = cellColours.TryGetValue("ReleasedToFactoryColor", out string v3) ? v3 : null;
                     record.MainContractorColor = cellColours.TryGetValue("MainContractorColor", out string v4) ? v4 : null;
                     record.ProjectNameColor = cellColours.TryGetValue("ProjectNameColor", out string v5) ? v5 : null;
                     record.FreightColor = cellColours.TryGetValue("FreightColor", out string v6) ? v6 : null;
@@ -471,7 +333,7 @@ namespace DispatchManager.Forms
             }
 
             // ✅ Disable editing for toggleable double-click cells
-            string[] toggleColumns = { "ProdInput", "MaterialsOrdered", "ReleasedtoFactory" };
+            string[] toggleColumns = { "ProdInput", "MaterialsOrdered", "ReleasedToFactory" };
             foreach (string colName in toggleColumns)
             {
                 if (dgvSchedule.Columns.Contains(colName))
@@ -482,138 +344,6 @@ namespace DispatchManager.Forms
 
             UpdateTotalLabel(dgvSchedule.Rows.Cast<DataGridViewRow>());
         }
-
-
-        //        private void LoadScheduleData()
-        //{
-        //    DateTime from = dtpFrom.Value;
-        //    DateTime to = dtpTo.Value;
-
-        //    fullDispatchList = DispatchData.GetDispatchByDateRange(from, to);
-        //            dispatchColors = DispatchData.GetDispatchColours();
-
-
-        //            var groupedList = fullDispatchList
-        //        .OrderBy(d => d.DispatchDate)
-        //        .ThenBy(d => d.JobNo)
-        //        .ToList();
-
-        //    var withWeeklyTotals = new List<DispatchRecord>();
-
-        //    int? currentWeek = null;
-        //    int weeklyTotal = 0;
-
-        //    for (int i = 0; i < groupedList.Count; i++)
-        //    {
-        //        var record = groupedList[i];
-
-        //        int recordWeek = System.Globalization.CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
-        //            record.DispatchDate,
-        //            System.Globalization.CalendarWeekRule.FirstFourDayWeek,
-        //            DayOfWeek.Monday);
-
-        //        // Insert total before new week starts
-        //        if (currentWeek != null && recordWeek != currentWeek)
-        //        {
-        //            withWeeklyTotals.Add(new DispatchBlankRow
-        //            {
-        //                Qty = weeklyTotal,
-        //                BoardETA = $"Total for Week {currentWeek}",
-        //                DispatchDate = DateTime.MinValue,
-        //            });
-        //            weeklyTotal = 0;
-        //        }
-
-        //        // ✅ Apply colors from DispatchColours table if present
-        //        if (dispatchColors.TryGetValue(record.ID, out var cellColours))
-        //        {
-        //            record.ProdInputColor = cellColours.TryGetValue("ProdInputColor", out string v1) ? v1 : null;
-        //            record.MaterialsOrderedColor = cellColours.TryGetValue("MaterialsOrderedColor", out string v2) ? v2 : null;
-        //            record.ReleasedtoFactoryColor = cellColours.TryGetValue("ReleasedtoFactoryColor", out string v3) ? v3 : null;
-        //            record.MainContractorColor = cellColours.TryGetValue("MainContractorColor", out string v4) ? v4 : null;
-        //            record.ProjectNameColor = cellColours.TryGetValue("ProjectNameColor", out string v5) ? v5 : null;
-        //            record.FreightColor = cellColours.TryGetValue("FreightColor", out string v6) ? v6 : null;
-        //            record.AmountColor = cellColours.TryGetValue("AmountColor", out string v7) ? v7 : null;
-        //        }
-
-        //        withWeeklyTotals.Add(record);
-        //        weeklyTotal += record.Qty;
-        //        currentWeek = recordWeek;
-
-        //        // Handle final record
-        //        bool isLast = (i == groupedList.Count - 1);
-        //        if (isLast && weeklyTotal > 0)
-        //        {
-        //            withWeeklyTotals.Add(new DispatchBlankRow
-        //            {
-        //                Qty = weeklyTotal,
-        //                BoardETA = $"Total for Week {currentWeek}",
-        //                WeekNo = -1,
-        //                DispatchDate = DateTime.MinValue,
-        //                JobNo = -1,
-        //                Amount = -1,
-        //                OrderNumber = -1
-        //            });
-        //        }
-        //    }
-
-        //    // ✅ STEP 2: Assign colors to each week
-        //    Color[] palette = new Color[]
-        //    {
-        //        Color.FromArgb(0, 255, 255),   // Cyan
-        //        Color.FromArgb(255, 128, 128), // Light Red
-        //        Color.FromArgb(0, 255, 0),     // Green
-        //        Color.FromArgb(255, 255, 0),   // Yellow
-        //        Color.FromArgb(255, 0, 255)    // Magenta
-        //    };
-
-        //    weekColors.Clear();
-        //    int colorIndex = 0;
-        //    foreach (var record in withWeeklyTotals)
-        //    {
-        //        if (record is DispatchBlankRow) continue;
-
-        //        int week = record.WeekNo;
-        //        if (!weekColors.ContainsKey(week))
-        //        {
-        //            weekColors[week] = palette[colorIndex % palette.Length];
-        //            colorIndex++;
-        //        }
-        //    }
-
-        //    dgvSchedule.DataSource = null;
-        //    dgvSchedule.Rows.Clear();
-        //    dgvSchedule.Columns.Clear();
-
-        //    dgvSchedule.DataSource = withWeeklyTotals;
-        //    dgvSchedule.Refresh();
-
-        //    dgvSchedule.Columns["ID"].Visible = false;
-        //    dgvSchedule.Columns["MaterialsOrderedBy"].Visible = false;
-        //    dgvSchedule.Columns["BenchtopOrderedBy"].Visible = false;
-
-        //    dgvSchedule.SelectionChanged += dgvSchedule_SelectionChanged;
-
-        //    foreach (DataGridViewColumn column in dgvSchedule.Columns)
-        //    {
-        //        column.SortMode = DataGridViewColumnSortMode.NotSortable;
-        //    }
-
-        //    foreach (DataGridViewRow row in dgvSchedule.Rows)
-        //    {
-        //        if (row.DataBoundItem is DispatchBlankRow)
-        //        {
-        //            row.DefaultCellStyle.Font = new Font(dgvSchedule.Font, FontStyle.Bold);
-        //            row.DefaultCellStyle.ForeColor = Color.DarkSlateGray;
-
-        //            int qtyColumnIndex = dgvSchedule.Columns["Qty"].Index;
-        //            row.Cells[qtyColumnIndex].Style.BackColor = Color.FromArgb(255, 204, 0); // Gold
-        //        }
-        //    }
-
-        //             UpdateTotalLabel(dgvSchedule.Rows.Cast<DataGridViewRow>());
-        //}
-
 
         private void dgvSchedule_SelectionChanged(object sender, EventArgs e)
         {
@@ -712,8 +442,8 @@ namespace DispatchManager.Forms
                     colorValue = rec.ProdInputColor;
                 else if (columnName == "MaterialsOrdered")
                     colorValue = rec.MaterialsOrderedColor;
-                else if (columnName == "ReleasedtoFactory")
-                    colorValue = rec.ReleasedtoFactoryColor;
+                else if (columnName == "ReleasedToFactory")
+                    colorValue = rec.ReleasedToFactoryColor;
                 else if (columnName == "MainContractor")
                     colorValue = rec.MainContractorColor;
                 else if (columnName == "ProjectName")
@@ -810,8 +540,8 @@ namespace DispatchManager.Forms
         //            colorValue = rec.ProdInputColor;
         //        else if (columnName == "MaterialsOrdered")
         //            colorValue = rec.MaterialsOrderedColor;
-        //        else if (columnName == "ReleasedtoFactory")
-        //            colorValue = rec.ReleasedtoFactoryColor;
+        //        else if (columnName == "ReleasedToFactory")
+        //            colorValue = rec.ReleasedToFactoryColor;
         //        else if (columnName == "MainContractor")
         //            colorValue = rec.MainContractorColor;
         //        else if (columnName == "ProjectName")
