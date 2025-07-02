@@ -330,7 +330,7 @@ namespace DispatchManager.Forms
                     withWeeklyTotals.Add(new DispatchBlankRow
                     {
                         Qty = weeklyTotal,
-                        BoardETA = $"Total for Week {currentWeek}",
+                        ProjectColour = $"Total for Week {currentWeek}",
                         DispatchDate = DateTime.MinValue,
                     });
                     weeklyTotal = 0;
@@ -356,7 +356,7 @@ namespace DispatchManager.Forms
                     withWeeklyTotals.Add(new DispatchBlankRow
                     {
                         Qty = weeklyTotal,
-                        BoardETA = $"Total for Week {currentWeek}",
+                        ProjectColour = $"Total for Week {currentWeek}",
                         WeekNo = -1,
                         DispatchDate = DateTime.MinValue,
                         JobNo = -1,
@@ -364,6 +364,7 @@ namespace DispatchManager.Forms
                         OrderNumber = -1
                     });
                 }
+               
             }
 
             Color[] palette = new Color[]
@@ -491,18 +492,28 @@ namespace DispatchManager.Forms
                     e.FormattingApplied = true;
                 }
 
-                // Grey style
-                row.Cells[e.ColumnIndex].Style.BackColor = Color.LightGray;
-                row.Cells[e.ColumnIndex].Style.SelectionBackColor = Color.LightGray;
-                row.Cells[e.ColumnIndex].Style.ForeColor = Color.DarkSlateGray;
-                row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.DarkSlateGray;
-
+                // Make totals yellow ONLY in Qty column
+                if (columnName == "Qty" || columnName == "ProjectColour")
+                {
+                    row.Cells[e.ColumnIndex].Style.BackColor = Color.FromArgb(255, 204, 0); // Yellow
+                    row.Cells[e.ColumnIndex].Style.SelectionBackColor = Color.FromArgb(255, 204, 0);
+                    row.Cells[e.ColumnIndex].Style.ForeColor = Color.Black;
+                    row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.Black;
+                }
+                else
+                {
+                    row.Cells[e.ColumnIndex].Style.BackColor = Color.LightGray;
+                    row.Cells[e.ColumnIndex].Style.SelectionBackColor = Color.LightGray;
+                    row.Cells[e.ColumnIndex].Style.ForeColor = Color.DarkSlateGray;
+                    row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.DarkSlateGray;
+                }
                 return;
             }
 
             // ✅ Apply week color
-            if (columnName == "WeekNo" || columnName == "DispatchDate" || columnName == "Day" || columnName == "JobNo")
-            {
+            if (columnName == "Day")
+                //if (columnName == "WeekNo" || columnName == "DispatchDate" || columnName == "Day" || columnName == "JobNo")
+                {
                 if (columnName == "DispatchDate" && e.Value is DateTime dtValue && dtValue != DateTime.MinValue)
                 {
                     e.Value = dtValue.ToString("dd-MMM");
