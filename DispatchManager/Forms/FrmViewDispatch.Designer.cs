@@ -168,7 +168,7 @@
             this.lblLoggedInUser.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblLoggedInUser.AutoSize = true;
             this.lblLoggedInUser.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLoggedInUser.Location = new System.Drawing.Point(934, 24);
+            this.lblLoggedInUser.Location = new System.Drawing.Point(933, 29);
             this.lblLoggedInUser.Name = "lblLoggedInUser";
             this.lblLoggedInUser.Size = new System.Drawing.Size(92, 13);
             this.lblLoggedInUser.TabIndex = 12;
