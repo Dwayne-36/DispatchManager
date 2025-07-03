@@ -46,5 +46,29 @@ namespace DispatchManager.Properties {
                 this["dtpToDate"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ColumnWidths {
+            get {
+                return ((string)(this["ColumnWidths"]));
+            }
+            set {
+                this["ColumnWidths"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ColumnOrder {
+            get {
+                return ((string)(this["ColumnOrder"]));
+            }
+            set {
+                this["ColumnOrder"] = value;
+            }
+        }
     }
 }

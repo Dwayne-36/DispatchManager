@@ -9,6 +9,9 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using System.IO;
+using Excel = Microsoft.Office.Interop.Excel;
+
 
 
 
@@ -51,6 +54,9 @@ namespace DispatchManager.Forms
         {
             InitializeComponent();
 
+            // ✅ Allow user to reorder columns
+            dgvSchedule.AllowUserToOrderColumns = true;
+
             // Form Level Events
             this.Load += FrmViewDispatch_Load;
             this.FormClosing += FrmViewDispatch_FormClosing;
@@ -76,8 +82,8 @@ namespace DispatchManager.Forms
             //colour and style events
             dgvSchedule.RowPostPaint += dgvSchedule_RowPostPaint;
 
-
-            // Remove blue selection highlight
+            
+             // Remove blue selection highlight
             dgvSchedule.DefaultCellStyle.SelectionBackColor = dgvSchedule.DefaultCellStyle.BackColor;
             dgvSchedule.DefaultCellStyle.SelectionForeColor = dgvSchedule.DefaultCellStyle.ForeColor;
 
@@ -99,7 +105,48 @@ namespace DispatchManager.Forms
 
             // Load data and populate DataGridView
             LoadScheduleData();
-                         
+
+            // ✅ Hook event to reposition label when columns are reordered
+            dgvSchedule.ColumnDisplayIndexChanged += (s, args) => PositionTotalLabelNextToQty();
+            dgvSchedule.ColumnWidthChanged += (s, args) => PositionTotalLabelNextToQty();
+
+            // ✅ Restore saved column widths
+            if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.ColumnWidths))
+            {
+                string[] widthPairs = Properties.Settings.Default.ColumnWidths.Split('|');
+
+                foreach (string pair in widthPairs)
+                {
+                    string[] parts = pair.Split(':');
+                    if (parts.Length == 2)
+                    {
+                        string colName = parts[0];
+                        if (int.TryParse(parts[1], out int width) && dgvSchedule.Columns.Contains(colName))
+                        {
+                            dgvSchedule.Columns[colName].Width = width;
+                        }
+                    }
+                }
+            }
+
+            // ✅ Restore saved column order
+            if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.ColumnOrder))
+            {
+                string[] orderPairs = Properties.Settings.Default.ColumnOrder.Split('|');
+                foreach (string pair in orderPairs)
+                {
+                    string[] parts = pair.Split(':');
+                    if (parts.Length == 2)
+                    {
+                        string colName = parts[0];
+                        if (int.TryParse(parts[1], out int displayIndex) && dgvSchedule.Columns.Contains(colName))
+                        {
+                            dgvSchedule.Columns[colName].DisplayIndex = displayIndex;
+                        }
+                    }
+                }
+            }
+
             // Optional: Apply double buffering to reduce flicker
             typeof(DataGridView).InvokeMember("DoubleBuffered",
                 System.Reflection.BindingFlags.NonPublic |
@@ -110,6 +157,9 @@ namespace DispatchManager.Forms
         }
         private Dictionary<int, Color> weekColors = new Dictionary<int, Color>();
 
+
+
+
         private void dgvSchedule_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
@@ -117,9 +167,31 @@ namespace DispatchManager.Forms
             var row = dgvSchedule.Rows[e.RowIndex];
             var column = dgvSchedule.Columns[e.ColumnIndex];
             var cell = row.Cells[e.ColumnIndex];
+
+            // ✅ Open file when double-clicking ProjectName
+            if (column.Name == "ProjectName")
+            {
+                string filePath = @"X:\Purchase Orders\Files\Purchase order.xlsm";
+                if (File.Exists(filePath))
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Could not open file:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show($"File not found:\n{filePath}", "File Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                return; // Prevent rest of logic from executing
+            }
+
             // Store the last double-clicked cell for potential future use
             lastDoubleClickedCell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
-
 
             if (row.DataBoundItem is DispatchRecord record)
             {
@@ -227,7 +299,6 @@ namespace DispatchManager.Forms
                     cell.Style.SelectionForeColor = Color.Black;
                     // ✅ Leave cell.Value alone to keep it user-editable
                 }
-
                 else
                 {
                     // Steps 1–2 logic (ProdInput, MaterialsOrdered)
@@ -279,12 +350,189 @@ namespace DispatchManager.Forms
                 else if (colorColumn == "MaterialsOrderedColor") record.MaterialsOrderedColor = colorString;
                 else if (colorColumn == "ReleasedToFactoryColor") record.ReleasedToFactoryColor = colorString;
                 else if (colorColumn == "MainContractorColor") record.MainContractorColor = colorString;
-                 else if (colorColumn == "FreightColor") record.FreightColor = colorString;
+                else if (colorColumn == "FreightColor") record.FreightColor = colorString;
                 else if (colorColumn == "AmountColor") record.AmountColor = colorString;
 
                 this.BeginInvoke((MethodInvoker)(() => dgvSchedule.InvalidateCell(cell)));
             }
         }
+
+
+        //private void dgvSchedule_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        //{
+        //    if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+
+        //    var row = dgvSchedule.Rows[e.RowIndex];
+        //    var column = dgvSchedule.Columns[e.ColumnIndex];
+        //    var cell = row.Cells[e.ColumnIndex];
+        //    // Store the last double-clicked cell for potential future use
+        //    lastDoubleClickedCell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+
+        //    if (row.DataBoundItem is DispatchRecord record)
+        //    {
+        //        string columnName = column.Name;
+        //        string initials = Session.CurrentInitials;
+        //        string oldValue = cell.Value?.ToString();
+        //        Color currentColor = cell.Style.BackColor;
+
+        //        string colorColumn = null;
+        //        if (columnName == "ProdInput") colorColumn = "ProdInputColor";
+        //        else if (columnName == "MaterialsOrdered") colorColumn = "MaterialsOrderedColor";
+        //        else if (columnName == "ReleasedToFactory") colorColumn = "ReleasedToFactoryColor";
+        //        else if (columnName == "MainContractor") colorColumn = "MainContractorColor";
+        //        else if (columnName == "Freight") colorColumn = "FreightColor";
+        //        else if (columnName == "Amount") colorColumn = "AmountColor";
+
+        //        if (colorColumn == null) return;  // 🛡️ Prevent crash for unsupported columns
+
+        //        Color red = Color.Red;
+        //        Color green = Color.FromArgb(146, 208, 80);
+        //        Color white = Color.White;
+        //        Color orange = Color.FromArgb(255, 140, 0);  // For ReleasedToFactory & MainContractor
+        //        Color purple = Color.FromArgb(153, 0, 204);  // For Amount
+
+        //        if (columnName == "ReleasedToFactory")
+        //        {
+        //            if (string.IsNullOrWhiteSpace(oldValue))
+        //            {
+        //                cell.Value = "REL";
+        //                cell.Style.BackColor = white;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{white.R},{white.G},{white.B}");
+        //            }
+        //            else if (oldValue == "REL" && currentColor.ToArgb() == white.ToArgb())
+        //            {
+        //                cell.Style.BackColor = orange;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{orange.R},{orange.G},{orange.B}");
+        //            }
+        //            else
+        //            {
+        //                cell.Value = "";
+        //                cell.Style.BackColor = white;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
+        //            }
+
+        //            cell.Style.ForeColor = Color.Black;
+        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
+        //            cell.Style.SelectionForeColor = Color.Black;
+        //            SaveInitialsToDispatch(record.ID, columnName, cell.Value?.ToString());
+        //        }
+        //        else if (columnName == "MainContractor")
+        //        {
+        //            if (currentColor.ToArgb() == white.ToArgb())
+        //            {
+        //                cell.Style.BackColor = orange;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{orange.R},{orange.G},{orange.B}");
+        //            }
+        //            else if (currentColor.ToArgb() == orange.ToArgb())
+        //            {
+        //                cell.Style.BackColor = green;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
+        //            }
+        //            else
+        //            {
+        //                cell.Style.BackColor = white;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
+        //            }
+
+        //            cell.Style.ForeColor = Color.Black;
+        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
+        //            cell.Style.SelectionForeColor = Color.Black;
+        //            // No initials change
+        //        }
+        //        else if (columnName == "Freight")
+        //        {
+        //            if (currentColor.ToArgb() == white.ToArgb())
+        //            {
+        //                cell.Style.BackColor = orange;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{orange.R},{orange.G},{orange.B}");
+        //            }
+        //            else
+        //            {
+        //                cell.Style.BackColor = white;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
+        //            }
+
+        //            cell.Style.ForeColor = Color.Black;
+        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
+        //            cell.Style.SelectionForeColor = Color.Black;
+        //        }
+        //        else if (columnName == "Amount")
+        //        {
+        //            if (currentColor.ToArgb() == white.ToArgb())
+        //            {
+        //                cell.Style.BackColor = purple;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{purple.R},{purple.G},{purple.B}");
+        //            }
+        //            else
+        //            {
+        //                cell.Style.BackColor = white;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
+        //            }
+
+        //            cell.Style.ForeColor = Color.Black;
+        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
+        //            cell.Style.SelectionForeColor = Color.Black;
+        //            // ✅ Leave cell.Value alone to keep it user-editable
+        //        }
+
+        //        else
+        //        {
+        //            // Steps 1–2 logic (ProdInput, MaterialsOrdered)
+        //            if (string.IsNullOrWhiteSpace(oldValue))
+        //            {
+        //                cell.Value = initials;
+        //                cell.Style.BackColor = red;
+        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{red.R},{red.G},{red.B}");
+        //            }
+        //            else if (oldValue == initials)
+        //            {
+        //                if (currentColor.ToArgb() == red.ToArgb())
+        //                {
+        //                    cell.Style.BackColor = green;
+        //                    SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
+        //                }
+        //                else
+        //                {
+        //                    cell.Value = "";
+        //                    cell.Style.BackColor = white;
+        //                    SaveCellColorToDatabase(record.ID, colorColumn, "White");
+        //                }
+        //            }
+        //            else
+        //            {
+        //                if (currentColor.ToArgb() == red.ToArgb())
+        //                {
+        //                    cell.Value = initials;
+        //                    cell.Style.BackColor = green;
+        //                    SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
+        //                }
+        //                else
+        //                {
+        //                    cell.Value = "";
+        //                    cell.Style.BackColor = white;
+        //                    SaveCellColorToDatabase(record.ID, colorColumn, "White");
+        //                }
+        //            }
+
+        //            cell.Style.ForeColor = Color.Black;
+        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
+        //            cell.Style.SelectionForeColor = Color.Black;
+        //            SaveInitialsToDispatch(record.ID, columnName, cell.Value?.ToString());
+        //        }
+
+        //        // ✅ Update in-memory record color
+        //        string colorString = cell.Style.BackColor == white ? null : $"{cell.Style.BackColor.R},{cell.Style.BackColor.G},{cell.Style.BackColor.B}";
+        //        if (colorColumn == "ProdInputColor") record.ProdInputColor = colorString;
+        //        else if (colorColumn == "MaterialsOrderedColor") record.MaterialsOrderedColor = colorString;
+        //        else if (colorColumn == "ReleasedToFactoryColor") record.ReleasedToFactoryColor = colorString;
+        //        else if (colorColumn == "MainContractorColor") record.MainContractorColor = colorString;
+        //         else if (colorColumn == "FreightColor") record.FreightColor = colorString;
+        //        else if (colorColumn == "AmountColor") record.AmountColor = colorString;
+
+        //        this.BeginInvoke((MethodInvoker)(() => dgvSchedule.InvalidateCell(cell)));
+        //    }
+        //}
 
 
 
@@ -515,7 +763,9 @@ namespace DispatchManager.Forms
             }
 
             lblTotal.Text = $"Total Cabinets: {totalQty:N0}";
-            
+            lblTotal.AutoSize = true; // Ensures accurate width
+
+
         }
 
         private void dgvSchedule_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
@@ -625,112 +875,6 @@ namespace DispatchManager.Forms
             }
         }
 
-
-
-        //Cell formatting to apply custom styles and blanking logic
-
-        //private void dgvSchedule_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        //{
-        //    var row = dgvSchedule.Rows[e.RowIndex];
-        //    string columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
-
-        //    // ✅ Blank total rows
-        //    if (row.DataBoundItem is DispatchBlankRow)
-        //    {
-        //        if ((columnName == "WeekNo" || columnName == "JobNo" || columnName == "OrderNumber" || columnName == "Qty" || columnName == "Amount")
-        //            && e.Value is int intVal && intVal <= 0)
-        //        {
-        //            e.Value = "";
-        //            e.FormattingApplied = true;
-        //        }
-
-        //        if (columnName == "Amount" && e.Value is decimal decVal && decVal <= 0)
-        //        {
-        //            e.Value = "";
-        //            e.FormattingApplied = true;
-        //        }
-
-        //        if (columnName == "DispatchDate" && e.Value is DateTime dt && dt == DateTime.MinValue)
-        //        {
-        //            e.Value = "";
-        //            e.FormattingApplied = true;
-        //        }
-
-        //        // Make totals yellow ONLY in Qty column
-        //        if (columnName == "Qty" || columnName == "ProjectColour")
-        //        {
-        //            row.Cells[e.ColumnIndex].Style.BackColor = Color.FromArgb(255, 204, 0); // Yellow
-        //            row.Cells[e.ColumnIndex].Style.SelectionBackColor = Color.FromArgb(255, 204, 0);
-        //            row.Cells[e.ColumnIndex].Style.ForeColor = Color.Black;
-        //            row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.Black;
-        //        }
-        //        else
-        //        {
-        //            row.Cells[e.ColumnIndex].Style.BackColor = Color.LightGray;
-        //            row.Cells[e.ColumnIndex].Style.SelectionBackColor = Color.LightGray;
-        //            row.Cells[e.ColumnIndex].Style.ForeColor = Color.DarkSlateGray;
-        //            row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.DarkSlateGray;
-        //        }
-        //        return;
-        //    }
-
-        //    // ✅ Apply week color
-        //    if (columnName == "Day")
-        //        //if (columnName == "WeekNo" || columnName == "DispatchDate" || columnName == "Day" || columnName == "JobNo")
-        //        {
-        //        if (columnName == "DispatchDate" && e.Value is DateTime dtValue && dtValue != DateTime.MinValue)
-        //        {
-        //            e.Value = dtValue.ToString("dd-MMM");
-        //            e.FormattingApplied = true;
-        //        }
-
-        //        var weekObj = row.Cells["WeekNo"].Value;
-        //        if (weekObj is int week && weekColors.TryGetValue(week, out var color))
-        //        {
-        //            row.Cells[e.ColumnIndex].Style.BackColor = color;
-        //            row.Cells[e.ColumnIndex].Style.SelectionBackColor = color;
-        //            row.Cells[e.ColumnIndex].Style.ForeColor = Color.Black;
-        //            row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.Black;
-        //        }
-        //    }
-
-        //    // ✅ Apply saved cell background colors
-        //    if (row.DataBoundItem is DispatchRecord rec)
-        //    {
-        //        string colorValue = null;
-
-        //        if (columnName == "ProdInput")
-        //            colorValue = rec.ProdInputColor;
-        //        else if (columnName == "MaterialsOrdered")
-        //            colorValue = rec.MaterialsOrderedColor;
-        //        else if (columnName == "ReleasedToFactory")
-        //            colorValue = rec.ReleasedToFactoryColor;
-        //        else if (columnName == "MainContractor")
-        //            colorValue = rec.MainContractorColor;
-        //        else if (columnName == "Freight")
-        //            colorValue = rec.FreightColor;
-        //        else if (columnName == "Amount")
-        //            colorValue = rec.AmountColor;
-
-        //        if (!string.IsNullOrWhiteSpace(colorValue))
-        //        {
-        //            string[] rgb = colorValue.Split(',');
-        //            if (rgb.Length == 3 &&
-        //                int.TryParse(rgb[0], out int r) &&
-        //                int.TryParse(rgb[1], out int g) &&
-        //                int.TryParse(rgb[2], out int b))
-        //            {
-        //                Color dbColor = Color.FromArgb(r, g, b);
-        //                row.Cells[e.ColumnIndex].Style.BackColor = dbColor;
-        //                row.Cells[e.ColumnIndex].Style.SelectionBackColor = dbColor;
-        //            }
-        //        }
-        //    }
-
-        //    // ✅ Force refresh to apply changes immediately
-        //    dgvSchedule.InvalidateCell(row.Cells[e.ColumnIndex]);
-        //}
-
         private Color ParseColor(string input)
         {
             try
@@ -753,12 +897,7 @@ namespace DispatchManager.Forms
         }
                 
 
-        private void FrmViewDispatch_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            Properties.Settings.Default.dtpFromDate = dtpFrom.Value;
-            Properties.Settings.Default.dtpToDate = dtpTo.Value;
-            Properties.Settings.Default.Save();
-        }
+        
         private void dtpFrom_ValueChanged(object sender, EventArgs e)
         {
             LoadScheduleData();
@@ -910,14 +1049,52 @@ namespace DispatchManager.Forms
         {
             if (dgvSchedule.Columns.Contains("Qty"))
             {
-                var qtyColumnIndex = dgvSchedule.Columns["Qty"].Index;
-                var qtyColumnRect = dgvSchedule.GetCellDisplayRectangle(qtyColumnIndex, -1, true);
+                var qtyColumn = dgvSchedule.Columns["Qty"];
+                int displayIndex = qtyColumn.DisplayIndex;
 
-                lblTotal.Top = dgvSchedule.Bottom + 5; // adjust vertically under grid
-                lblTotal.Left = dgvSchedule.Left + qtyColumnRect.Left - 100; // match Qty column X position
+                // Get the rectangle of the Qty column header
+                var qtyColumnRect = dgvSchedule.GetCellDisplayRectangle(displayIndex, -1, true);
+
+                // Measure the text width using the current font
+                SizeF textSize;
+                using (Graphics g = lblTotal.CreateGraphics())
+                {
+                    textSize = g.MeasureString(lblTotal.Text, lblTotal.Font);
+                }
+
+                // Center the label text under the column
+                int centerOfQtyColumn = qtyColumnRect.Left + (qtyColumnRect.Width / 2);
+                int labelLeft = dgvSchedule.Left + centerOfQtyColumn - (int)(textSize.Width / 2);
+
+                lblTotal.Left = labelLeft;
+                lblTotal.Top = dgvSchedule.Bottom + 5;
             }
         }
 
+
+        private void FrmViewDispatch_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            List<string> widthList = new List<string>();
+
+            foreach (DataGridViewColumn col in dgvSchedule.Columns)
+            {
+                widthList.Add($"{col.Name}:{col.Width}");
+            }
+            //Properties.Settings.Default.ColumnWidths = string.Join("|", widthList);
+
+            // ✅ Save column order
+            List<string> orderPairs = new List<string>();
+            foreach (DataGridViewColumn col in dgvSchedule.Columns)
+            {
+                orderPairs.Add($"{col.Name}:{col.DisplayIndex}");
+            }
+            
+            Properties.Settings.Default.dtpFromDate = dtpFrom.Value;
+            Properties.Settings.Default.dtpToDate = dtpTo.Value;
+            Properties.Settings.Default.ColumnWidths = string.Join("|", widthList);
+            Properties.Settings.Default.ColumnOrder = string.Join("|", orderPairs);
+            Properties.Settings.Default.Save();
+        }
 
     }
 }
