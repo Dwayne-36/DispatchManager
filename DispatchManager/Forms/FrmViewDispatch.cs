@@ -47,7 +47,6 @@ namespace DispatchManager.Forms
     "OrderNumber"
 };
 
-
         public FrmViewDispatch()
         {
             InitializeComponent();
@@ -68,19 +67,19 @@ namespace DispatchManager.Forms
             dgvSchedule.CellFormatting += dgvSchedule_CellFormatting;
             dgvSchedule.SelectionChanged += dgvSchedule_SelectionChanged;
 
+            dgvSchedule.SelectionChanged += (s, e) =>
+            {
+                foreach (DataGridViewRow row in dgvSchedule.Rows)
+                    dgvSchedule.InvalidateRow(row.Index);
+            };
+
             //colour and style events
-            //dgvSchedule.Paint += dgvSchedule_Paint;
-            //dgvSchedule.RowPostPaint += dgvSchedule_RowPostPaint;
+            dgvSchedule.RowPostPaint += dgvSchedule_RowPostPaint;
+
 
             // Remove blue selection highlight
             dgvSchedule.DefaultCellStyle.SelectionBackColor = dgvSchedule.DefaultCellStyle.BackColor;
             dgvSchedule.DefaultCellStyle.SelectionForeColor = dgvSchedule.DefaultCellStyle.ForeColor;
-
-            //// Optional: remove selection color from header cells too
-            //dgvSchedule.RowHeadersDefaultCellStyle.SelectionBackColor = dgvSchedule.RowHeadersDefaultCellStyle.BackColor;
-            //dgvSchedule.RowHeadersDefaultCellStyle.SelectionForeColor = dgvSchedule.RowHeadersDefaultCellStyle.ForeColor;
-
-
 
             //Optional: supress tooltips to reduce flicker
             dgvSchedule.ShowCellToolTips = false;
@@ -436,9 +435,6 @@ namespace DispatchManager.Forms
             dgvSchedule.Columns.Clear();
 
             dgvSchedule.DataSource = withWeeklyTotals;
-
-            //pink boarders
-            dgvSchedule.RowPostPaint += dgvSchedule_RowPostPaint;
 
             string[] hiddenColumns = {
     "ID", "MaterialsOrderedBy", "BenchtopOrderedBy",
