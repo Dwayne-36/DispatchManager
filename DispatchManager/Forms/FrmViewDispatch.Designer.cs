@@ -56,7 +56,7 @@
             this.dgvSchedule.Location = new System.Drawing.Point(1, 126);
             this.dgvSchedule.Name = "dgvSchedule";
             this.dgvSchedule.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvSchedule.Size = new System.Drawing.Size(2855, 1083);
+            this.dgvSchedule.Size = new System.Drawing.Size(2855, 883);
             this.dgvSchedule.TabIndex = 0;
             // 
             // dtpFrom
@@ -97,6 +97,7 @@
             this.tbSearch.Name = "tbSearch";
             this.tbSearch.Size = new System.Drawing.Size(200, 20);
             this.tbSearch.TabIndex = 5;
+            this.tbSearch.TextChanged += new System.EventHandler(this.tbSearch_TextChanged);
             // 
             // lblSearch
             // 
@@ -132,7 +133,7 @@
             this.lblTotal.AutoSize = true;
             this.lblTotal.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTotal.ForeColor = System.Drawing.Color.Red;
-            this.lblTotal.Location = new System.Drawing.Point(2669, 1221);
+            this.lblTotal.Location = new System.Drawing.Point(2669, 1021);
             this.lblTotal.Name = "lblTotal";
             this.lblTotal.Size = new System.Drawing.Size(45, 17);
             this.lblTotal.TabIndex = 10;
@@ -178,7 +179,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2854, 1261);
+            this.ClientSize = new System.Drawing.Size(2854, 1061);
             this.Controls.Add(this.lblLoggedInUser);
             this.Controls.Add(this.lblTotal);
             this.Controls.Add(this.btnNewProject);

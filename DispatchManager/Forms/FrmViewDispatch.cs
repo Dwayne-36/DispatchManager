@@ -65,7 +65,7 @@ namespace DispatchManager.Forms
             // Control Level Events
             this.dtpFrom.ValueChanged += dtpFrom_ValueChanged;
             this.dtpTo.ValueChanged += dtpTo_ValueChanged;
-            this.btnSearch.Click += btnSearch_Click;
+            
 
             //DataGridView Events
             this.dgvSchedule.CellDoubleClick += dgvSchedule_CellDoubleClick;
@@ -111,42 +111,56 @@ namespace DispatchManager.Forms
             dgvSchedule.ColumnDisplayIndexChanged += (s, args) => PositionTotalLabelNextToQty();
             dgvSchedule.ColumnWidthChanged += (s, args) => PositionTotalLabelNextToQty();
 
-            // ✅ Restore saved column widths
-            if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.ColumnWidths))
-            {
-                string[] widthPairs = Properties.Settings.Default.ColumnWidths.Split('|');
+            // ✅ Hook event to handle editing control showing for custom columns
+            dgvSchedule.EditingControlShowing += dgvSchedule_EditingControlShowing;
 
-                foreach (string pair in widthPairs)
-                {
-                    string[] parts = pair.Split(':');
-                    if (parts.Length == 2)
-                    {
-                        string colName = parts[0];
-                        if (int.TryParse(parts[1], out int width) && dgvSchedule.Columns.Contains(colName))
-                        {
-                            dgvSchedule.Columns[colName].Width = width;
-                        }
-                    }
-                }
-            }
+            dgvSchedule.DataBindingComplete += dgvSchedule_DataBindingComplete;
 
-            // ✅ Restore saved column order
-            if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.ColumnOrder))
-            {
-                string[] orderPairs = Properties.Settings.Default.ColumnOrder.Split('|');
-                foreach (string pair in orderPairs)
-                {
-                    string[] parts = pair.Split(':');
-                    if (parts.Length == 2)
-                    {
-                        string colName = parts[0];
-                        if (int.TryParse(parts[1], out int displayIndex) && dgvSchedule.Columns.Contains(colName))
-                        {
-                            dgvSchedule.Columns[colName].DisplayIndex = displayIndex;
-                        }
-                    }
-                }
-            }
+            dgvSchedule.CellMouseClick += dgvSchedule_CellMouseClick;
+
+            // ✅ Restore layout
+            RestoreColumnSettings();
+
+            //// ✅ Restore saved column widths
+            //if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.ColumnWidths))
+            //{
+            //    string[] widthPairs = Properties.Settings.Default.ColumnWidths.Split('|');
+
+            //    foreach (string pair in widthPairs)
+            //    {
+            //        string[] parts = pair.Split(':');
+            //        if (parts.Length == 2)
+            //        {
+            //            string colName = parts[0];
+            //            if (int.TryParse(parts[1], out int width) && dgvSchedule.Columns.Contains(colName))
+            //            {
+            //                dgvSchedule.Columns[colName].Width = width;
+            //            }
+            //        }
+            //    }
+            //}
+
+            //// ✅ Restore saved column order
+            //if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.ColumnOrder))
+            //{
+            //    string[] orderPairs = Properties.Settings.Default.ColumnOrder.Split('|');
+            //    foreach (string pair in orderPairs)
+            //    {
+            //        string[] parts = pair.Split(':');
+            //        if (parts.Length == 2)
+            //        {
+            //            string colName = parts[0];
+            //            if (int.TryParse(parts[1], out int displayIndex) && dgvSchedule.Columns.Contains(colName))
+            //            {
+            //                dgvSchedule.Columns[colName].DisplayIndex = displayIndex;
+            //            }
+            //        }
+            //    }
+            //}
+
+
+
+
 
             // Optional: Apply double buffering to reduce flicker
             typeof(DataGridView).InvokeMember("DoubleBuffered",
@@ -172,7 +186,7 @@ namespace DispatchManager.Forms
             // ✅ Open file when double-clicking ProjectName
             if (column.Name == "ProjectName")
             {
-                string filePath = @"C:\Users\User1\Documents\Dispatch V2\Purchase order.xlsm";
+                string filePath = @"X:\Purchase Orders\Files\Purchase order.xlsm";
                 if (!File.Exists(filePath))
                 {
                     MessageBox.Show($"File not found:\n{filePath}", "File Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -750,17 +764,29 @@ namespace DispatchManager.Forms
         private void dtpFrom_ValueChanged(object sender, EventArgs e)
         {
             LoadScheduleData();
+            // ✅ Restore layout
+            RestoreColumnSettings();
         }
 
         private void dtpTo_ValueChanged(object sender, EventArgs e)
         {
             LoadScheduleData();
+            // ✅ Restore layout
+            RestoreColumnSettings();
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            string keyword = tbSearch.Text.ToLower();
+            string keyword = tbSearch.Text.Trim().ToLower();
 
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                // 🔁 If search is empty, restore full schedule with total rows
+                LoadScheduleData();
+                return;
+            }
+
+            // 🔍 Filter based on search keyword
             var filteredList = fullDispatchList.Where(d =>
                 d.JobNo.ToString().Contains(keyword) ||
                 (d.ProjectName?.ToLower().Contains(keyword) ?? false) ||
@@ -771,8 +797,10 @@ namespace DispatchManager.Forms
             ).ToList();
 
             dgvSchedule.DataSource = filteredList;
+            RestoreColumnSettings(); // 🛠️ Keep this to reapply column width/order
             dgvSchedule.Refresh();
         }
+
 
         private void menuEmployeesViewAll_Click(object sender, EventArgs e)
         {
@@ -920,6 +948,88 @@ namespace DispatchManager.Forms
             }
         }
 
+        private void dgvSchedule_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            if (e.Control is TextBox tb)
+            {
+                // Remove any existing handler to prevent multiple subscriptions
+                tb.Enter -= TextBox_EnterMoveToEnd;
+                tb.Enter += TextBox_EnterMoveToEnd;
+            }
+        }
+
+        private void TextBox_EnterMoveToEnd(object sender, EventArgs e)
+        {
+            if (sender is TextBox tb)
+            {
+                // Delay placing the caret at the end to let the DataGridView finish processing
+                this.BeginInvoke((MethodInvoker)(() =>
+                {
+                    tb.SelectionStart = tb.Text.Length;
+                    tb.SelectionLength = 0;
+                }));
+            }
+        }
+
+        private void dgvSchedule_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            {
+                dgvSchedule.CurrentCell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
+                dgvSchedule.BeginEdit(true);  // Start editing immediately
+
+                if (dgvSchedule.EditingControl is TextBox tb)
+                {
+                    // Delay cursor placement until control is ready
+                    BeginInvoke((MethodInvoker)(() =>
+                    {
+                        tb.SelectionStart = tb.Text.Length;
+                        tb.SelectionLength = 0;
+                    }));
+                }
+            }
+        }
+        private void RestoreColumnSettings()
+        {
+            // Restore saved column widths
+            if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.ColumnWidths))
+            {
+                string[] widthPairs = Properties.Settings.Default.ColumnWidths.Split('|');
+                foreach (string pair in widthPairs)
+                {
+                    string[] parts = pair.Split(':');
+                    if (parts.Length == 2)
+                    {
+                        string colName = parts[0];
+                        if (int.TryParse(parts[1], out int width) && dgvSchedule.Columns.Contains(colName))
+                        {
+                            dgvSchedule.Columns[colName].Width = width;
+                        }
+                    }
+                }
+            }
+
+            // Restore saved column order
+            if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.ColumnOrder))
+            {
+                string[] orderPairs = Properties.Settings.Default.ColumnOrder.Split('|');
+                foreach (string pair in orderPairs)
+                {
+                    string[] parts = pair.Split(':');
+                    if (parts.Length == 2)
+                    {
+                        string colName = parts[0];
+                        if (int.TryParse(parts[1], out int displayIndex) && dgvSchedule.Columns.Contains(colName))
+                        {
+                            dgvSchedule.Columns[colName].DisplayIndex = displayIndex;
+                        }
+                    }
+                }
+            }
+        }
+
+
+
 
         private void FrmViewDispatch_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -944,6 +1054,35 @@ namespace DispatchManager.Forms
             Properties.Settings.Default.ColumnOrder = string.Join("|", orderPairs);
             Properties.Settings.Default.Save();
         }
+
+        private void dgvSchedule_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            RestoreColumnSettings();
+        }
+
+        private void tbSearch_TextChanged(object sender, EventArgs e)
+        {
+            string keyword = tbSearch.Text.Trim().ToLower();
+
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                LoadScheduleData(); // brings back full data + blank rows
+                return;
+            }
+
+            var filteredList = fullDispatchList.Where(d =>
+                d.JobNo.ToString().Contains(keyword) ||
+                (d.ProjectName?.ToLower().Contains(keyword) ?? false) ||
+                (d.MainContractor?.ToLower().Contains(keyword) ?? false) ||
+                (d.ProjectColour?.ToLower().Contains(keyword) ?? false) ||
+                (d.DispatchDate.ToShortDateString().ToLower().Contains(keyword)) ||
+                (d.Comment?.ToLower().Contains(keyword) ?? false)
+            ).ToList();
+
+            dgvSchedule.DataSource = filteredList;
+        }
+
+
 
     }
 }
