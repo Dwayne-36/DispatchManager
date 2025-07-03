@@ -57,7 +57,7 @@ namespace DispatchManager.Forms
 
             // ✅ Allow user to reorder columns
             dgvSchedule.AllowUserToOrderColumns = true;
-
+                       
             // Form Level Events
             this.Load += FrmViewDispatch_Load;
             this.FormClosing += FrmViewDispatch_FormClosing;
@@ -1082,7 +1082,17 @@ namespace DispatchManager.Forms
             dgvSchedule.DataSource = filteredList;
         }
 
+        private void btnNewProject_Click(object sender, EventArgs e)
+        {
+            using (var newProjectForm = new FrmNewProject())
+            {
+                newProjectForm.ShowDialog();
 
+                // Optionally refresh the main view after closing
+                LoadScheduleData(); // Reload to reflect new project
+                RestoreColumnSettings(); // Keep column widths/order
+            }
+        }
 
     }
 }
