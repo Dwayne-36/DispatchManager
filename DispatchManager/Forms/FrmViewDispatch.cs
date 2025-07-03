@@ -7,9 +7,10 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 
 
@@ -171,24 +172,46 @@ namespace DispatchManager.Forms
             // ✅ Open file when double-clicking ProjectName
             if (column.Name == "ProjectName")
             {
-                string filePath = @"X:\Purchase Orders\Files\Purchase order.xlsm";
-                if (File.Exists(filePath))
-                {
-                    try
-                    {
-                        System.Diagnostics.Process.Start(filePath);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Could not open file:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                else
+                string filePath = @"C:\Users\User1\Documents\Dispatch V2\Purchase order.xlsm";
+                if (!File.Exists(filePath))
                 {
                     MessageBox.Show($"File not found:\n{filePath}", "File Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
-                return; // Prevent rest of logic from executing
+
+                try
+                {
+                    // Launch Excel
+                    var excelApp = new Excel.Application();
+                    excelApp.Visible = true;
+                    var workbooks = excelApp.Workbooks;
+                    var workbook = workbooks.Open(filePath);
+
+                    // ❗ Use exact sheet name
+                    Excel.Worksheet worksheet = workbook.Sheets["Purchase Orders"] as Excel.Worksheet;
+
+                    // Find next empty row in column A
+                    int lastRow = worksheet.Cells[worksheet.Rows.Count, 1].End(Excel.XlDirection.xlUp).Row + 1;
+
+                    // Write ProjectName and JobNo
+                    worksheet.Cells[lastRow, 1].Value = cell.Value?.ToString(); // ProjectName
+                    worksheet.Cells[lastRow, 2].Value = row.Cells["JobNo"].Value?.ToString(); // JobNo
+
+                    // ❌ DO NOT save or close workbook — user will handle that
+                    // ✅ Release COM objects to prevent locking
+                    Marshal.ReleaseComObject(worksheet);
+                    Marshal.ReleaseComObject(workbook);
+                    Marshal.ReleaseComObject(workbooks);
+                    Marshal.ReleaseComObject(excelApp);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error writing to Excel file:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                return;
             }
+
 
             // Store the last double-clicked cell for potential future use
             lastDoubleClickedCell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
@@ -358,181 +381,7 @@ namespace DispatchManager.Forms
         }
 
 
-        //private void dgvSchedule_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        //{
-        //    if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
-
-        //    var row = dgvSchedule.Rows[e.RowIndex];
-        //    var column = dgvSchedule.Columns[e.ColumnIndex];
-        //    var cell = row.Cells[e.ColumnIndex];
-        //    // Store the last double-clicked cell for potential future use
-        //    lastDoubleClickedCell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
-
-
-        //    if (row.DataBoundItem is DispatchRecord record)
-        //    {
-        //        string columnName = column.Name;
-        //        string initials = Session.CurrentInitials;
-        //        string oldValue = cell.Value?.ToString();
-        //        Color currentColor = cell.Style.BackColor;
-
-        //        string colorColumn = null;
-        //        if (columnName == "ProdInput") colorColumn = "ProdInputColor";
-        //        else if (columnName == "MaterialsOrdered") colorColumn = "MaterialsOrderedColor";
-        //        else if (columnName == "ReleasedToFactory") colorColumn = "ReleasedToFactoryColor";
-        //        else if (columnName == "MainContractor") colorColumn = "MainContractorColor";
-        //        else if (columnName == "Freight") colorColumn = "FreightColor";
-        //        else if (columnName == "Amount") colorColumn = "AmountColor";
-
-        //        if (colorColumn == null) return;  // 🛡️ Prevent crash for unsupported columns
-
-        //        Color red = Color.Red;
-        //        Color green = Color.FromArgb(146, 208, 80);
-        //        Color white = Color.White;
-        //        Color orange = Color.FromArgb(255, 140, 0);  // For ReleasedToFactory & MainContractor
-        //        Color purple = Color.FromArgb(153, 0, 204);  // For Amount
-
-        //        if (columnName == "ReleasedToFactory")
-        //        {
-        //            if (string.IsNullOrWhiteSpace(oldValue))
-        //            {
-        //                cell.Value = "REL";
-        //                cell.Style.BackColor = white;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{white.R},{white.G},{white.B}");
-        //            }
-        //            else if (oldValue == "REL" && currentColor.ToArgb() == white.ToArgb())
-        //            {
-        //                cell.Style.BackColor = orange;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{orange.R},{orange.G},{orange.B}");
-        //            }
-        //            else
-        //            {
-        //                cell.Value = "";
-        //                cell.Style.BackColor = white;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
-        //            }
-
-        //            cell.Style.ForeColor = Color.Black;
-        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
-        //            cell.Style.SelectionForeColor = Color.Black;
-        //            SaveInitialsToDispatch(record.ID, columnName, cell.Value?.ToString());
-        //        }
-        //        else if (columnName == "MainContractor")
-        //        {
-        //            if (currentColor.ToArgb() == white.ToArgb())
-        //            {
-        //                cell.Style.BackColor = orange;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{orange.R},{orange.G},{orange.B}");
-        //            }
-        //            else if (currentColor.ToArgb() == orange.ToArgb())
-        //            {
-        //                cell.Style.BackColor = green;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
-        //            }
-        //            else
-        //            {
-        //                cell.Style.BackColor = white;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
-        //            }
-
-        //            cell.Style.ForeColor = Color.Black;
-        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
-        //            cell.Style.SelectionForeColor = Color.Black;
-        //            // No initials change
-        //        }
-        //        else if (columnName == "Freight")
-        //        {
-        //            if (currentColor.ToArgb() == white.ToArgb())
-        //            {
-        //                cell.Style.BackColor = orange;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{orange.R},{orange.G},{orange.B}");
-        //            }
-        //            else
-        //            {
-        //                cell.Style.BackColor = white;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
-        //            }
-
-        //            cell.Style.ForeColor = Color.Black;
-        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
-        //            cell.Style.SelectionForeColor = Color.Black;
-        //        }
-        //        else if (columnName == "Amount")
-        //        {
-        //            if (currentColor.ToArgb() == white.ToArgb())
-        //            {
-        //                cell.Style.BackColor = purple;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{purple.R},{purple.G},{purple.B}");
-        //            }
-        //            else
-        //            {
-        //                cell.Style.BackColor = white;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, "White");
-        //            }
-
-        //            cell.Style.ForeColor = Color.Black;
-        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
-        //            cell.Style.SelectionForeColor = Color.Black;
-        //            // ✅ Leave cell.Value alone to keep it user-editable
-        //        }
-
-        //        else
-        //        {
-        //            // Steps 1–2 logic (ProdInput, MaterialsOrdered)
-        //            if (string.IsNullOrWhiteSpace(oldValue))
-        //            {
-        //                cell.Value = initials;
-        //                cell.Style.BackColor = red;
-        //                SaveCellColorToDatabase(record.ID, colorColumn, $"{red.R},{red.G},{red.B}");
-        //            }
-        //            else if (oldValue == initials)
-        //            {
-        //                if (currentColor.ToArgb() == red.ToArgb())
-        //                {
-        //                    cell.Style.BackColor = green;
-        //                    SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
-        //                }
-        //                else
-        //                {
-        //                    cell.Value = "";
-        //                    cell.Style.BackColor = white;
-        //                    SaveCellColorToDatabase(record.ID, colorColumn, "White");
-        //                }
-        //            }
-        //            else
-        //            {
-        //                if (currentColor.ToArgb() == red.ToArgb())
-        //                {
-        //                    cell.Value = initials;
-        //                    cell.Style.BackColor = green;
-        //                    SaveCellColorToDatabase(record.ID, colorColumn, $"{green.R},{green.G},{green.B}");
-        //                }
-        //                else
-        //                {
-        //                    cell.Value = "";
-        //                    cell.Style.BackColor = white;
-        //                    SaveCellColorToDatabase(record.ID, colorColumn, "White");
-        //                }
-        //            }
-
-        //            cell.Style.ForeColor = Color.Black;
-        //            cell.Style.SelectionBackColor = cell.Style.BackColor;
-        //            cell.Style.SelectionForeColor = Color.Black;
-        //            SaveInitialsToDispatch(record.ID, columnName, cell.Value?.ToString());
-        //        }
-
-        //        // ✅ Update in-memory record color
-        //        string colorString = cell.Style.BackColor == white ? null : $"{cell.Style.BackColor.R},{cell.Style.BackColor.G},{cell.Style.BackColor.B}";
-        //        if (colorColumn == "ProdInputColor") record.ProdInputColor = colorString;
-        //        else if (colorColumn == "MaterialsOrderedColor") record.MaterialsOrderedColor = colorString;
-        //        else if (colorColumn == "ReleasedToFactoryColor") record.ReleasedToFactoryColor = colorString;
-        //        else if (colorColumn == "MainContractorColor") record.MainContractorColor = colorString;
-        //         else if (colorColumn == "FreightColor") record.FreightColor = colorString;
-        //        else if (colorColumn == "AmountColor") record.AmountColor = colorString;
-
-        //        this.BeginInvoke((MethodInvoker)(() => dgvSchedule.InvalidateCell(cell)));
-        //    }
-        //}
+        
 
 
 
