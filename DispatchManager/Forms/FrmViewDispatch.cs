@@ -481,6 +481,9 @@ namespace DispatchManager.Forms
 
             UpdateTotalLabel(dgvSchedule.Rows.Cast<DataGridViewRow>());
 
+            PositionTotalLabelNextToQty();
+
+
             dgvSchedule.Refresh();
         }
 
@@ -536,7 +539,7 @@ namespace DispatchManager.Forms
                     e.FormattingApplied = true;
                 }
 
-                if (columnName == "DispatchDate" && e.Value is DateTime dt && dt == DateTime.MinValue)
+                if (columnName == "DispatchDate"  && e.Value is DateTime dt && dt == DateTime.MinValue)
                 {
                     e.Value = "";
                     e.FormattingApplied = true;
@@ -578,6 +581,15 @@ namespace DispatchManager.Forms
                     row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.Black;
                 }
             }
+
+            if ((columnName == "DispatchDate" || columnName == "DateOrdered") &&
+                 e.Value is DateTime realDate && realDate != DateTime.MinValue)
+            {
+                e.Value = realDate.ToString("dd-MMM");
+                e.FormattingApplied = true;
+            }
+
+
 
             // ✅ Apply saved cell background colors
             if (row.DataBoundItem is DispatchRecord rec)
@@ -894,7 +906,18 @@ namespace DispatchManager.Forms
                 }
             }
         }
-       
+        private void PositionTotalLabelNextToQty()
+        {
+            if (dgvSchedule.Columns.Contains("Qty"))
+            {
+                var qtyColumnIndex = dgvSchedule.Columns["Qty"].Index;
+                var qtyColumnRect = dgvSchedule.GetCellDisplayRectangle(qtyColumnIndex, -1, true);
+
+                lblTotal.Top = dgvSchedule.Bottom + 5; // adjust vertically under grid
+                lblTotal.Left = dgvSchedule.Left + qtyColumnRect.Left - 100; // match Qty column X position
+            }
+        }
+
 
     }
 }
