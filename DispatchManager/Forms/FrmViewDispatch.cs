@@ -20,45 +20,87 @@ namespace DispatchManager.Forms
         private Dictionary<Guid, Dictionary<string, string>> dispatchColors;
         private DataGridViewCell lastDoubleClickedCell = null;
 
+        // Place this at the top of your FrmViewDispatch form
+        private readonly HashSet<string> editableColumns = new HashSet<string>
+{
+    "DispatchDate",
+    "ProdInput",
+    "MaterialsOrdered",
+    "ReleasedToFactory",
+    "ProjectName",
+    "ProjectColour",
+    "Qty",
+    "FB",
+    "EB",
+    "ASS",
+    "BoardETA",
+    "Installed",
+    "Freight",
+    "BenchTopSupplier",
+    "BenchTopColour",
+    "Installer",
+    "Comment",
+    "DeliveryAddress",
+    "Phone",
+    "M3",
+    "Amount",
+    "OrderNumber"
+};
+
 
         public FrmViewDispatch()
         {
             InitializeComponent();
+
+            // Form Level Events
             this.Load += FrmViewDispatch_Load;
             this.FormClosing += FrmViewDispatch_FormClosing;
+
+            // Control Level Events
             this.dtpFrom.ValueChanged += dtpFrom_ValueChanged;
             this.dtpTo.ValueChanged += dtpTo_ValueChanged;
             this.btnSearch.Click += btnSearch_Click;
-            this.dgvSchedule.CellDoubleClick += dgvSchedule_CellDoubleClick;
 
+            //DataGridView Events
+            this.dgvSchedule.CellDoubleClick += dgvSchedule_CellDoubleClick;
+            this.dgvSchedule.CellEndEdit += dgvSchedule_CellEndEdit;
+            dgvSchedule.CellBeginEdit += dgvSchedule_CellBeginEdit;
+            dgvSchedule.CellFormatting += dgvSchedule_CellFormatting;
+            dgvSchedule.SelectionChanged += dgvSchedule_SelectionChanged;
+
+            //colour and style events
+            //dgvSchedule.Paint += dgvSchedule_Paint;
+            //dgvSchedule.RowPostPaint += dgvSchedule_RowPostPaint;
+
+            // Remove blue selection highlight
+            dgvSchedule.DefaultCellStyle.SelectionBackColor = dgvSchedule.DefaultCellStyle.BackColor;
+            dgvSchedule.DefaultCellStyle.SelectionForeColor = dgvSchedule.DefaultCellStyle.ForeColor;
+
+            //// Optional: remove selection color from header cells too
+            //dgvSchedule.RowHeadersDefaultCellStyle.SelectionBackColor = dgvSchedule.RowHeadersDefaultCellStyle.BackColor;
+            //dgvSchedule.RowHeadersDefaultCellStyle.SelectionForeColor = dgvSchedule.RowHeadersDefaultCellStyle.ForeColor;
+
+
+
+            //Optional: supress tooltips to reduce flicker
+            dgvSchedule.ShowCellToolTips = false;
         }
-        
+
         private void FrmViewDispatch_Load(object sender, EventArgs e)
         {
             // Load saved date settings
             dtpFrom.Value = Properties.Settings.Default.dtpFromDate;
             dtpTo.Value = Properties.Settings.Default.dtpToDate;
 
+            // Set the logged-in user label
             lblLoggedInUser.Text = $"{Session.CurrentFullName} is logged in";
-
-            dgvSchedule.CellFormatting += dgvSchedule_CellFormatting;
-            //dgvSchedule.DataError += (s, ev) => { ev.ThrowException = false; };
 
             // Load and store colors from database
             dispatchColors = DispatchData.GetDispatchColours();
 
             // Load data and populate DataGridView
             LoadScheduleData();
-
-            // Disable tooltips (helps reduce flicker)
-            dgvSchedule.ShowCellToolTips = false;
-
-            
-            dgvSchedule.CellBeginEdit += dgvSchedule_CellBeginEdit;
-            
-
-
-
+                         
             // Optional: Apply double buffering to reduce flicker
             typeof(DataGridView).InvokeMember("DoubleBuffered",
                 System.Reflection.BindingFlags.NonPublic |
@@ -364,7 +406,7 @@ namespace DispatchManager.Forms
                         OrderNumber = -1
                     });
                 }
-               
+
             }
 
             Color[] palette = new Color[]
@@ -394,17 +436,29 @@ namespace DispatchManager.Forms
             dgvSchedule.Columns.Clear();
 
             dgvSchedule.DataSource = withWeeklyTotals;
-            dgvSchedule.Refresh();
 
-            dgvSchedule.Columns["ID"].Visible = false;
-            dgvSchedule.Columns["MaterialsOrderedBy"].Visible = false;
-            dgvSchedule.Columns["BenchtopOrderedBy"].Visible = false;
+            //pink boarders
+            dgvSchedule.RowPostPaint += dgvSchedule_RowPostPaint;
 
-            dgvSchedule.SelectionChanged += dgvSchedule_SelectionChanged;
+            string[] hiddenColumns = {
+    "ID", "MaterialsOrderedBy", "BenchtopOrderedBy",
+    "ProdInputColor", "MaterialsOrderedColor", "ReleasedToFactoryColor",
+    "MainContractorColor", "FreightColor", "AmountColor"
+};
+
+            foreach (string col in hiddenColumns)
+            {
+                if (dgvSchedule.Columns.Contains(col))
+                {
+                    dgvSchedule.Columns[col].Visible = false;
+                }
+            }
+                    
 
             foreach (DataGridViewColumn column in dgvSchedule.Columns)
             {
                 column.SortMode = DataGridViewColumnSortMode.NotSortable;
+                column.ReadOnly = !editableColumns.Contains(column.Name);
             }
 
             foreach (DataGridViewRow row in dgvSchedule.Rows)
@@ -430,6 +484,8 @@ namespace DispatchManager.Forms
             }
 
             UpdateTotalLabel(dgvSchedule.Rows.Cast<DataGridViewRow>());
+
+            dgvSchedule.Refresh();
         }
 
         private void dgvSchedule_SelectionChanged(object sender, EventArgs e)
@@ -462,8 +518,6 @@ namespace DispatchManager.Forms
             lblTotal.Text = $"Total Cabinets: {totalQty:N0}";
             
         }
-
-        //Cell formatting to apply custom styles and blanking logic
 
         private void dgvSchedule_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
@@ -512,8 +566,7 @@ namespace DispatchManager.Forms
 
             // ✅ Apply week color
             if (columnName == "Day")
-                //if (columnName == "WeekNo" || columnName == "DispatchDate" || columnName == "Day" || columnName == "JobNo")
-                {
+            {
                 if (columnName == "DispatchDate" && e.Value is DateTime dtValue && dtValue != DateTime.MinValue)
                 {
                     e.Value = dtValue.ToString("dd-MMM");
@@ -562,10 +615,113 @@ namespace DispatchManager.Forms
                     }
                 }
             }
-
-            // ✅ Force refresh to apply changes immediately
-            dgvSchedule.InvalidateCell(row.Cells[e.ColumnIndex]);
         }
+
+
+
+        //Cell formatting to apply custom styles and blanking logic
+
+        //private void dgvSchedule_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        //{
+        //    var row = dgvSchedule.Rows[e.RowIndex];
+        //    string columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
+
+        //    // ✅ Blank total rows
+        //    if (row.DataBoundItem is DispatchBlankRow)
+        //    {
+        //        if ((columnName == "WeekNo" || columnName == "JobNo" || columnName == "OrderNumber" || columnName == "Qty" || columnName == "Amount")
+        //            && e.Value is int intVal && intVal <= 0)
+        //        {
+        //            e.Value = "";
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        if (columnName == "Amount" && e.Value is decimal decVal && decVal <= 0)
+        //        {
+        //            e.Value = "";
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        if (columnName == "DispatchDate" && e.Value is DateTime dt && dt == DateTime.MinValue)
+        //        {
+        //            e.Value = "";
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        // Make totals yellow ONLY in Qty column
+        //        if (columnName == "Qty" || columnName == "ProjectColour")
+        //        {
+        //            row.Cells[e.ColumnIndex].Style.BackColor = Color.FromArgb(255, 204, 0); // Yellow
+        //            row.Cells[e.ColumnIndex].Style.SelectionBackColor = Color.FromArgb(255, 204, 0);
+        //            row.Cells[e.ColumnIndex].Style.ForeColor = Color.Black;
+        //            row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.Black;
+        //        }
+        //        else
+        //        {
+        //            row.Cells[e.ColumnIndex].Style.BackColor = Color.LightGray;
+        //            row.Cells[e.ColumnIndex].Style.SelectionBackColor = Color.LightGray;
+        //            row.Cells[e.ColumnIndex].Style.ForeColor = Color.DarkSlateGray;
+        //            row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.DarkSlateGray;
+        //        }
+        //        return;
+        //    }
+
+        //    // ✅ Apply week color
+        //    if (columnName == "Day")
+        //        //if (columnName == "WeekNo" || columnName == "DispatchDate" || columnName == "Day" || columnName == "JobNo")
+        //        {
+        //        if (columnName == "DispatchDate" && e.Value is DateTime dtValue && dtValue != DateTime.MinValue)
+        //        {
+        //            e.Value = dtValue.ToString("dd-MMM");
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        var weekObj = row.Cells["WeekNo"].Value;
+        //        if (weekObj is int week && weekColors.TryGetValue(week, out var color))
+        //        {
+        //            row.Cells[e.ColumnIndex].Style.BackColor = color;
+        //            row.Cells[e.ColumnIndex].Style.SelectionBackColor = color;
+        //            row.Cells[e.ColumnIndex].Style.ForeColor = Color.Black;
+        //            row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.Black;
+        //        }
+        //    }
+
+        //    // ✅ Apply saved cell background colors
+        //    if (row.DataBoundItem is DispatchRecord rec)
+        //    {
+        //        string colorValue = null;
+
+        //        if (columnName == "ProdInput")
+        //            colorValue = rec.ProdInputColor;
+        //        else if (columnName == "MaterialsOrdered")
+        //            colorValue = rec.MaterialsOrderedColor;
+        //        else if (columnName == "ReleasedToFactory")
+        //            colorValue = rec.ReleasedToFactoryColor;
+        //        else if (columnName == "MainContractor")
+        //            colorValue = rec.MainContractorColor;
+        //        else if (columnName == "Freight")
+        //            colorValue = rec.FreightColor;
+        //        else if (columnName == "Amount")
+        //            colorValue = rec.AmountColor;
+
+        //        if (!string.IsNullOrWhiteSpace(colorValue))
+        //        {
+        //            string[] rgb = colorValue.Split(',');
+        //            if (rgb.Length == 3 &&
+        //                int.TryParse(rgb[0], out int r) &&
+        //                int.TryParse(rgb[1], out int g) &&
+        //                int.TryParse(rgb[2], out int b))
+        //            {
+        //                Color dbColor = Color.FromArgb(r, g, b);
+        //                row.Cells[e.ColumnIndex].Style.BackColor = dbColor;
+        //                row.Cells[e.ColumnIndex].Style.SelectionBackColor = dbColor;
+        //            }
+        //        }
+        //    }
+
+        //    // ✅ Force refresh to apply changes immediately
+        //    dgvSchedule.InvalidateCell(row.Cells[e.ColumnIndex]);
+        //}
 
         private Color ParseColor(string input)
         {
@@ -657,9 +813,94 @@ namespace DispatchManager.Forms
             }
         }
 
+        private void dgvSchedule_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                return;
 
+            string columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
 
+            // ✅ Bail if not editable
+            if (!editableColumns.Contains(columnName))
+                return;
+
+            var row = dgvSchedule.Rows[e.RowIndex];
+
+            if (row.IsNewRow || row.Cells["ID"].Value == null)
+                return;
+
+            if (!Guid.TryParse(row.Cells["ID"].Value.ToString(), out Guid id))
+                return;
+
+            object newValue = row.Cells[columnName].Value ?? DBNull.Value;
+
+            bool success = DispatchData.UpdateDispatchField(id, columnName, newValue);
+
+            if (!success)
+            {
+                MessageBox.Show($"Could not update {columnName}.", "Update Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+        private void dgvSchedule_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
+        {
+            var grid = dgvSchedule;
+            if (grid.SelectedCells.Count == 0) return;
+
+            using (Pen pinkPen = new Pen(Color.DeepPink, 2))
+            {
+                var selectedRowIndexes = grid.SelectedCells
+                    .Cast<DataGridViewCell>()
+                    .Select(c => c.RowIndex)
+                    .Distinct()
+                    .OrderBy(i => i)
+                    .ToList();
+
+                bool isContiguous =
+                    selectedRowIndexes.Count > 1 &&
+                    selectedRowIndexes.Last() - selectedRowIndexes.First() + 1 == selectedRowIndexes.Count;
+
+                if (isContiguous)
+                {
+                    int topRow = selectedRowIndexes.First();
+                    int bottomRow = selectedRowIndexes.Last();
+
+                    // Only draw once — on the last row
+                    if (e.RowIndex == bottomRow)
+                    {
+                        Rectangle topRect = grid.GetRowDisplayRectangle(topRow, true);
+                        Rectangle bottomRect = grid.GetRowDisplayRectangle(bottomRow, true);
+
+                        int left = grid.RowHeadersWidth;
+                        int width = grid.Columns.GetColumnsWidth(DataGridViewElementStates.Visible);
+
+                        // Draw top border
+                        e.Graphics.DrawLine(pinkPen, left, topRect.Top + 1, left + width, topRect.Top + 1);
+
+                        // Draw bottom border
+                        e.Graphics.DrawLine(pinkPen, left, bottomRect.Bottom - 2, left + width, bottomRect.Bottom - 2);
+                    }
+                }
+                else
+                {
+                    // Non-contiguous selection
+                    if (grid.Rows[e.RowIndex].Selected)
+                    {
+                        Rectangle rowRect = grid.GetRowDisplayRectangle(e.RowIndex, true);
+                        int left = grid.RowHeadersWidth;
+                        int width = grid.Columns.GetColumnsWidth(DataGridViewElementStates.Visible);
+
+                        e.Graphics.DrawRectangle(pinkPen, new Rectangle(
+                            left + 1,
+                            rowRect.Top + 1,
+                            width - 3,
+                            rowRect.Height - 3));
+                    }
+                }
+            }
+        }
+       
 
     }
 }
+
 

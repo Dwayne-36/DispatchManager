@@ -124,5 +124,42 @@ namespace DispatchManager.DataAccess
             return (T)Convert.ChangeType(value, typeof(T));
         }
 
+        public static bool UpdateDispatchField(Guid id, string columnName, object value)
+        {
+            // Only allow updates to these fields
+            var allowedColumns = new HashSet<string> {
+        "DispatchDate", "ProdInput", "MaterialsOrdered", "ReleasedToFactory", "ProjectName",
+        "ProjectColour", "Qty", "FB", "EB", "ASS", "BoardETA", "Installed", "Freight",
+        "BenchTopSupplier", "BenchTopColour", "Installer", "Comment", "DeliveryAddress",
+        "Phone", "M3", "Amount", "OrderNumber"
+    };
+
+            if (!allowedColumns.Contains(columnName))
+                return false;
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                string sql = $"UPDATE Dispatch SET {columnName} = @Value WHERE ID = @ID";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Value", value ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ID", id);
+
+                    try
+                    {
+                        conn.Open();
+                        return cmd.ExecuteNonQuery() == 1;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Failed to update '{columnName}' for ID {id}.\n{ex.Message}", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
+                    }
+                }
+            }
+        }
+
+
     }
 }

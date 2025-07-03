@@ -56,7 +56,7 @@
             this.dgvSchedule.Location = new System.Drawing.Point(1, 126);
             this.dgvSchedule.Name = "dgvSchedule";
             this.dgvSchedule.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvSchedule.Size = new System.Drawing.Size(1192, 597);
+            this.dgvSchedule.Size = new System.Drawing.Size(2855, 1083);
             this.dgvSchedule.TabIndex = 0;
             // 
             // dtpFrom
@@ -132,7 +132,7 @@
             this.lblTotal.AutoSize = true;
             this.lblTotal.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTotal.ForeColor = System.Drawing.Color.Red;
-            this.lblTotal.Location = new System.Drawing.Point(1006, 735);
+            this.lblTotal.Location = new System.Drawing.Point(2669, 1221);
             this.lblTotal.Name = "lblTotal";
             this.lblTotal.Size = new System.Drawing.Size(45, 17);
             this.lblTotal.TabIndex = 10;
@@ -144,7 +144,7 @@
             this.menuEmployees});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1191, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(2854, 24);
             this.menuStrip1.TabIndex = 11;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -168,7 +168,7 @@
             this.lblLoggedInUser.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblLoggedInUser.AutoSize = true;
             this.lblLoggedInUser.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLoggedInUser.Location = new System.Drawing.Point(933, 29);
+            this.lblLoggedInUser.Location = new System.Drawing.Point(2596, 29);
             this.lblLoggedInUser.Name = "lblLoggedInUser";
             this.lblLoggedInUser.Size = new System.Drawing.Size(92, 13);
             this.lblLoggedInUser.TabIndex = 12;
@@ -178,7 +178,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1191, 775);
+            this.ClientSize = new System.Drawing.Size(2854, 1261);
             this.Controls.Add(this.lblLoggedInUser);
             this.Controls.Add(this.lblTotal);
             this.Controls.Add(this.btnNewProject);
@@ -195,7 +195,6 @@
             this.Name = "FrmViewDispatch";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Haylo View";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
