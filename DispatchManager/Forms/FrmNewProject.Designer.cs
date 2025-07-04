@@ -470,6 +470,7 @@
             this.btnAddLeadTime.TabIndex = 47;
             this.btnAddLeadTime.Text = "+";
             this.btnAddLeadTime.UseVisualStyleBackColor = true;
+            
             // 
             // FrmNewProject
             // 

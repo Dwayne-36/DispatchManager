@@ -26,7 +26,12 @@ namespace DispatchManager.Forms
 
             cbxLeadTime.SelectedIndexChanged += cbxLeadTime_SelectedIndexChanged;
 
+            tbDateOrdered.Text = DateTime.Today.ToString("d-MMM");
 
+            // Add Installed options
+            cbxInstalled.Items.Clear();
+            cbxInstalled.Items.Add("Yes");
+            cbxInstalled.Items.Add("No");
 
         }
         private void FrmNewProject_Load(object sender, EventArgs e)
@@ -67,6 +72,7 @@ namespace DispatchManager.Forms
                     DateTime startDate = DateTime.Today;
                     DateTime dispatchDate = AddWorkingDays(startDate, daysToAdd, holidays);
 
+                    
                     tbDispatchDate.Text = dispatchDate.ToString("d-MMM");
                     lblDay1.Text = dispatchDate.ToString("dddd"); // Shows "Monday", "Tuesday", etc.
                     lblWeekNumber1.Text = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
@@ -88,6 +94,62 @@ namespace DispatchManager.Forms
 
         private void btnEnterProject_Click(object sender, EventArgs e)
         {
+            SaveProject(false); // Save and stay open
+            //try
+            //{
+            //    string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
+
+            //    using (SqlConnection conn = new SqlConnection(connStr))
+            //    {
+            //        conn.Open();
+
+            //        string sql = @"
+            //    INSERT INTO Dispatch (
+            //        DispatchDate, MainContractor, ProjectName, ProjectColour, Qty, Freight,
+            //        BenchTopSupplier, BenchTopColour, Installer, Comment,
+            //        DeliveryAddress, Phone, M3, Amount, OrderNumber, DateOrdered, LeadTime
+            //    )
+            //    VALUES (
+            //        @DispatchDate, @MainContractor, @ProjectName, @ProjectColour, @Qty, @Freight,
+            //        @BenchTopSupplier, @BenchTopColour, @Installer, @Comment,
+            //        @DeliveryAddress, @Phone, @M3, @Amount, @OrderNumber, @DateOrdered, @LeadTime
+            //    )";
+
+            //        using (SqlCommand cmd = new SqlCommand(sql, conn))
+            //        {
+            //            cmd.Parameters.AddWithValue("@DispatchDate", ParseDate(tbDispatchDate.Text));
+            //            cmd.Parameters.AddWithValue("@MainContractor", cbxMainContractor.Text);
+            //            cmd.Parameters.AddWithValue("@ProjectName", tbProjectName.Text);
+            //            cmd.Parameters.AddWithValue("@ProjectColour", tbProjectColour.Text);
+            //            cmd.Parameters.AddWithValue("@Qty", ParseInt(tbQty.Text));
+            //            cmd.Parameters.AddWithValue("@Freight", tbFreight.Text);
+            //            cmd.Parameters.AddWithValue("@BenchTopSupplier", tbBenchtopSupplier.Text);
+            //            cmd.Parameters.AddWithValue("@BenchTopColour", tbBenchtopColour.Text);
+            //            cmd.Parameters.AddWithValue("@Installer", tbInstaller.Text);
+            //            cmd.Parameters.AddWithValue("@Comment", tbComment.Text);
+            //            cmd.Parameters.AddWithValue("@DeliveryAddress", tbDeliveryAddress.Text);
+            //            cmd.Parameters.AddWithValue("@Phone", tbPhone.Text);
+            //            cmd.Parameters.AddWithValue("@M3", tbM3.Text);
+            //            cmd.Parameters.AddWithValue("@Amount", ParseDecimal(tbAmount.Text));
+            //            cmd.Parameters.AddWithValue("@OrderNumber", ParseInt(tbOrderNumber.Text));
+            //            cmd.Parameters.AddWithValue("@DateOrdered", ParseDate(tbDateOrdered.Text));
+            //            cmd.Parameters.AddWithValue("@LeadTime", cbxLeadTime.Text);
+
+            //            cmd.ExecuteNonQuery();
+            //        }
+
+            //        MessageBox.Show("Project saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //        this.Close(); // Close the form after save
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show("Error saving project: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
+        }
+
+        private void SaveProject(bool closeAfterSave)
+        {
             try
             {
                 string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
@@ -97,16 +159,16 @@ namespace DispatchManager.Forms
                     conn.Open();
 
                     string sql = @"
-                INSERT INTO Dispatch (
-                    DispatchDate, MainContractor, ProjectName, ProjectColour, Qty, Freight,
-                    BenchTopSupplier, BenchTopColour, Installer, Comment,
-                    DeliveryAddress, Phone, M3, Amount, OrderNumber, DateOrdered, LeadTime
-                )
-                VALUES (
-                    @DispatchDate, @MainContractor, @ProjectName, @ProjectColour, @Qty, @Freight,
-                    @BenchTopSupplier, @BenchTopColour, @Installer, @Comment,
-                    @DeliveryAddress, @Phone, @M3, @Amount, @OrderNumber, @DateOrdered, @LeadTime
-                )";
+            INSERT INTO Dispatch (
+                DispatchDate, MainContractor, ProjectName, ProjectColour, Qty, Freight,
+                BenchTopSupplier, BenchTopColour, Installer, Comment,
+                DeliveryAddress, Phone, M3, Amount, OrderNumber, DateOrdered, LeadTime
+            )
+            VALUES (
+                @DispatchDate, @MainContractor, @ProjectName, @ProjectColour, @Qty, @Freight,
+                @BenchTopSupplier, @BenchTopColour, @Installer, @Comment,
+                @DeliveryAddress, @Phone, @M3, @Amount, @OrderNumber, @DateOrdered, @LeadTime
+            )";
 
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -132,7 +194,15 @@ namespace DispatchManager.Forms
                     }
 
                     MessageBox.Show("Project saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    this.Close(); // Close the form after save
+
+                    if (closeAfterSave)
+                    {
+                        this.Close();
+                    }
+                    else
+                    {
+                        ClearFormInputs();
+                    }
                 }
             }
             catch (Exception ex)
@@ -140,6 +210,30 @@ namespace DispatchManager.Forms
                 MessageBox.Show("Error saving project: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void ClearFormInputs()
+        {
+            tbDispatchDate.Clear();
+            cbxMainContractor.SelectedIndex = -1;
+            tbProjectName.Clear();
+            tbProjectColour.Clear();
+            tbQty.Clear();
+            tbFreight.Clear();
+            tbBenchtopSupplier.Clear();
+            tbBenchtopColour.Clear();
+            tbInstaller.Clear();
+            tbComment.Clear();
+            tbDeliveryAddress.Clear();
+            tbPhone.Clear();
+            tbM3.Clear();
+            tbAmount.Clear();
+            tbOrderNumber.Clear();
+            cbxLeadTime.SelectedIndex = -1;
+            cbxInstalled.SelectedIndex = -1;
+
+            // Keep tbDateOrdered unchanged
+        }
+
         private object ParseDate(string input)
         {
             if (DateTime.TryParse(input, out DateTime dt))
@@ -167,8 +261,8 @@ namespace DispatchManager.Forms
         }
 
         private void btnEnterClose_Click(object sender, EventArgs e)
-        {            
-            this.Close();
+        {
+            SaveProject(true);  // Save and close
         }
 
         private void btnAddMainContractor_Click(object sender, EventArgs e)
@@ -178,8 +272,56 @@ namespace DispatchManager.Forms
 
         private void btnAddLeadTime_Click(object sender, EventArgs e)
         {
-            AddItemToComboBox(cbxLeadTime, "Lead Time", "LeadTimes", "Description");
+            string description = Interaction.InputBox("Enter Lead Time description:", "Add Lead Time", "");
+            if (string.IsNullOrWhiteSpace(description)) return;
+
+            // Prompt for all day values
+            string orderStr = Interaction.InputBox("Enter number of days for Order:", "Add Lead Time", "0");
+            string productionStr = Interaction.InputBox("Enter number of days for Production:", "Add Lead Time", "0");
+            string detailWithBTStr = Interaction.InputBox("Enter number of days for Detail with benchtop:", "Add Lead Time", "0");
+            string detailWithoutBTStr = Interaction.InputBox("Enter number of days for Detail without benchtop:", "Add Lead Time", "0");
+
+            // Validate input
+            if (!int.TryParse(orderStr, out int orderDays) ||
+                !int.TryParse(productionStr, out int productionDays) ||
+                !int.TryParse(detailWithBTStr, out int detailWithBTDays) ||
+                !int.TryParse(detailWithoutBTStr, out int detailWithoutBTDays))
+            {
+                MessageBox.Show("Please enter valid numeric values for all day fields.", "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Insert into database
+            try
+            {
+                string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    conn.Open();
+                    string sql = @"
+                INSERT INTO LeadTimes (Description, OrderDays, ProductionDays, DetailWithBenchtopDays, DetailWithoutBenchtopDays)
+                VALUES (@Description, @OrderDays, @ProductionDays, @DetailWithBT, @DetailWithoutBT)";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Description", description);
+                        cmd.Parameters.AddWithValue("@OrderDays", orderDays);
+                        cmd.Parameters.AddWithValue("@ProductionDays", productionDays);
+                        cmd.Parameters.AddWithValue("@DetailWithBT", detailWithBTDays);
+                        cmd.Parameters.AddWithValue("@DetailWithoutBT", detailWithoutBTDays);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                LoadComboBox(cbxLeadTime, "SELECT Description FROM LeadTimes ORDER BY Description");
+                cbxLeadTime.SelectedItem = description;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error saving new lead time: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
 
         private void LoadComboBox(ComboBox comboBox, string query)
         {
@@ -260,10 +402,7 @@ namespace DispatchManager.Forms
             return date;
         }
 
-
-
-
-
+     
     }
 
 }
