@@ -25,6 +25,8 @@ namespace DispatchManager.Forms
             btnAddLeadTime.Click += btnAddLeadTime_Click;
 
             cbxLeadTime.SelectedIndexChanged += cbxLeadTime_SelectedIndexChanged;
+            cbxMainContractor.SelectedIndexChanged += cbxMainContractor_SelectedIndexChanged;
+
 
             tbDateOrdered.Text = DateTime.Today.ToString("d-MMM");
 
@@ -92,61 +94,7 @@ namespace DispatchManager.Forms
 
 
 
-        private void btnEnterProject_Click(object sender, EventArgs e)
-        {
-            SaveProject(false); // Save and stay open
-            //try
-            //{
-            //    string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
-
-            //    using (SqlConnection conn = new SqlConnection(connStr))
-            //    {
-            //        conn.Open();
-
-            //        string sql = @"
-            //    INSERT INTO Dispatch (
-            //        DispatchDate, MainContractor, ProjectName, ProjectColour, Qty, Freight,
-            //        BenchTopSupplier, BenchTopColour, Installer, Comment,
-            //        DeliveryAddress, Phone, M3, Amount, OrderNumber, DateOrdered, LeadTime
-            //    )
-            //    VALUES (
-            //        @DispatchDate, @MainContractor, @ProjectName, @ProjectColour, @Qty, @Freight,
-            //        @BenchTopSupplier, @BenchTopColour, @Installer, @Comment,
-            //        @DeliveryAddress, @Phone, @M3, @Amount, @OrderNumber, @DateOrdered, @LeadTime
-            //    )";
-
-            //        using (SqlCommand cmd = new SqlCommand(sql, conn))
-            //        {
-            //            cmd.Parameters.AddWithValue("@DispatchDate", ParseDate(tbDispatchDate.Text));
-            //            cmd.Parameters.AddWithValue("@MainContractor", cbxMainContractor.Text);
-            //            cmd.Parameters.AddWithValue("@ProjectName", tbProjectName.Text);
-            //            cmd.Parameters.AddWithValue("@ProjectColour", tbProjectColour.Text);
-            //            cmd.Parameters.AddWithValue("@Qty", ParseInt(tbQty.Text));
-            //            cmd.Parameters.AddWithValue("@Freight", tbFreight.Text);
-            //            cmd.Parameters.AddWithValue("@BenchTopSupplier", tbBenchtopSupplier.Text);
-            //            cmd.Parameters.AddWithValue("@BenchTopColour", tbBenchtopColour.Text);
-            //            cmd.Parameters.AddWithValue("@Installer", tbInstaller.Text);
-            //            cmd.Parameters.AddWithValue("@Comment", tbComment.Text);
-            //            cmd.Parameters.AddWithValue("@DeliveryAddress", tbDeliveryAddress.Text);
-            //            cmd.Parameters.AddWithValue("@Phone", tbPhone.Text);
-            //            cmd.Parameters.AddWithValue("@M3", tbM3.Text);
-            //            cmd.Parameters.AddWithValue("@Amount", ParseDecimal(tbAmount.Text));
-            //            cmd.Parameters.AddWithValue("@OrderNumber", ParseInt(tbOrderNumber.Text));
-            //            cmd.Parameters.AddWithValue("@DateOrdered", ParseDate(tbDateOrdered.Text));
-            //            cmd.Parameters.AddWithValue("@LeadTime", cbxLeadTime.Text);
-
-            //            cmd.ExecuteNonQuery();
-            //        }
-
-            //        MessageBox.Show("Project saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //        this.Close(); // Close the form after save
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show("Error saving project: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //}
-        }
+       
 
         private void SaveProject(bool closeAfterSave)
         {
@@ -162,12 +110,12 @@ namespace DispatchManager.Forms
             INSERT INTO Dispatch (
                 DispatchDate, MainContractor, ProjectName, ProjectColour, Qty, Freight,
                 BenchTopSupplier, BenchTopColour, Installer, Comment,
-                DeliveryAddress, Phone, M3, Amount, OrderNumber, DateOrdered, LeadTime
+                DeliveryAddress, Phone, M3, Amount, OrderNumber, DateOrdered, LeadTime, WeekNo, Day, Installed, JobNo
             )
             VALUES (
                 @DispatchDate, @MainContractor, @ProjectName, @ProjectColour, @Qty, @Freight,
                 @BenchTopSupplier, @BenchTopColour, @Installer, @Comment,
-                @DeliveryAddress, @Phone, @M3, @Amount, @OrderNumber, @DateOrdered, @LeadTime
+                @DeliveryAddress, @Phone, @M3, @Amount, @OrderNumber, @DateOrdered, @LeadTime, @WeekNo, @Day, @Installed, @JobNo
             )";
 
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -189,8 +137,16 @@ namespace DispatchManager.Forms
                         cmd.Parameters.AddWithValue("@OrderNumber", ParseInt(tbOrderNumber.Text));
                         cmd.Parameters.AddWithValue("@DateOrdered", ParseDate(tbDateOrdered.Text));
                         cmd.Parameters.AddWithValue("@LeadTime", cbxLeadTime.Text);
+                        cmd.Parameters.AddWithValue("@WeekNo", ParseInt(lblWeekNumber1.Text));
+                        cmd.Parameters.AddWithValue("@Day", DateTime.Parse(tbDispatchDate.Text).ToString("ddd", CultureInfo.InvariantCulture));
+                        cmd.Parameters.AddWithValue("@Installed", cbxInstalled.Text);
+                        cmd.Parameters.AddWithValue("@JobNo", lblProjectNumber1.Text);
+
 
                         cmd.ExecuteNonQuery();
+
+                        // ✅ Update JobNo for selected main contractor
+                        UpdateMainContractorJobNo(cbxMainContractor.Text);
                     }
 
                     MessageBox.Show("Project saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -259,7 +215,10 @@ namespace DispatchManager.Forms
         {
            this.Close();
         }
-
+        private void btnEnterProject_Click(object sender, EventArgs e)
+        {
+            SaveProject(false); // Save and stay open            
+        }
         private void btnEnterClose_Click(object sender, EventArgs e)
         {
             SaveProject(true);  // Save and close
@@ -401,8 +360,86 @@ namespace DispatchManager.Forms
 
             return date;
         }
+        private void cbxMainContractor_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string selectedContractor = cbxMainContractor.Text;
 
-     
+            if (string.IsNullOrWhiteSpace(selectedContractor))
+            {
+                lblProjectNumber1.Text = "";
+                return;
+            }
+
+            string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connStr))
+                using (SqlCommand cmd = new SqlCommand("SELECT JobNo FROM MainContractors WHERE Name = @Name", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Name", selectedContractor);
+                    conn.Open();
+
+                    object result = cmd.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        lblProjectNumber1.Text = result.ToString();
+                    }
+                    else
+                    {
+                        lblProjectNumber1.Text = "(No JobNo found)";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error retrieving JobNo: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                lblProjectNumber1.Text = "";
+            }
+        }
+        private void UpdateMainContractorJobNo(string contractorName)
+        {
+            try
+            {
+                string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
+
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    conn.Open();
+
+                    // Get current JobNo
+                    string selectSql = "SELECT JobNo FROM MainContractors WHERE Name = @Name";
+                    using (SqlCommand selectCmd = new SqlCommand(selectSql, conn))
+                    {
+                        selectCmd.Parameters.AddWithValue("@Name", contractorName);
+                        object result = selectCmd.ExecuteScalar();
+
+                        if (result != null && int.TryParse(result.ToString(), out int currentJobNo))
+                        {
+                            // Increment and adjust if ending in 999
+                            int nextJobNo = currentJobNo + 1;
+                            if (nextJobNo % 1000 == 999)
+                                nextJobNo = (nextJobNo / 1000 + 1) * 1000;
+
+                            // Update new JobNo
+                            string updateSql = "UPDATE MainContractors SET JobNo = @NewJobNo WHERE Name = @Name";
+                            using (SqlCommand updateCmd = new SqlCommand(updateSql, conn))
+                            {
+                                updateCmd.Parameters.AddWithValue("@NewJobNo", nextJobNo);
+                                updateCmd.Parameters.AddWithValue("@Name", contractorName);
+                                updateCmd.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error updating JobNo: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
     }
 
 }

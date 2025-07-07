@@ -268,6 +268,7 @@
             // 
             // cbxLeadTime
             // 
+            this.cbxLeadTime.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxLeadTime.FormattingEnabled = true;
             this.cbxLeadTime.Location = new System.Drawing.Point(12, 25);
             this.cbxLeadTime.Name = "cbxLeadTime";
@@ -276,6 +277,7 @@
             // 
             // cbxMainContractor
             // 
+            this.cbxMainContractor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxMainContractor.FormattingEnabled = true;
             this.cbxMainContractor.Location = new System.Drawing.Point(499, 25);
             this.cbxMainContractor.Name = "cbxMainContractor";
@@ -284,6 +286,7 @@
             // 
             // cbxInstalled
             // 
+            this.cbxInstalled.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxInstalled.FormattingEnabled = true;
             this.cbxInstalled.Location = new System.Drawing.Point(282, 82);
             this.cbxInstalled.Name = "cbxInstalled";
@@ -304,9 +307,8 @@
             this.lblProjectNumber1.AutoSize = true;
             this.lblProjectNumber1.Location = new System.Drawing.Point(249, 215);
             this.lblProjectNumber1.Name = "lblProjectNumber1";
-            this.lblProjectNumber1.Size = new System.Drawing.Size(31, 13);
+            this.lblProjectNumber1.Size = new System.Drawing.Size(0, 13);
             this.lblProjectNumber1.TabIndex = 25;
-            this.lblProjectNumber1.Text = "1234";
             // 
             // lblDay1
             // 
@@ -470,7 +472,6 @@
             this.btnAddLeadTime.TabIndex = 47;
             this.btnAddLeadTime.Text = "+";
             this.btnAddLeadTime.UseVisualStyleBackColor = true;
-            
             // 
             // FrmNewProject
             // 
