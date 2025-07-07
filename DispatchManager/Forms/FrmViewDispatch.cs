@@ -121,46 +121,7 @@ namespace DispatchManager.Forms
             // ✅ Restore layout
             RestoreColumnSettings();
 
-            //// ✅ Restore saved column widths
-            //if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.ColumnWidths))
-            //{
-            //    string[] widthPairs = Properties.Settings.Default.ColumnWidths.Split('|');
-
-            //    foreach (string pair in widthPairs)
-            //    {
-            //        string[] parts = pair.Split(':');
-            //        if (parts.Length == 2)
-            //        {
-            //            string colName = parts[0];
-            //            if (int.TryParse(parts[1], out int width) && dgvSchedule.Columns.Contains(colName))
-            //            {
-            //                dgvSchedule.Columns[colName].Width = width;
-            //            }
-            //        }
-            //    }
-            //}
-
-            //// ✅ Restore saved column order
-            //if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.ColumnOrder))
-            //{
-            //    string[] orderPairs = Properties.Settings.Default.ColumnOrder.Split('|');
-            //    foreach (string pair in orderPairs)
-            //    {
-            //        string[] parts = pair.Split(':');
-            //        if (parts.Length == 2)
-            //        {
-            //            string colName = parts[0];
-            //            if (int.TryParse(parts[1], out int displayIndex) && dgvSchedule.Columns.Contains(colName))
-            //            {
-            //                dgvSchedule.Columns[colName].DisplayIndex = displayIndex;
-            //            }
-            //        }
-            //    }
-            //}
-
-
-
-
+            
 
             // Optional: Apply double buffering to reduce flicker
             typeof(DataGridView).InvokeMember("DoubleBuffered",
@@ -1092,6 +1053,13 @@ namespace DispatchManager.Forms
                 LoadScheduleData(); // Reload to reflect new project
                 RestoreColumnSettings(); // Keep column widths/order
             }
+        }
+        private void LogDeletion(string deletedRowDetails, string currentUser)
+        {
+            string logPath = Path.Combine(Application.StartupPath, "DeletionLog.txt");
+            string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} | User: {currentUser} | Deleted: {deletedRowDetails}";
+
+            File.AppendAllText(logPath, logEntry + Environment.NewLine);
         }
 
     }

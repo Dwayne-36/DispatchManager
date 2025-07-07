@@ -18,7 +18,7 @@ namespace DispatchManager.Forms
             InitializeComponent();
 
             this.Load += FrmNewProject_Load;             
-            btnEnterProject.Click += btnEnterProject_Click;
+            //btnEnterProject.Click += btnEnterProject_Click;
             
             //btnEnterClose.Click += btnEnterClose_Click;
             //btnClose.Click += btnClose_Click;
@@ -41,6 +41,8 @@ namespace DispatchManager.Forms
             LoadComboBox(cbxMainContractor, "SELECT Name FROM MainContractors ORDER BY Name");
             LoadComboBox(cbxLeadTime, "SELECT Description FROM LeadTimes ORDER BY Description");
         }
+
+        //private DateTime? dispatchDateValue = null;
 
         private void cbxLeadTime_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -73,8 +75,10 @@ namespace DispatchManager.Forms
                     // Calculate dispatch date
                     DateTime startDate = DateTime.Today;
                     DateTime dispatchDate = AddWorkingDays(startDate, daysToAdd, holidays);
+                    //dispatchDateValue = dispatchDate;
 
-                    
+
+
                     tbDispatchDate.Text = dispatchDate.ToString("d-MMM");
                     lblDay1.Text = dispatchDate.ToString("dddd"); // Shows "Monday", "Tuesday", etc.
                     lblWeekNumber1.Text = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
@@ -121,6 +125,11 @@ namespace DispatchManager.Forms
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@DispatchDate", ParseDate(tbDispatchDate.Text));
+                        //if (dispatchDateValue.HasValue)
+                        //    cmd.Parameters.AddWithValue("@DispatchDate", dispatchDateValue.Value);
+                        //else
+                        //    throw new InvalidOperationException("Dispatch date is not set.");
+
                         cmd.Parameters.AddWithValue("@MainContractor", cbxMainContractor.Text);
                         cmd.Parameters.AddWithValue("@ProjectName", tbProjectName.Text);
                         cmd.Parameters.AddWithValue("@ProjectColour", tbProjectColour.Text);
@@ -186,6 +195,8 @@ namespace DispatchManager.Forms
             tbOrderNumber.Clear();
             cbxLeadTime.SelectedIndex = -1;
             cbxInstalled.SelectedIndex = -1;
+            lblDay1.Text = "";
+            lblWeekNumber1.Text = "";
 
             // Keep tbDateOrdered unchanged
         }
