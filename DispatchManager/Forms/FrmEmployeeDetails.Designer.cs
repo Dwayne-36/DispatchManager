@@ -44,6 +44,7 @@
             this.lblPassword = new System.Windows.Forms.Label();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
+            this.chkIsAdmin = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // lblFullName
@@ -168,6 +169,7 @@
             this.btnCancel.TabIndex = 14;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // btnSave
             // 
@@ -177,17 +179,24 @@
             this.btnSave.TabIndex = 15;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
-
-
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-
+            // 
+            // chkIsAdmin
+            // 
+            this.chkIsAdmin.AutoSize = true;
+            this.chkIsAdmin.Location = new System.Drawing.Point(226, 88);
+            this.chkIsAdmin.Name = "chkIsAdmin";
+            this.chkIsAdmin.Size = new System.Drawing.Size(86, 17);
+            this.chkIsAdmin.TabIndex = 16;
+            this.chkIsAdmin.Text = "Administrator";
+            this.chkIsAdmin.UseVisualStyleBackColor = true;
             // 
             // FrmEmployeeDetails
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(366, 422);
+            this.Controls.Add(this.chkIsAdmin);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.txtPassword);
@@ -230,5 +239,6 @@
         private System.Windows.Forms.Label lblPassword;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.CheckBox chkIsAdmin;
     }
 }

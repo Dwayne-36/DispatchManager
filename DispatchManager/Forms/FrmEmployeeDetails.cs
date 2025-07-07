@@ -68,7 +68,7 @@ namespace DispatchManager.Forms
                     cmd = new SqlCommand(@"UPDATE Employees SET 
                         FullName = @FullName, Initials = @Initials, WorkEmail = @WorkEmail,
                         PrivateEmail = @PrivateEmail, Address = @Address, 
-                        PhoneNumber = @PhoneNumber, Password = @Password 
+                        PhoneNumber = @PhoneNumber, Password = @Password, ISAdmin = @IsAdmin 
                         WHERE ID = @ID", conn);
                     cmd.Parameters.AddWithValue("@ID", employeeId.Value);
                 }
@@ -76,9 +76,9 @@ namespace DispatchManager.Forms
                 {
                     // Add new employee
                     cmd = new SqlCommand(@"INSERT INTO Employees 
-                        (FullName, Initials, WorkEmail, PrivateEmail, Address, PhoneNumber, Password) 
+                        (FullName, Initials, WorkEmail, PrivateEmail, Address, PhoneNumber, Password, IsAdmin) 
                         VALUES 
-                        (@FullName, @Initials, @WorkEmail, @PrivateEmail, @Address, @PhoneNumber, @Password)", conn);
+                        (@FullName, @Initials, @WorkEmail, @PrivateEmail, @Address, @PhoneNumber, @Password, @IsAdmin)", conn);
                 }
 
                 cmd.Parameters.AddWithValue("@FullName", txtFullName.Text.Trim());
@@ -88,6 +88,8 @@ namespace DispatchManager.Forms
                 cmd.Parameters.AddWithValue("@Address", txtAddress.Text.Trim());
                 cmd.Parameters.AddWithValue("@PhoneNumber", txtPhone.Text.Trim());
                 cmd.Parameters.AddWithValue("@Password", txtPassword.Text.Trim());
+                cmd.Parameters.AddWithValue("@IsAdmin", chkIsAdmin.Checked);
+
 
                 cmd.ExecuteNonQuery();
                 MessageBox.Show("Employee saved.");
