@@ -89,8 +89,9 @@
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(1022, 800);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(400, 0);
+            this.MinimumSize = new System.Drawing.Size(400, 39);
             this.Name = "FrmEmployeesList";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "FrmEmployeesList";
             this.Load += new System.EventHandler(this.FrmEmployeesList_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvEmployees)).EndInit();

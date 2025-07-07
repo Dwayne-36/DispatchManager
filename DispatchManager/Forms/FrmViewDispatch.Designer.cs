@@ -39,9 +39,10 @@
             this.btnNewProject = new System.Windows.Forms.Button();
             this.lblTotal = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.menuEmployees = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuEmployeesViewAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.lblLoggedInUser = new System.Windows.Forms.Label();
+            this.menuEmployees = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuDeletedProjects = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -143,27 +144,21 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuEmployees});
+            this.menuOptions});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(2454, 24);
             this.menuStrip1.TabIndex = 11;
             this.menuStrip1.Text = "menuStrip1";
             // 
-            // menuEmployees
+            // menuOptions
             // 
-            this.menuEmployees.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuEmployeesViewAll});
-            this.menuEmployees.Name = "menuEmployees";
-            this.menuEmployees.Size = new System.Drawing.Size(76, 20);
-            this.menuEmployees.Text = "Employees";
-            // 
-            // menuEmployeesViewAll
-            // 
-            this.menuEmployeesViewAll.Name = "menuEmployeesViewAll";
-            this.menuEmployeesViewAll.Size = new System.Drawing.Size(176, 22);
-            this.menuEmployeesViewAll.Text = "View All Employees";
-            this.menuEmployeesViewAll.Click += new System.EventHandler(this.menuEmployeesViewAll_Click);
+            this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuEmployees,
+            this.MenuDeletedProjects});
+            this.menuOptions.Name = "menuOptions";
+            this.menuOptions.Size = new System.Drawing.Size(61, 20);
+            this.menuOptions.Text = "Options";
             // 
             // lblLoggedInUser
             // 
@@ -175,6 +170,19 @@
             this.lblLoggedInUser.Size = new System.Drawing.Size(92, 13);
             this.lblLoggedInUser.TabIndex = 12;
             this.lblLoggedInUser.Text = "Logged in as...";
+            // 
+            // menuEmployees
+            // 
+            this.menuEmployees.Name = "menuEmployees";
+            this.menuEmployees.Size = new System.Drawing.Size(180, 22);
+            this.menuEmployees.Text = "Employees";
+            this.menuEmployees.Click += new System.EventHandler(this.menuEmployees_Click);
+            // 
+            // MenuDeletedProjects
+            // 
+            this.MenuDeletedProjects.Name = "MenuDeletedProjects";
+            this.MenuDeletedProjects.Size = new System.Drawing.Size(180, 22);
+            this.MenuDeletedProjects.Text = "Deleted Projects";
             // 
             // FrmViewDispatch
             // 
@@ -218,8 +226,9 @@
         private System.Windows.Forms.Button btnNewProject;
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem menuEmployees;
-        private System.Windows.Forms.ToolStripMenuItem menuEmployeesViewAll;
+        private System.Windows.Forms.ToolStripMenuItem menuOptions;
         private System.Windows.Forms.Label lblLoggedInUser;
+        private System.Windows.Forms.ToolStripMenuItem menuEmployees;
+        private System.Windows.Forms.ToolStripMenuItem MenuDeletedProjects;
     }
 }

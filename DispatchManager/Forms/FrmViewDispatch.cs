@@ -761,14 +761,12 @@ namespace DispatchManager.Forms
             RestoreColumnSettings(); // 🛠️ Keep this to reapply column width/order
             dgvSchedule.Refresh();
         }
-
-
-        private void menuEmployeesViewAll_Click(object sender, EventArgs e)
+                       
+        private void menuEmployees_Click(object sender, EventArgs e)
         {
             FrmEmployeesList frm = new FrmEmployeesList();
             frm.ShowDialog();
         }
-        
         private void dgvSchedule_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
             var cell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
@@ -1062,6 +1060,7 @@ namespace DispatchManager.Forms
             File.AppendAllText(logPath, logEntry + Environment.NewLine);
         }
 
+        
     }
 }
 
