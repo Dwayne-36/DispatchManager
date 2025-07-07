@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.dgvSchedule = new System.Windows.Forms.DataGridView();
             this.dtpFrom = new System.Windows.Forms.DateTimePicker();
             this.lblFrom = new System.Windows.Forms.Label();
@@ -43,8 +44,11 @@
             this.lblLoggedInUser = new System.Windows.Forms.Label();
             this.menuEmployees = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuDeletedProjects = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuDeleteRow = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
             this.menuStrip1.SuspendLayout();
+            this.contextMenuGrid.SuspendLayout();
             this.SuspendLayout();
             // 
             // dgvSchedule
@@ -54,6 +58,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvSchedule.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvSchedule.ContextMenuStrip = this.contextMenuGrid;
             this.dgvSchedule.Location = new System.Drawing.Point(1, 126);
             this.dgvSchedule.Name = "dgvSchedule";
             this.dgvSchedule.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -184,6 +189,20 @@
             this.MenuDeletedProjects.Size = new System.Drawing.Size(180, 22);
             this.MenuDeletedProjects.Text = "Deleted Projects";
             // 
+            // contextMenuGrid
+            // 
+            this.contextMenuGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuDeleteRow});
+            this.contextMenuGrid.Name = "contextMenuGrid";
+            this.contextMenuGrid.Size = new System.Drawing.Size(181, 48);
+            // 
+            // menuDeleteRow
+            // 
+            this.menuDeleteRow.Name = "menuDeleteRow";
+            this.menuDeleteRow.Size = new System.Drawing.Size(180, 22);
+            this.menuDeleteRow.Text = "Delete Row";
+            this.menuDeleteRow.Click += new System.EventHandler(this.menuDeleteRow_Click);
+            // 
             // FrmViewDispatch
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -208,6 +227,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.contextMenuGrid.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -230,5 +250,7 @@
         private System.Windows.Forms.Label lblLoggedInUser;
         private System.Windows.Forms.ToolStripMenuItem menuEmployees;
         private System.Windows.Forms.ToolStripMenuItem MenuDeletedProjects;
+        private System.Windows.Forms.ContextMenuStrip contextMenuGrid;
+        private System.Windows.Forms.ToolStripMenuItem menuDeleteRow;
     }
 }

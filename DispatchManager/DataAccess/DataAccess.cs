@@ -160,6 +160,20 @@ namespace DispatchManager.DataAccess
             }
         }
 
+        public static void DeleteById(Guid id)
+        {
+            string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
+            string query = "DELETE FROM Dispatch WHERE ID = @ID";
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@ID", id);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
 
     }
 }

@@ -1052,15 +1052,94 @@ namespace DispatchManager.Forms
                 RestoreColumnSettings(); // Keep column widths/order
             }
         }
-        private void LogDeletion(string deletedRowDetails, string currentUser)
-        {
-            string logPath = Path.Combine(Application.StartupPath, "DeletionLog.txt");
-            string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} | User: {currentUser} | Deleted: {deletedRowDetails}";
+       
 
-            File.AppendAllText(logPath, logEntry + Environment.NewLine);
+        private void AppendDeletedRowToCsv(DataGridViewRow row)
+        {
+            try
+            {
+                string logPath = Path.Combine(Application.StartupPath, "DeletedRowsLog.csv");
+
+                // Build row values
+                List<string> values = new List<string>();
+
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    string value = cell.Value?.ToString().Replace("\"", "\"\"") ?? "";
+                    values.Add($"\"{value}\"");
+                }
+
+                // Add metadata
+                string deletedBy = Session.CurrentFullName;
+                string deletedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                values.Add($"\"Deleted by {deletedBy} at {deletedAt}\"");
+
+                string csvLine = string.Join(",", values);
+
+                // Write header if file doesn't exist
+                if (!File.Exists(logPath))
+                {
+                    using (StreamWriter sw = new StreamWriter(logPath, true))
+                    {
+                        List<string> headers = new List<string>();
+                        foreach (DataGridViewColumn col in dgvSchedule.Columns)
+                            headers.Add($"\"{col.HeaderText}\"");
+
+                        headers.Add("\"Deleted Info\"");
+                        sw.WriteLine(string.Join(",", headers));
+                    }
+                }
+
+                // Append the deleted row
+                File.AppendAllText(logPath, csvLine + Environment.NewLine);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to write deleted row log.\n" + ex.Message);
+            }
+        }
+        private void dgvSchedule_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                var hitTest = dgvSchedule.HitTest(e.X, e.Y);
+                if (hitTest.RowIndex >= 0)
+                {
+                    dgvSchedule.ClearSelection();
+                    dgvSchedule.Rows[hitTest.RowIndex].Selected = true;
+                }
+            }
         }
 
-        
+        private void menuDeleteRow_Click(object sender, EventArgs e)
+        {
+            if (dgvSchedule.SelectedRows.Count == 0)
+                return;
+
+            var result = MessageBox.Show("Are you sure you want to delete this row?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result != DialogResult.Yes)
+                return;
+
+            var selectedRow = dgvSchedule.SelectedRows[0];
+
+            // Log to CSV
+            AppendDeletedRowToCsv(selectedRow);
+
+            // Delete from DB
+            if (selectedRow.Cells["ID"].Value is Guid id)
+            {
+                // Backup to CSV first (already done before this)
+
+                // Delete from DB
+                DispatchData.DeleteById(id);
+
+                // Refresh the grid to reflect changes
+                LoadScheduleData(); // Or whatever method you're using to reload the data
+            }
+
+        }
+
+
     }
 }
 
