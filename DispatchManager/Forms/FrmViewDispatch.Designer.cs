@@ -188,19 +188,20 @@
             this.MenuDeletedProjects.Name = "MenuDeletedProjects";
             this.MenuDeletedProjects.Size = new System.Drawing.Size(180, 22);
             this.MenuDeletedProjects.Text = "Deleted Projects";
+            this.MenuDeletedProjects.Click += new System.EventHandler(this.MenuDeletedProjects_Click);
             // 
             // contextMenuGrid
             // 
             this.contextMenuGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuDeleteRow});
             this.contextMenuGrid.Name = "contextMenuGrid";
-            this.contextMenuGrid.Size = new System.Drawing.Size(181, 48);
+            this.contextMenuGrid.Size = new System.Drawing.Size(141, 26);
             // 
             // menuDeleteRow
             // 
             this.menuDeleteRow.Name = "menuDeleteRow";
-            this.menuDeleteRow.Size = new System.Drawing.Size(180, 22);
-            this.menuDeleteRow.Text = "Delete Row";
+            this.menuDeleteRow.Size = new System.Drawing.Size(140, 22);
+            this.menuDeleteRow.Text = "Deleted Row";
             this.menuDeleteRow.Click += new System.EventHandler(this.menuDeleteRow_Click);
             // 
             // FrmViewDispatch

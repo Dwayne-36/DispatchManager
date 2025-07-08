@@ -412,6 +412,11 @@ namespace DispatchManager.Forms
             }
         }
 
+        public void ReloadSchedule()
+        {
+            LoadScheduleData(); // Or whatever method you use to repopulate dgvSchedule
+
+        }
         private void LoadScheduleData()
         {
             DateTime from = dtpFrom.Value;
@@ -1052,31 +1057,40 @@ namespace DispatchManager.Forms
                 RestoreColumnSettings(); // Keep column widths/order
             }
         }
-       
+
 
         private void AppendDeletedRowToCsv(DataGridViewRow row)
         {
             try
             {
-                string logPath = Path.Combine(Application.StartupPath, "DeletedRowsLog.csv");
+                string documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string logPath = Path.Combine(documentsFolder, "DeletedRowsLog.csv");
 
-                // Build row values
                 List<string> values = new List<string>();
 
-                foreach (DataGridViewCell cell in row.Cells)
-                {
-                    string value = cell.Value?.ToString().Replace("\"", "\"\"") ?? "";
-                    values.Add($"\"{value}\"");
-                }
+                // Capture the row data
 
-                // Add metadata
+                    //foreach (DataGridViewCell cell in row.Cells)
+                    //{
+                    //    string value = cell.Value?.ToString().Replace("\"", "\"\"") ?? "";
+                    //    values.Add($"\"{value}\"");
+                    //}
+
+                    foreach (DataGridViewColumn col in dgvSchedule.Columns)
+                    {
+                        var cellValue = row.Cells[col.Index].Value?.ToString().Replace("\"", "\"\"") ?? "";
+                        values.Add($"\"{cellValue}\"");
+                    }
+
+
+                // Add separate metadata fields
                 string deletedBy = Session.CurrentFullName;
                 string deletedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                values.Add($"\"Deleted by {deletedBy} at {deletedAt}\"");
 
-                string csvLine = string.Join(",", values);
+                values.Add($"\"{deletedBy}\"");
+                values.Add($"\"{deletedAt}\"");
 
-                // Write header if file doesn't exist
+                // Add headers if file is new
                 if (!File.Exists(logPath))
                 {
                     using (StreamWriter sw = new StreamWriter(logPath, true))
@@ -1085,19 +1099,23 @@ namespace DispatchManager.Forms
                         foreach (DataGridViewColumn col in dgvSchedule.Columns)
                             headers.Add($"\"{col.HeaderText}\"");
 
-                        headers.Add("\"Deleted Info\"");
+                        headers.Add("\"Deleted By\"");
+                        headers.Add("\"Date Deleted\"");
+
                         sw.WriteLine(string.Join(",", headers));
                     }
                 }
 
-                // Append the deleted row
-                File.AppendAllText(logPath, csvLine + Environment.NewLine);
+                // Append row
+                File.AppendAllText(logPath, string.Join(",", values) + Environment.NewLine);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to write deleted row log.\n" + ex.Message);
             }
         }
+
+
         private void dgvSchedule_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -1113,6 +1131,12 @@ namespace DispatchManager.Forms
 
         private void menuDeleteRow_Click(object sender, EventArgs e)
         {
+            if (!Session.IsAdmin)
+            {
+                MessageBox.Show("Only administrators can delete rows.", "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             if (dgvSchedule.SelectedRows.Count == 0)
                 return;
 
@@ -1139,7 +1163,11 @@ namespace DispatchManager.Forms
 
         }
 
-
+        private void MenuDeletedProjects_Click(object sender, EventArgs e)
+        {
+            FrmDeletedProjects frm = new FrmDeletedProjects();
+            frm.ShowDialog();
+        }
     }
 }
 
