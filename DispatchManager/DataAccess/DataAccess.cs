@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace DispatchManager.DataAccess
@@ -177,66 +178,63 @@ namespace DispatchManager.DataAccess
             }
         }
 
-        public static void CopyDispatchColours(Guid originalId, Guid newId)
+        public static void CopyDispatchColours(Guid fromId, Guid toId, string[] clearKeys = null)
         {
-            string selectQuery = "SELECT * FROM DispatchColours WHERE LinkID = @OriginalID";
-            string insertQuery = @"
-        INSERT INTO DispatchColours 
-        (ID, LinkID, ProdInputColor, MaterialsOrderedColor, ReleasedToFactoryColor, 
-         MainContractorColor, ProjectNameColor, FreightColor, AmountColor)
-        VALUES
-        (@ID, @LinkID, @ProdInputColor, @MaterialsOrderedColor, @ReleasedToFactoryColor, 
-         @MainContractorColor, @ProjectNameColor, @FreightColor, @AmountColor)";
+            string query = "SELECT * FROM DispatchColours WHERE LinkID = @FromID";
 
             using (SqlConnection conn = new SqlConnection(connStr))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
             {
+                cmd.Parameters.AddWithValue("@FromID", fromId);
                 conn.Open();
 
-                object prodInputColor = DBNull.Value;
-                object materialsOrderedColor = DBNull.Value;
-                object releasedToFactoryColor = DBNull.Value;
-                object mainContractorColor = DBNull.Value;
-                object projectNameColor = DBNull.Value;
-                object freightColor = DBNull.Value;
-                object amountColor = DBNull.Value;
-
-                // ✅ STEP 1: Read from old row
-                using (SqlCommand selectCmd = new SqlCommand(selectQuery, conn))
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    selectCmd.Parameters.AddWithValue("@OriginalID", originalId);
-
-                    using (SqlDataReader reader = selectCmd.ExecuteReader())
+                    if (reader.Read())
                     {
-                        if (reader.Read())
+                        var colorDict = new Dictionary<string, object>();
+
+                        for (int i = 0; i < reader.FieldCount; i++)
                         {
-                            prodInputColor = reader["ProdInputColor"] ?? DBNull.Value;
-                            materialsOrderedColor = reader["MaterialsOrderedColor"] ?? DBNull.Value;
-                            releasedToFactoryColor = reader["ReleasedToFactoryColor"] ?? DBNull.Value;
-                            mainContractorColor = reader["MainContractorColor"] ?? DBNull.Value;
-                            projectNameColor = reader["ProjectNameColor"] ?? DBNull.Value;
-                            freightColor = reader["FreightColor"] ?? DBNull.Value;
-                            amountColor = reader["AmountColor"] ?? DBNull.Value;
+                            string col = reader.GetName(i);
+                            if (col != "ID" && col != "LinkID")
+                            {
+                                object val = reader[col];
+
+                                // Clear if in clearKeys
+                                if (clearKeys != null && clearKeys.Contains(col))
+                                    colorDict[col] = DBNull.Value;
+                                else
+                                    colorDict[col] = val == DBNull.Value ? DBNull.Value : val;
+                            }
+                        }
+
+                        reader.Close(); // ✅ Must close reader before issuing another command
+
+                        // Build insert command
+                        List<string> columns = colorDict.Keys.ToList();
+                        List<string> parameters = columns.Select(c => "@" + c).ToList();
+
+                        string insertSql = $@"
+                    INSERT INTO DispatchColours (LinkID, {string.Join(",", columns)})
+                    VALUES (@ToID, {string.Join(",", parameters)})
+                ";
+
+                        using (SqlCommand insertCmd = new SqlCommand(insertSql, conn))
+                        {
+                            insertCmd.Parameters.AddWithValue("@ToID", toId);
+                            foreach (var col in columns)
+                            {
+                                insertCmd.Parameters.AddWithValue("@" + col, colorDict[col] ?? DBNull.Value);
+                            }
+
+                            insertCmd.ExecuteNonQuery();
                         }
                     }
                 }
-
-                // ✅ STEP 2: Insert new row with color values
-                using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
-                {
-                    insertCmd.Parameters.AddWithValue("@ID", Guid.NewGuid());
-                    insertCmd.Parameters.AddWithValue("@LinkID", newId);
-                    insertCmd.Parameters.AddWithValue("@ProdInputColor", prodInputColor);
-                    insertCmd.Parameters.AddWithValue("@MaterialsOrderedColor", materialsOrderedColor);
-                    insertCmd.Parameters.AddWithValue("@ReleasedToFactoryColor", releasedToFactoryColor);
-                    insertCmd.Parameters.AddWithValue("@MainContractorColor", mainContractorColor);
-                    insertCmd.Parameters.AddWithValue("@ProjectNameColor", projectNameColor);
-                    insertCmd.Parameters.AddWithValue("@FreightColor", freightColor);
-                    insertCmd.Parameters.AddWithValue("@AmountColor", amountColor);
-
-                    insertCmd.ExecuteNonQuery();
-                }
             }
         }
+
 
 
 
