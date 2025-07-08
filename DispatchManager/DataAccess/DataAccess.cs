@@ -66,7 +66,9 @@ namespace DispatchManager.DataAccess
                                 Amount = SafeRead<decimal>(reader, "Amount"),
                                 OrderNumber = SafeRead<int>(reader, "OrderNumber"),
                                 DateOrdered = SafeRead<DateTime>(reader, "DateOrdered"),
-                                LeadTime = SafeRead<string>(reader, "LeadTime")
+                                LeadTime = SafeRead<string>(reader, "LeadTime"),
+                                LinkId = SafeRead<string>(reader, "LinkId")
+
                             };
 
                             records.Add(record);
@@ -174,6 +176,71 @@ namespace DispatchManager.DataAccess
                 cmd.ExecuteNonQuery();
             }
         }
+
+        public static void CopyDispatchColours(Guid originalId, Guid newId)
+        {
+            string selectQuery = "SELECT * FROM DispatchColours WHERE LinkID = @OriginalID";
+            string insertQuery = @"
+        INSERT INTO DispatchColours 
+        (ID, LinkID, ProdInputColor, MaterialsOrderedColor, ReleasedToFactoryColor, 
+         MainContractorColor, ProjectNameColor, FreightColor, AmountColor)
+        VALUES
+        (@ID, @LinkID, @ProdInputColor, @MaterialsOrderedColor, @ReleasedToFactoryColor, 
+         @MainContractorColor, @ProjectNameColor, @FreightColor, @AmountColor)";
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+
+                object prodInputColor = DBNull.Value;
+                object materialsOrderedColor = DBNull.Value;
+                object releasedToFactoryColor = DBNull.Value;
+                object mainContractorColor = DBNull.Value;
+                object projectNameColor = DBNull.Value;
+                object freightColor = DBNull.Value;
+                object amountColor = DBNull.Value;
+
+                // ✅ STEP 1: Read from old row
+                using (SqlCommand selectCmd = new SqlCommand(selectQuery, conn))
+                {
+                    selectCmd.Parameters.AddWithValue("@OriginalID", originalId);
+
+                    using (SqlDataReader reader = selectCmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            prodInputColor = reader["ProdInputColor"] ?? DBNull.Value;
+                            materialsOrderedColor = reader["MaterialsOrderedColor"] ?? DBNull.Value;
+                            releasedToFactoryColor = reader["ReleasedToFactoryColor"] ?? DBNull.Value;
+                            mainContractorColor = reader["MainContractorColor"] ?? DBNull.Value;
+                            projectNameColor = reader["ProjectNameColor"] ?? DBNull.Value;
+                            freightColor = reader["FreightColor"] ?? DBNull.Value;
+                            amountColor = reader["AmountColor"] ?? DBNull.Value;
+                        }
+                    }
+                }
+
+                // ✅ STEP 2: Insert new row with color values
+                using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                {
+                    insertCmd.Parameters.AddWithValue("@ID", Guid.NewGuid());
+                    insertCmd.Parameters.AddWithValue("@LinkID", newId);
+                    insertCmd.Parameters.AddWithValue("@ProdInputColor", prodInputColor);
+                    insertCmd.Parameters.AddWithValue("@MaterialsOrderedColor", materialsOrderedColor);
+                    insertCmd.Parameters.AddWithValue("@ReleasedToFactoryColor", releasedToFactoryColor);
+                    insertCmd.Parameters.AddWithValue("@MainContractorColor", mainContractorColor);
+                    insertCmd.Parameters.AddWithValue("@ProjectNameColor", projectNameColor);
+                    insertCmd.Parameters.AddWithValue("@FreightColor", freightColor);
+                    insertCmd.Parameters.AddWithValue("@AmountColor", amountColor);
+
+                    insertCmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+
+
 
     }
 }

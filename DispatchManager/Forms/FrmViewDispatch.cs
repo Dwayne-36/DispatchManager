@@ -1168,6 +1168,218 @@ namespace DispatchManager.Forms
             FrmDeletedProjects frm = new FrmDeletedProjects();
             frm.ShowDialog();
         }
+
+
+        private void menuCopyRow_Click(object sender, EventArgs e)
+        {
+            if (dgvSchedule.SelectedRows.Count == 0)
+                return;
+
+            var originalRow = dgvSchedule.SelectedRows[0];
+            CopyRowToDatabase(originalRow);
+            LoadScheduleData(); // Refresh grid to show the new copied row
+        }
+
+        private void CopyRowToDatabase(DataGridViewRow row)
+        {
+            try
+            {
+                string[] columns = new string[]
+                {
+            "WeekNo", "DispatchDate", "MaterialsOrderedBy", "BenchtopOrderedBy", "Day", "JobNo",
+            "ProdInput", "MaterialsOrdered", "ReleasedtoFactory", "MainContractor", "ProjectName", "ProjectColour", "Qty",
+            "FB", "EB", "ASS", "Installed", "Freight", "BenchTopSupplier", "BenchTopColour", "Installer",
+            "Comment", "DeliveryAddress", "Phone", "M3", "Amount", "OrderNumber", "DateOrdered", "LeadTime", "ID", "LinkId"
+                };
+
+                var values = new List<string>();
+
+                Guid newID = Guid.NewGuid(); // ✅ new ID to use in query
+                Guid originalID = (Guid)row.Cells["ID"].Value; // ✅ original row's ID
+
+                foreach (string column in columns)
+                {
+                    object val = row.Cells[column]?.Value;
+
+                    if (column == "ID")
+                    {
+                        values.Add($"'{newID}'"); // ✅ use new ID
+                    }
+                    else if (column == "Day")
+                    {
+                        if (DateTime.TryParse(row.Cells["DispatchDate"]?.Value?.ToString(), out DateTime dd))
+                        {
+                            values.Add($"'{dd:ddd}'");
+                        }
+                        else
+                        {
+                            values.Add("NULL");
+                        }
+                    }
+                    else if (val == null || string.IsNullOrWhiteSpace(val.ToString()))
+                    {
+                        values.Add("NULL");
+                    }
+                    else if (DateTime.TryParse(val.ToString(), out DateTime dt))
+                    {
+                        values.Add($"'{dt:yyyy-MM-dd HH:mm:ss}'");
+                    }
+                    else
+                    {
+                        values.Add($"'{val.ToString().Replace("'", "''")}'");
+                    }
+                }
+
+                string query = $"INSERT INTO Dispatch ({string.Join(",", columns)}) VALUES ({string.Join(",", values)})";
+
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
+                // ✅ Copy colour data from old row to new
+                DispatchData.CopyDispatchColours(originalID, newID);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to copy row to database.\n" + ex.Message);
+            }
+        }
+
+
+        //private void CopyRowToDatabase(DataGridViewRow row)
+        //{
+        //    try
+        //    {
+        //        Guid newId = Guid.NewGuid(); // Generate new ID for the copied row
+
+        //        string[] columns = new string[]
+        //        {
+        //    "WeekNo", "DispatchDate", "MaterialsOrderedBy", "BenchtopOrderedBy", "Day", "JobNo",
+        //    "ProdInput", "MaterialsOrdered", "ReleasedtoFactory", "MainContractor", "ProjectName", "ProjectColour", "Qty",
+        //    "FB", "EB", "ASS", "Installed", "Freight", "BenchTopSupplier", "BenchTopColour", "Installer",
+        //    "Comment", "DeliveryAddress", "Phone", "M3", "Amount", "OrderNumber", "DateOrdered", "LeadTime", "ID", "LinkId"
+        //        };
+
+        //        var values = new List<string>();
+
+        //        foreach (string column in columns)
+        //        {
+        //            object val = row.Cells[column]?.Value;
+
+        //            if (column == "ID")
+        //            {
+        //                values.Add($"'{newId}'"); // Use the new generated ID
+        //            }
+        //            else if (column == "Day")
+        //            {
+        //                // Derive day of week from DispatchDate
+        //                if (DateTime.TryParse(row.Cells["DispatchDate"]?.Value?.ToString(), out DateTime dd))
+        //                {
+        //                    values.Add($"'{dd:ddd}'");
+        //                }
+        //                else
+        //                {
+        //                    values.Add("NULL");
+        //                }
+        //            }
+        //            else if (val == null || string.IsNullOrWhiteSpace(val.ToString()))
+        //            {
+        //                values.Add("NULL");
+        //            }
+        //            else if (DateTime.TryParse(val.ToString(), out DateTime dt))
+        //            {
+        //                values.Add($"'{dt:yyyy-MM-dd HH:mm:ss}'");
+        //            }
+        //            else
+        //            {
+        //                values.Add($"'{val.ToString().Replace("'", "''")}'");
+        //            }
+        //        }
+
+        //        string query = $"INSERT INTO Dispatch ({string.Join(",", columns)}) VALUES ({string.Join(",", values)})";
+
+        //        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString))
+        //        using (SqlCommand cmd = new SqlCommand(query, conn))
+        //        {
+        //            conn.Open();
+        //            cmd.ExecuteNonQuery();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Failed to copy row to database.\n" + ex.Message);
+        //    }
+        //}
+
+        //private void CopyRowToDatabase(DataGridViewRow row)
+        //{
+        //    try
+        //    {
+        //        string[] columns = new string[]
+        //        {
+        //    "WeekNo", "DispatchDate", "MaterialsOrderedBy", "BenchtopOrderedBy", "Day", "JobNo",
+        //    "ProdInput", "MaterialsOrdered", "ReleasedtoFactory", "MainContractor", "ProjectName", "ProjectColour", "Qty",
+        //    "FB", "EB", "ASS", "Installed", "Freight", "BenchTopSupplier", "BenchTopColour", "Installer",
+        //    "Comment", "DeliveryAddress", "Phone", "M3", "Amount", "OrderNumber", "DateOrdered", "LeadTime", "ID", "LinkId"
+        //        };
+
+        //        var values = new List<string>();
+
+        //        foreach (string column in columns)
+        //        {
+        //            object val = row.Cells[column]?.Value;
+
+        //            if (column == "ID")
+        //            {
+        //                // Generate a new unique ID
+        //                values.Add($"'{Guid.NewGuid()}'");
+        //            }
+        //            else if (column == "Day")
+        //            {
+        //                // Derive day of week from DispatchDate
+        //                if (DateTime.TryParse(row.Cells["DispatchDate"]?.Value?.ToString(), out DateTime dd))
+        //                {
+        //                    values.Add($"'{dd:ddd}'"); // Mon, Tue, etc.
+        //                }
+        //                else
+        //                {
+        //                    values.Add("NULL");
+        //                }
+        //            }
+        //            else if (val == null || string.IsNullOrWhiteSpace(val.ToString()))
+        //            {
+        //                values.Add("NULL");
+        //            }
+        //            else if (DateTime.TryParse(val.ToString(), out DateTime dt))
+        //            {
+        //                values.Add($"'{dt:yyyy-MM-dd HH:mm:ss}'");
+        //            }
+        //            else
+        //            {
+        //                values.Add($"'{val.ToString().Replace("'", "''")}'");
+        //            }
+        //        }
+
+        //        string query = $"INSERT INTO Dispatch ({string.Join(",", columns)}) VALUES ({string.Join(",", values)})";
+
+        //        using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString))
+        //        using (SqlCommand cmd = new SqlCommand(query, conn))
+        //        {
+        //            conn.Open();
+        //            cmd.ExecuteNonQuery();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Failed to copy row to database.\n" + ex.Message);
+        //    }
+        //}
+
+
+
     }
 }
 
