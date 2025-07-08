@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
 
 
@@ -17,11 +18,11 @@ namespace DispatchManager.Forms
         {
             InitializeComponent();
 
-            this.Load += FrmNewProject_Load;             
-            //btnEnterProject.Click += btnEnterProject_Click;
-            
-            //btnEnterClose.Click += btnEnterClose_Click;
-            //btnClose.Click += btnClose_Click;
+            this.Load += FrmNewProject_Load;
+            this.tbProjectColour.Leave += tbProjectColour_Leave;
+            this.btnAddKeyword.Click += btnAddKeyword_Click;
+
+
             btnAddLeadTime.Click += btnAddLeadTime_Click;
 
             cbxLeadTime.SelectedIndexChanged += cbxLeadTime_SelectedIndexChanged;
@@ -34,12 +35,16 @@ namespace DispatchManager.Forms
             cbxInstalled.Items.Clear();
             cbxInstalled.Items.Add("Yes");
             cbxInstalled.Items.Add("No");
-
         }
+
+        private List<string> deztekKeywords = new List<string>();
+
         private void FrmNewProject_Load(object sender, EventArgs e)
         {
             LoadComboBox(cbxMainContractor, "SELECT Name FROM MainContractors ORDER BY Name");
             LoadComboBox(cbxLeadTime, "SELECT Description FROM LeadTimes ORDER BY Description");
+
+            LoadDeztekKeywords();
         }
 
         //private DateTime? dispatchDateValue = null;
@@ -95,10 +100,6 @@ namespace DispatchManager.Forms
                 MessageBox.Show("Error calculating dispatch date: " + ex.Message);
             }
         }
-
-
-
-       
 
         private void SaveProject(bool closeAfterSave)
         {
@@ -449,7 +450,67 @@ namespace DispatchManager.Forms
                 MessageBox.Show("Error updating JobNo: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        private void LoadDeztekKeywords()
+        {
+            deztekKeywords.Clear();
 
+            string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
+            string query = "SELECT Dezignatek FROM KeyWords";
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string keyword = reader["Dezignatek"].ToString();
+                        deztekKeywords.Add(keyword.ToLower()); // Store lowercase for case-insensitive checks
+                    }
+                }
+            }
+        }
+        private void tbProjectColour_Leave(object sender, EventArgs e)
+        {
+            string input = tbProjectColour.Text.ToLower();
+
+            bool matchFound = deztekKeywords.Any(keyword => input.Contains(keyword));
+
+            chkIsDeztek.Checked = matchFound;
+        }
+
+        private void btnAddKeyword_Click(object sender, EventArgs e)
+        {
+            string input = Microsoft.VisualBasic.Interaction.InputBox(
+                "Enter a new keyword (e.g. 'dezignatek', 'D/Tek', etc):",
+                "Add Keyword", "");
+
+            if (string.IsNullOrWhiteSpace(input))
+                return;
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString))
+                {
+                    conn.Open();
+                    string query = "INSERT INTO KeyWords (Dezignatek) VALUES (@Keyword)";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Keyword", input.Trim());
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                MessageBox.Show("Keyword added.");
+                LoadDeztekKeywords(); // Reload updated list
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to add keyword.\n" + ex.Message);
+            }
+        }
+       
 
     }
 

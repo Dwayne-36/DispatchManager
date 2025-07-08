@@ -75,6 +75,8 @@
             this.btnClose = new System.Windows.Forms.Button();
             this.btnAddMainContractor = new System.Windows.Forms.Button();
             this.btnAddLeadTime = new System.Windows.Forms.Button();
+            this.chkIsDeztek = new System.Windows.Forms.CheckBox();
+            this.btnAddKeyword = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblLeadTime
@@ -143,7 +145,7 @@
             // lblQty
             // 
             this.lblQty.AutoSize = true;
-            this.lblQty.Location = new System.Drawing.Point(219, 63);
+            this.lblQty.Location = new System.Drawing.Point(319, 63);
             this.lblQty.Name = "lblQty";
             this.lblQty.Size = new System.Drawing.Size(23, 13);
             this.lblQty.TabIndex = 7;
@@ -152,7 +154,7 @@
             // lblInstalled
             // 
             this.lblInstalled.AutoSize = true;
-            this.lblInstalled.Location = new System.Drawing.Point(279, 57);
+            this.lblInstalled.Location = new System.Drawing.Point(379, 57);
             this.lblInstalled.Name = "lblInstalled";
             this.lblInstalled.Size = new System.Drawing.Size(46, 13);
             this.lblInstalled.TabIndex = 8;
@@ -161,7 +163,7 @@
             // lblFreight
             // 
             this.lblFreight.AutoSize = true;
-            this.lblFreight.Location = new System.Drawing.Point(376, 57);
+            this.lblFreight.Location = new System.Drawing.Point(476, 57);
             this.lblFreight.Name = "lblFreight";
             this.lblFreight.Size = new System.Drawing.Size(33, 13);
             this.lblFreight.TabIndex = 9;
@@ -170,7 +172,7 @@
             // lblBenchtopSupplier
             // 
             this.lblBenchtopSupplier.AutoSize = true;
-            this.lblBenchtopSupplier.Location = new System.Drawing.Point(494, 57);
+            this.lblBenchtopSupplier.Location = new System.Drawing.Point(594, 57);
             this.lblBenchtopSupplier.Name = "lblBenchtopSupplier";
             this.lblBenchtopSupplier.Size = new System.Drawing.Size(94, 13);
             this.lblBenchtopSupplier.TabIndex = 10;
@@ -179,7 +181,7 @@
             // lblBenchtopColour
             // 
             this.lblBenchtopColour.AutoSize = true;
-            this.lblBenchtopColour.Location = new System.Drawing.Point(626, 57);
+            this.lblBenchtopColour.Location = new System.Drawing.Point(726, 57);
             this.lblBenchtopColour.Name = "lblBenchtopColour";
             this.lblBenchtopColour.Size = new System.Drawing.Size(86, 13);
             this.lblBenchtopColour.TabIndex = 11;
@@ -288,7 +290,7 @@
             // 
             this.cbxInstalled.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxInstalled.FormattingEnabled = true;
-            this.cbxInstalled.Location = new System.Drawing.Point(282, 82);
+            this.cbxInstalled.Location = new System.Drawing.Point(382, 82);
             this.cbxInstalled.Name = "cbxInstalled";
             this.cbxInstalled.Size = new System.Drawing.Size(54, 21);
             this.cbxInstalled.TabIndex = 23;
@@ -342,28 +344,28 @@
             // 
             // tbQty
             // 
-            this.tbQty.Location = new System.Drawing.Point(203, 82);
+            this.tbQty.Location = new System.Drawing.Point(303, 82);
             this.tbQty.Name = "tbQty";
             this.tbQty.Size = new System.Drawing.Size(47, 20);
             this.tbQty.TabIndex = 30;
             // 
             // tbFreight
             // 
-            this.tbFreight.Location = new System.Drawing.Point(379, 83);
+            this.tbFreight.Location = new System.Drawing.Point(479, 83);
             this.tbFreight.Name = "tbFreight";
             this.tbFreight.Size = new System.Drawing.Size(100, 20);
             this.tbFreight.TabIndex = 31;
             // 
             // tbBenchtopSupplier
             // 
-            this.tbBenchtopSupplier.Location = new System.Drawing.Point(497, 83);
+            this.tbBenchtopSupplier.Location = new System.Drawing.Point(597, 83);
             this.tbBenchtopSupplier.Name = "tbBenchtopSupplier";
             this.tbBenchtopSupplier.Size = new System.Drawing.Size(100, 20);
             this.tbBenchtopSupplier.TabIndex = 32;
             // 
             // tbBenchtopColour
             // 
-            this.tbBenchtopColour.Location = new System.Drawing.Point(629, 83);
+            this.tbBenchtopColour.Location = new System.Drawing.Point(729, 83);
             this.tbBenchtopColour.Name = "tbBenchtopColour";
             this.tbBenchtopColour.Size = new System.Drawing.Size(100, 20);
             this.tbBenchtopColour.TabIndex = 33;
@@ -473,11 +475,32 @@
             this.btnAddLeadTime.Text = "+";
             this.btnAddLeadTime.UseVisualStyleBackColor = true;
             // 
+            // chkIsDeztek
+            // 
+            this.chkIsDeztek.AutoSize = true;
+            this.chkIsDeztek.Location = new System.Drawing.Point(180, 82);
+            this.chkIsDeztek.Name = "chkIsDeztek";
+            this.chkIsDeztek.Size = new System.Drawing.Size(71, 17);
+            this.chkIsDeztek.TabIndex = 48;
+            this.chkIsDeztek.Text = "Is Deztek";
+            this.chkIsDeztek.UseVisualStyleBackColor = true;
+            // 
+            // btnAddKeyword
+            // 
+            this.btnAddKeyword.Location = new System.Drawing.Point(257, 77);
+            this.btnAddKeyword.Name = "btnAddKeyword";
+            this.btnAddKeyword.Size = new System.Drawing.Size(25, 25);
+            this.btnAddKeyword.TabIndex = 49;
+            this.btnAddKeyword.Text = "+";
+            this.btnAddKeyword.UseVisualStyleBackColor = true;
+            // 
             // FrmNewProject
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1060, 372);
+            this.Controls.Add(this.btnAddKeyword);
+            this.Controls.Add(this.chkIsDeztek);
             this.Controls.Add(this.btnAddLeadTime);
             this.Controls.Add(this.btnAddMainContractor);
             this.Controls.Add(this.btnClose);
@@ -582,5 +605,7 @@
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Button btnAddMainContractor;
         private System.Windows.Forms.Button btnAddLeadTime;
+        private System.Windows.Forms.CheckBox chkIsDeztek;
+        private System.Windows.Forms.Button btnAddKeyword;
     }
 }
