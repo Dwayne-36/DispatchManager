@@ -23,6 +23,8 @@ namespace DispatchManager.Forms
         private List<DispatchRecord> fullDispatchList = new List<DispatchRecord>();
         private Dictionary<Guid, Dictionary<string, string>> dispatchColors;
         private DataGridViewCell lastDoubleClickedCell = null;
+        private List<string> deztekKeywords = new List<string>();
+
 
         // Place this at the top of your FrmViewDispatch form
         private readonly HashSet<string> editableColumns = new HashSet<string>
@@ -510,6 +512,7 @@ namespace DispatchManager.Forms
             dgvSchedule.DataSource = null;
             dgvSchedule.Rows.Clear();
             dgvSchedule.Columns.Clear();
+            dgvSchedule.SuspendLayout();
 
             dgvSchedule.DataSource = withWeeklyTotals;
 
@@ -562,6 +565,54 @@ namespace DispatchManager.Forms
 
 
             dgvSchedule.Refresh();
+            LoadDeztekKeywords();
+            HighlightDeztekRows();
+            dgvSchedule.ResumeLayout();
+
+        }
+
+        private void LoadDeztekKeywords()
+        {
+            deztekKeywords.Clear();
+
+            string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
+            string query = "SELECT Dezignatek FROM KeyWords";
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string keyword = reader["Dezignatek"].ToString();
+                        if (!string.IsNullOrWhiteSpace(keyword))
+                            deztekKeywords.Add(keyword.ToLower());
+                    }
+                }
+            }
+        }
+
+        private void HighlightDeztekRows()
+        {
+            foreach (DataGridViewRow row in dgvSchedule.Rows)
+            {
+                if (row.Cells["ProjectColour"].Value != null)
+                {
+                    string colourValue = row.Cells["ProjectColour"].Value.ToString().ToLower();
+
+                    // Check against all keywords
+                    foreach (string keyword in deztekKeywords)
+                    {
+                        if (colourValue.Contains(keyword))
+                        {
+                            row.Cells["ProjectColour"].Style.BackColor = Color.FromArgb(127, 247, 247);
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         private void dgvSchedule_SelectionChanged(object sender, EventArgs e)
@@ -828,7 +879,25 @@ namespace DispatchManager.Forms
             {
                 MessageBox.Show($"Could not update {columnName}.", "Update Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+
+            // ✅ Extra: Update cell color if editing ProjectColour
+            if (columnName == "ProjectColour")
+            {
+                string cellValue = newValue?.ToString().ToLower() ?? "";
+
+                bool isDeztek = deztekKeywords.Any(keyword => cellValue.Contains(keyword));
+
+                if (isDeztek)
+                {
+                    row.Cells["ProjectColour"].Style.BackColor = Color.FromArgb(127, 247, 247); // match
+                }
+                else
+                {
+                    row.Cells["ProjectColour"].Style.BackColor = Color.White; // no match
+                }
+            }
         }
+
         private void dgvSchedule_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
         {
             var grid = dgvSchedule;
