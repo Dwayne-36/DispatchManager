@@ -217,7 +217,7 @@ namespace DispatchManager.Forms
             }
 
         }
-        
+
 
 
         private void RemoveRowFromCsv(DataGridViewRow rowToRemove)
@@ -225,21 +225,30 @@ namespace DispatchManager.Forms
             string documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string logPath = Path.Combine(documentsFolder, "DeletedRowsLog.csv");
 
-            var allLines = File.ReadAllLines(logPath).ToList();
-            if (allLines.Count < 2) return; // Header + at least 1 row
+            if (!File.Exists(logPath)) return;
 
-            string[] targetValues = new string[rowToRemove.Cells.Count];
-            for (int i = 0; i < rowToRemove.Cells.Count; i++)
+            var lines = File.ReadAllLines(logPath).ToList();
+            if (lines.Count < 2) return;
+
+            string header = lines[0];
+            lines.RemoveAt(0);
+
+            string idToRemove = rowToRemove.Cells["ID"].Value.ToString();
+
+            // Remove line with matching ID in first column (regardless of quotes)
+            var filteredLines = lines.Where(line =>
             {
-                targetValues[i] = $"\"{rowToRemove.Cells[i].Value?.ToString().Replace("\"", "\"\"") ?? ""}\"";
-            }
-            string targetLine = string.Join(",", targetValues);
+                string[] columns = line.Split(',');
+                if (columns.Length == 0) return true;
+                string firstCol = columns[0].Trim('"'); // Trim quotes just in case
+                return firstCol != idToRemove;
+            }).ToList();
 
-            // Remove the line
-            allLines.RemoveAll(line => line == targetLine);
-
-            File.WriteAllLines(logPath, allLines);
+            filteredLines.Insert(0, header);
+            File.WriteAllLines(logPath, filteredLines);
         }
+
+
 
     }
 }
