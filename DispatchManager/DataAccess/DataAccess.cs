@@ -131,11 +131,11 @@ namespace DispatchManager.DataAccess
         {
             // Only allow updates to these fields
             var allowedColumns = new HashSet<string> {
-        "DispatchDate", "ProdInput", "MaterialsOrdered", "ReleasedToFactory", "ProjectName",
+        "DispatchDate", "WeekNo", "Day", "ProdInput", "MaterialsOrdered", "ReleasedToFactory", "ProjectName",
         "ProjectColour", "Qty", "FB", "EB", "ASS", "BoardETA", "Installed", "Freight",
         "BenchTopSupplier", "BenchTopColour", "Installer", "Comment", "DeliveryAddress",
         "Phone", "M3", "Amount", "OrderNumber"
-    };
+         };
 
             if (!allowedColumns.Contains(columnName))
                 return false;
