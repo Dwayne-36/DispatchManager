@@ -242,38 +242,62 @@ namespace DispatchManager.Forms
                 string oldValue = cell.Value?.ToString();
                 Color currentColor = cell.Style.BackColor;
 
-                // ✅ ProjectName column toggle green
-                if (columnName == "ProjectName")
+                // ✅ Toggle ProjectName, Freight, and Amount columns with specific colors
+                if (columnName == "ProjectName" || columnName == "Freight" || columnName == "Amount")
                 {
-                    Color green = Color.FromArgb(0, 176, 80);
+                    Color toggleColor;
+                    string dbColorColumn;
+
+                    if (columnName == "ProjectName")
+                    {
+                        toggleColor = Color.FromArgb(0, 176, 80); // Green
+                        dbColorColumn = "ProjectNameColor";
+                    }
+                    else if (columnName == "Freight")
+                    {
+                        toggleColor = Color.FromArgb(255, 140, 0); // Orange
+                        dbColorColumn = "FreightColor";
+                    }
+                    else // Amount
+                    {
+                        toggleColor = Color.FromArgb(153, 0, 204); // Purple
+                        dbColorColumn = "AmountColor";
+                    }
+
                     Color white = Color.White;
 
-                    if (currentColor.ToArgb() == green.ToArgb())
+                    // Toggle between target color and white
+                    if (currentColor.ToArgb() == toggleColor.ToArgb())
                     {
                         cell.Style.BackColor = white;
-                        SaveCellColorToDatabase(record.ID, "ProjectNameColor", "White");
+                        SaveCellColorToDatabase(record.ID, dbColorColumn, "White");
                     }
                     else
                     {
-                        cell.Style.BackColor = green;
-                        SaveCellColorToDatabase(record.ID, "ProjectNameColor", $"{green.R},{green.G},{green.B}");
+                        cell.Style.BackColor = toggleColor;
+                        SaveCellColorToDatabase(record.ID, dbColorColumn, $"{toggleColor.R},{toggleColor.G},{toggleColor.B}");
                     }
 
                     cell.Style.ForeColor = Color.Black;
                     cell.Style.SelectionBackColor = cell.Style.BackColor;
                     cell.Style.SelectionForeColor = Color.Black;
 
-                    this.BeginInvoke((MethodInvoker)(() => dgvSchedule.InvalidateCell(cell)));
+                    // Save color to DispatchRecord object
+                    string colorStr = cell.Style.BackColor == white ? null : $"{toggleColor.R},{toggleColor.G},{toggleColor.B}";
+                    if (columnName == "ProjectName") record.ProjectNameColor = colorStr;
+                    else if (columnName == "Freight") record.FreightColor = colorStr;
+                    else if (columnName == "Amount") record.AmountColor = colorStr;
 
-                    // Move focus to the next cell to avoid edit mode
+                    // Shift focus to right cell to avoid edit mode
                     int nextCol = e.ColumnIndex + 1;
                     if (nextCol < dgvSchedule.ColumnCount)
-                    {
                         dgvSchedule.CurrentCell = dgvSchedule.Rows[e.RowIndex].Cells[nextCol];
-                    }
 
-                    return; // ✅ Stop here, don't do any of the other toggle logic
+                    // Invalidate visual update
+                    this.BeginInvoke((MethodInvoker)(() => dgvSchedule.InvalidateCell(cell)));
+                    return;
                 }
+
 
                 string colorColumn = null;
                 if (columnName == "ProdInput") colorColumn = "ProdInputColor";
@@ -338,26 +362,26 @@ namespace DispatchManager.Forms
                     cell.Style.SelectionBackColor = cell.Style.BackColor;
                     cell.Style.SelectionForeColor = Color.Black;
                 }
-                else if (columnName == "Freight")
-                {
-                    cell.Style.BackColor = currentColor.ToArgb() == white2.ToArgb() ? orange : white2;
-                    SaveCellColorToDatabase(record.ID, colorColumn,
-                        cell.Style.BackColor == white2 ? "White" : $"{orange.R},{orange.G},{orange.B}");
+                //else if (columnName == "Freight")
+                //{
+                //    cell.Style.BackColor = currentColor.ToArgb() == white2.ToArgb() ? orange : white2;
+                //    SaveCellColorToDatabase(record.ID, colorColumn,
+                //        cell.Style.BackColor == white2 ? "White" : $"{orange.R},{orange.G},{orange.B}");
 
-                    cell.Style.ForeColor = Color.Black;
-                    cell.Style.SelectionBackColor = cell.Style.BackColor;
-                    cell.Style.SelectionForeColor = Color.Black;
-                }
-                else if (columnName == "Amount")
-                {
-                    cell.Style.BackColor = currentColor.ToArgb() == white2.ToArgb() ? purple : white2;
-                    SaveCellColorToDatabase(record.ID, colorColumn,
-                        cell.Style.BackColor == white2 ? "White" : $"{purple.R},{purple.G},{purple.B}");
+                //    cell.Style.ForeColor = Color.Black;
+                //    cell.Style.SelectionBackColor = cell.Style.BackColor;
+                //    cell.Style.SelectionForeColor = Color.Black;
+                //}
+                //else if (columnName == "Amount")
+                //{
+                //    cell.Style.BackColor = currentColor.ToArgb() == white2.ToArgb() ? purple : white2;
+                //    SaveCellColorToDatabase(record.ID, colorColumn,
+                //        cell.Style.BackColor == white2 ? "White" : $"{purple.R},{purple.G},{purple.B}");
 
-                    cell.Style.ForeColor = Color.Black;
-                    cell.Style.SelectionBackColor = cell.Style.BackColor;
-                    cell.Style.SelectionForeColor = Color.Black;
-                }
+                //    cell.Style.ForeColor = Color.Black;
+                //    cell.Style.SelectionBackColor = cell.Style.BackColor;
+                //    cell.Style.SelectionForeColor = Color.Black;
+                //}
                 else
                 {
                     if (string.IsNullOrWhiteSpace(oldValue))
@@ -810,7 +834,7 @@ namespace DispatchManager.Forms
             string[] hiddenColumns = {
     "ID", "MaterialsOrderedBy", "BenchtopOrderedBy",
     "ProdInputColor", "MaterialsOrderedColor", "ReleasedToFactoryColor",
-    "MainContractorColor", "FreightColor", "AmountColor", "LinkID"
+    "MainContractorColor", "FreightColor", "AmountColor", "LinkID", "ProjectNameColor"
 };
 
             foreach (string col in hiddenColumns)
