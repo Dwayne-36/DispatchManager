@@ -44,6 +44,8 @@ namespace DispatchManager.Models
         public string LinkId { get; set; }
         public string ProjectNameColor { get; set; }
 
+        
+
 
 
 

@@ -80,6 +80,8 @@ namespace DispatchManager.Forms
             dgvSchedule.CellFormatting += dgvSchedule_CellFormatting;
             dgvSchedule.SelectionChanged += dgvSchedule_SelectionChanged;
             dgvSchedule.CellClick += dgvSchedule_CellClick;
+            dgvSchedule.CellMouseDown += dgvSchedule_CellMouseDown;
+
 
 
             dgvSchedule.SelectionChanged += (s, e) =>
@@ -971,7 +973,7 @@ namespace DispatchManager.Forms
             // ✅ Blank total rows
             if (row.DataBoundItem is DispatchBlankRow)
             {
-                if ((columnName == "WeekNo" || columnName == "JobNo" || columnName == "OrderNumber" || columnName == "Qty" )
+                if ((columnName == "WeekNo" || columnName == "JobNo" || columnName == "OrderNumber" || columnName == "Qty")
                     && e.Value is int intVal && intVal <= 0)
                 {
                     e.Value = "";
@@ -984,7 +986,7 @@ namespace DispatchManager.Forms
                 //    e.FormattingApplied = true;
                 //}
 
-                if (columnName == "DispatchDate"  && e.Value is DateTime dt && dt == DateTime.MinValue)
+                if (columnName == "DispatchDate" && e.Value is DateTime dt && dt == DateTime.MinValue)
                 {
                     e.Value = "";
                     e.FormattingApplied = true;
@@ -1323,7 +1325,15 @@ namespace DispatchManager.Forms
                 }));
             }
         }
-
+        private void dgvSchedule_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            {
+                dgvSchedule.ClearSelection();
+                dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex].Selected = true;
+                dgvSchedule.CurrentCell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            }
+        }
         private void dgvSchedule_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
@@ -1697,9 +1707,47 @@ namespace DispatchManager.Forms
             dgvSchedule.Focus();
         }
 
+        private void MenuPurchaseOrder_Click(object sender, EventArgs e)
+        {            
+                if (dgvSchedule.SelectedCells.Count == 0) return;
 
+                var cell = dgvSchedule.SelectedCells[0];
+                var row = dgvSchedule.Rows[cell.RowIndex];
+                var columnName = dgvSchedule.Columns[cell.ColumnIndex].Name;
 
+                if (row.DataBoundItem is DispatchRecord record)
+                {
+                    string filePath = @"X:\Purchase Orders\Files\Purchase order.xlsm";
+                    if (!File.Exists(filePath))
+                    {
+                        MessageBox.Show($"File not found:\n{filePath}", "File Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
 
+                    try
+                    {
+                        var excelApp = new Excel.Application();
+                        excelApp.Visible = true;
+                        var workbooks = excelApp.Workbooks;
+                        var workbook = workbooks.Open(filePath);
+
+                        Excel.Worksheet worksheet = workbook.Sheets["Purchase Orders"] as Excel.Worksheet;
+                        int lastRow = worksheet.Cells[worksheet.Rows.Count, 1].End(Excel.XlDirection.xlUp).Row + 1;
+
+                        worksheet.Cells[lastRow, 1].Value = record.ProjectName;
+                        worksheet.Cells[lastRow, 2].Value = record.JobNo;
+
+                        Marshal.ReleaseComObject(worksheet);
+                        Marshal.ReleaseComObject(workbook);
+                        Marshal.ReleaseComObject(workbooks);
+                        Marshal.ReleaseComObject(excelApp);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error writing to Excel file:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
     }
 }
 

@@ -30,6 +30,9 @@
         {
             this.components = new System.ComponentModel.Container();
             this.dgvSchedule = new System.Windows.Forms.DataGridView();
+            this.contextMenuGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuCopyRow = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuDeleteRow = new System.Windows.Forms.ToolStripMenuItem();
             this.dtpFrom = new System.Windows.Forms.DateTimePicker();
             this.lblFrom = new System.Windows.Forms.Label();
             this.dtpTo = new System.Windows.Forms.DateTimePicker();
@@ -41,15 +44,13 @@
             this.lblTotal = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
-            this.lblLoggedInUser = new System.Windows.Forms.Label();
             this.menuEmployees = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuDeletedProjects = new System.Windows.Forms.ToolStripMenuItem();
-            this.contextMenuGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.menuDeleteRow = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuCopyRow = new System.Windows.Forms.ToolStripMenuItem();
+            this.lblLoggedInUser = new System.Windows.Forms.Label();
+            this.MenuPurchaseOrder = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
-            this.menuStrip1.SuspendLayout();
             this.contextMenuGrid.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // dgvSchedule
@@ -65,6 +66,29 @@
             this.dgvSchedule.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvSchedule.Size = new System.Drawing.Size(2455, 883);
             this.dgvSchedule.TabIndex = 0;
+            // 
+            // contextMenuGrid
+            // 
+            this.contextMenuGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MenuPurchaseOrder,
+            this.menuCopyRow,
+            this.menuDeleteRow});
+            this.contextMenuGrid.Name = "contextMenuGrid";
+            this.contextMenuGrid.Size = new System.Drawing.Size(181, 92);
+            // 
+            // menuCopyRow
+            // 
+            this.menuCopyRow.Name = "menuCopyRow";
+            this.menuCopyRow.Size = new System.Drawing.Size(180, 22);
+            this.menuCopyRow.Text = "Copy Row";
+            this.menuCopyRow.Click += new System.EventHandler(this.menuCopyRow_Click);
+            // 
+            // menuDeleteRow
+            // 
+            this.menuDeleteRow.Name = "menuDeleteRow";
+            this.menuDeleteRow.Size = new System.Drawing.Size(180, 22);
+            this.menuDeleteRow.Text = "Deleted Row";
+            this.menuDeleteRow.Click += new System.EventHandler(this.menuDeleteRow_Click);
             // 
             // dtpFrom
             // 
@@ -166,6 +190,20 @@
             this.menuOptions.Size = new System.Drawing.Size(61, 20);
             this.menuOptions.Text = "Options";
             // 
+            // menuEmployees
+            // 
+            this.menuEmployees.Name = "menuEmployees";
+            this.menuEmployees.Size = new System.Drawing.Size(159, 22);
+            this.menuEmployees.Text = "Employees";
+            this.menuEmployees.Click += new System.EventHandler(this.menuEmployees_Click);
+            // 
+            // MenuDeletedProjects
+            // 
+            this.MenuDeletedProjects.Name = "MenuDeletedProjects";
+            this.MenuDeletedProjects.Size = new System.Drawing.Size(159, 22);
+            this.MenuDeletedProjects.Text = "Deleted Projects";
+            this.MenuDeletedProjects.Click += new System.EventHandler(this.MenuDeletedProjects_Click);
+            // 
             // lblLoggedInUser
             // 
             this.lblLoggedInUser.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -177,42 +215,12 @@
             this.lblLoggedInUser.TabIndex = 12;
             this.lblLoggedInUser.Text = "Logged in as...";
             // 
-            // menuEmployees
+            // MenuPurchaseOrder
             // 
-            this.menuEmployees.Name = "menuEmployees";
-            this.menuEmployees.Size = new System.Drawing.Size(180, 22);
-            this.menuEmployees.Text = "Employees";
-            this.menuEmployees.Click += new System.EventHandler(this.menuEmployees_Click);
-            // 
-            // MenuDeletedProjects
-            // 
-            this.MenuDeletedProjects.Name = "MenuDeletedProjects";
-            this.MenuDeletedProjects.Size = new System.Drawing.Size(180, 22);
-            this.MenuDeletedProjects.Text = "Deleted Projects";
-            this.MenuDeletedProjects.Click += new System.EventHandler(this.MenuDeletedProjects_Click);
-            // 
-            // contextMenuGrid
-            // 
-            this.contextMenuGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuCopyRow,
-            this.menuDeleteRow});
-            this.contextMenuGrid.Name = "contextMenuGrid";
-            this.contextMenuGrid.Size = new System.Drawing.Size(181, 70);
-           
-            // 
-            // menuDeleteRow
-            // 
-            this.menuDeleteRow.Name = "menuDeleteRow";
-            this.menuDeleteRow.Size = new System.Drawing.Size(180, 22);
-            this.menuDeleteRow.Text = "Deleted Row";
-            this.menuDeleteRow.Click += new System.EventHandler(this.menuDeleteRow_Click);
-            // 
-            // menuCopyRow
-            // 
-            this.menuCopyRow.Name = "menuCopyRow";
-            this.menuCopyRow.Size = new System.Drawing.Size(180, 22);
-            this.menuCopyRow.Text = "Copy Row";
-            this.menuCopyRow.Click += new System.EventHandler(this.menuCopyRow_Click);
+            this.MenuPurchaseOrder.Name = "MenuPurchaseOrder";
+            this.MenuPurchaseOrder.Size = new System.Drawing.Size(180, 22);
+            this.MenuPurchaseOrder.Text = "Purchase Order";
+            this.MenuPurchaseOrder.Click += new System.EventHandler(this.MenuPurchaseOrder_Click);
             // 
             // FrmViewDispatch
             // 
@@ -236,9 +244,9 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Haylo View";
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).EndInit();
+            this.contextMenuGrid.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.contextMenuGrid.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -264,5 +272,6 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuGrid;
         private System.Windows.Forms.ToolStripMenuItem menuDeleteRow;
         private System.Windows.Forms.ToolStripMenuItem menuCopyRow;
+        private System.Windows.Forms.ToolStripMenuItem MenuPurchaseOrder;
     }
 }
