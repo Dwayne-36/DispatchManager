@@ -15,6 +15,9 @@ namespace DispatchManager.Models
         public string MainContractorColor { get; set; }
         public string FreightColor { get; set; }
         public string AmountColor { get; set; }
+        public string ProjectNameColor { get; set; }
+
+
     }
 }
 

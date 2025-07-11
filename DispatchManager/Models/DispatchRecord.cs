@@ -42,6 +42,9 @@ namespace DispatchManager.Models
         public string FreightColor { get; set; }
         public string AmountColor { get; set; }
         public string LinkId { get; set; }
+        public string ProjectNameColor { get; set; }
+
+
 
 
     }
