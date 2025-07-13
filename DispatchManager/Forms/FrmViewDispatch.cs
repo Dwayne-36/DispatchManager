@@ -27,7 +27,14 @@ namespace DispatchManager.Forms
         private List<string> deztekKeywords = new List<string>();
         private DateTimePicker dtpDispatch = new DateTimePicker();
         private DataGridViewCell currentDateCell = null;
- 
+        private bool isSelectingPrintArea = false;
+        private List<DataGridViewCell> selectedPrintCells = new List<DataGridViewCell>();
+        private Timer antTimer = new Timer();
+        private float dashOffset = 0f;
+        private Dictionary<int, Color> weekColors = new Dictionary<int, Color>();
+
+
+
 
 
         // Place this at the top of your FrmViewDispatch form
@@ -70,8 +77,7 @@ namespace DispatchManager.Forms
 
             // Control Level Events
             this.dtpFrom.ValueChanged += dtpFrom_ValueChanged;
-            this.dtpTo.ValueChanged += dtpTo_ValueChanged;
-            
+            this.dtpTo.ValueChanged += dtpTo_ValueChanged;                                          
 
             //DataGridView Events
             this.dgvSchedule.CellDoubleClick += dgvSchedule_CellDoubleClick;
@@ -82,6 +88,10 @@ namespace DispatchManager.Forms
             dgvSchedule.CellClick += dgvSchedule_CellClick;
             dgvSchedule.CellMouseDown += dgvSchedule_CellMouseDown;
 
+            dgvSchedule.Paint += dgvSchedule_Paint;
+
+            this.KeyPreview = true;
+            this.KeyDown += FrmViewDispatch_KeyDown;
 
 
             dgvSchedule.SelectionChanged += (s, e) =>
@@ -116,6 +126,9 @@ namespace DispatchManager.Forms
             dtpDispatch.CustomFormat = "d-MMM"; // This will format like 8-Jul
             dtpDispatch.TextChanged += DtpDispatch_TextChanged;
             this.Controls.Add(dtpDispatch);
+
+            this.MouseDown += FrmViewDispatch_MouseDown;
+
 
             // Load saved date settings
             dtpFrom.Value = Properties.Settings.Default.dtpFromDate;
@@ -153,8 +166,20 @@ namespace DispatchManager.Forms
                 System.Reflection.BindingFlags.SetProperty,
                 null, dgvSchedule, new object[] { true });
 
+
+            antTimer.Interval = 100;
+            antTimer.Tick += AntTimer_Tick;
         }
-        private Dictionary<int, Color> weekColors = new Dictionary<int, Color>();
+
+        private void AntTimer_Tick(object sender, EventArgs e)
+        {
+            dashOffset += 1f;
+            if (dashOffset > 10f) dashOffset = 0f;
+            dgvSchedule.Invalidate(); // Force border redraw
+        }
+
+
+        //private Dictionary<int, Color> weekColors = new Dictionary<int, Color>();
 
         private void DtpDispatch_TextChanged(object sender, EventArgs e)
         {
@@ -1222,6 +1247,9 @@ namespace DispatchManager.Forms
 
         private void dgvSchedule_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
         {
+            if (isSelectingPrintArea)
+                return; // ⛔ Skip row borders during print selection
+
             var grid = dgvSchedule;
             if (grid.SelectedCells.Count == 0) return;
 
@@ -1327,13 +1355,16 @@ namespace DispatchManager.Forms
         }
         private void dgvSchedule_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.ColumnIndex >= 0)
-            {
-                dgvSchedule.ClearSelection();
-                dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex].Selected = true;
-                dgvSchedule.CurrentCell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
-            }
+            if (!isSelectingPrintArea) return;
+
+            var cell = dgvSchedule[e.ColumnIndex, e.RowIndex];
+            if (!selectedPrintCells.Contains(cell))
+                selectedPrintCells.Add(cell);
+
+            dgvSchedule.ClearSelection(); // optional: don't show highlight
+            dgvSchedule.Invalidate();
         }
+
         private void dgvSchedule_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
@@ -1748,6 +1779,90 @@ namespace DispatchManager.Forms
                     }
                 }
             }
+
+        private void btnSetPrintArea_Click(object sender, EventArgs e)
+        {
+            isSelectingPrintArea = true;
+            selectedPrintCells.Clear();
+
+            dgvSchedule.SelectionMode = DataGridViewSelectionMode.CellSelect; // ✅ allows multi-cell drag
+            dgvSchedule.MultiSelect = true;
+
+            dgvSchedule.ClearSelection();
+            dgvSchedule.CurrentCell = null;
+
+            dashOffset = 0f;
+            antTimer.Start();
+
+            dgvSchedule.Invalidate();
+        }
+
+        private void ExitPrintAreaMode()
+        {
+            isSelectingPrintArea = false;
+            antTimer.Stop();
+            dgvSchedule.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvSchedule.ClearSelection();
+            dgvSchedule.Invalidate();
+        }
+
+        private void dgvSchedule_Paint(object sender, PaintEventArgs e)
+        {
+            if (!isSelectingPrintArea || dgvSchedule.SelectedCells.Count == 0) return;
+
+            var selectedCells = dgvSchedule.SelectedCells
+                .Cast<DataGridViewCell>()
+                .ToList();
+
+            int minRow = selectedCells.Min(c => c.RowIndex);
+            int maxRow = selectedCells.Max(c => c.RowIndex);
+            int minCol = selectedCells.Min(c => c.ColumnIndex);
+            int maxCol = selectedCells.Max(c => c.ColumnIndex);
+
+            Rectangle topLeft = dgvSchedule.GetCellDisplayRectangle(minCol, minRow, true);
+            Rectangle bottomRight = dgvSchedule.GetCellDisplayRectangle(maxCol, maxRow, true);
+
+            if (topLeft.IsEmpty || bottomRight.IsEmpty)
+                return;
+
+            Rectangle borderRect = new Rectangle(
+                topLeft.X,
+                topLeft.Y,
+                bottomRight.Right - topLeft.Left - 1,
+                bottomRight.Bottom - topLeft.Top - 1
+            );
+
+            using (Pen pinkPen = new Pen(Color.DeepPink, 2))
+            {
+                pinkPen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+                pinkPen.DashOffset = dashOffset; // animate here
+                e.Graphics.DrawRectangle(pinkPen, borderRect);
+            }
+        }
+        private void FrmViewDispatch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (isSelectingPrintArea && e.KeyCode == Keys.Escape)
+            {
+                ExitPrintAreaMode();
+                e.Handled = true;
+            }
+        }
+        private void FrmViewDispatch_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (isSelectingPrintArea)
+            {
+                // Check if clicked outside the DataGridView
+                var mousePos = dgvSchedule.PointToClient(Cursor.Position);
+                if (!dgvSchedule.ClientRectangle.Contains(mousePos))
+                {
+                    ExitPrintAreaMode();
+                }
+            }
+        }
+
+
+
+
     }
 }
 

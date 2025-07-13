@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.dgvSchedule = new System.Windows.Forms.DataGridView();
             this.contextMenuGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.MenuPurchaseOrder = new System.Windows.Forms.ToolStripMenuItem();
             this.menuCopyRow = new System.Windows.Forms.ToolStripMenuItem();
             this.menuDeleteRow = new System.Windows.Forms.ToolStripMenuItem();
             this.dtpFrom = new System.Windows.Forms.DateTimePicker();
@@ -47,7 +48,8 @@
             this.menuEmployees = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuDeletedProjects = new System.Windows.Forms.ToolStripMenuItem();
             this.lblLoggedInUser = new System.Windows.Forms.Label();
-            this.MenuPurchaseOrder = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnSetPrintArea = new System.Windows.Forms.Button();
+            this.btnPrint = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
             this.contextMenuGrid.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -74,19 +76,26 @@
             this.menuCopyRow,
             this.menuDeleteRow});
             this.contextMenuGrid.Name = "contextMenuGrid";
-            this.contextMenuGrid.Size = new System.Drawing.Size(181, 92);
+            this.contextMenuGrid.Size = new System.Drawing.Size(156, 70);
+            // 
+            // MenuPurchaseOrder
+            // 
+            this.MenuPurchaseOrder.Name = "MenuPurchaseOrder";
+            this.MenuPurchaseOrder.Size = new System.Drawing.Size(155, 22);
+            this.MenuPurchaseOrder.Text = "Purchase Order";
+            this.MenuPurchaseOrder.Click += new System.EventHandler(this.MenuPurchaseOrder_Click);
             // 
             // menuCopyRow
             // 
             this.menuCopyRow.Name = "menuCopyRow";
-            this.menuCopyRow.Size = new System.Drawing.Size(180, 22);
+            this.menuCopyRow.Size = new System.Drawing.Size(155, 22);
             this.menuCopyRow.Text = "Copy Row";
             this.menuCopyRow.Click += new System.EventHandler(this.menuCopyRow_Click);
             // 
             // menuDeleteRow
             // 
             this.menuDeleteRow.Name = "menuDeleteRow";
-            this.menuDeleteRow.Size = new System.Drawing.Size(180, 22);
+            this.menuDeleteRow.Size = new System.Drawing.Size(155, 22);
             this.menuDeleteRow.Text = "Deleted Row";
             this.menuDeleteRow.Click += new System.EventHandler(this.menuDeleteRow_Click);
             // 
@@ -215,18 +224,32 @@
             this.lblLoggedInUser.TabIndex = 12;
             this.lblLoggedInUser.Text = "Logged in as...";
             // 
-            // MenuPurchaseOrder
+            // btnSetPrintArea
             // 
-            this.MenuPurchaseOrder.Name = "MenuPurchaseOrder";
-            this.MenuPurchaseOrder.Size = new System.Drawing.Size(180, 22);
-            this.MenuPurchaseOrder.Text = "Purchase Order";
-            this.MenuPurchaseOrder.Click += new System.EventHandler(this.MenuPurchaseOrder_Click);
+            this.btnSetPrintArea.Location = new System.Drawing.Point(604, 21);
+            this.btnSetPrintArea.Name = "btnSetPrintArea";
+            this.btnSetPrintArea.Size = new System.Drawing.Size(185, 23);
+            this.btnSetPrintArea.TabIndex = 13;
+            this.btnSetPrintArea.Text = "Set Print Area";
+            this.btnSetPrintArea.UseVisualStyleBackColor = true;
+            this.btnSetPrintArea.Click += new System.EventHandler(this.btnSetPrintArea_Click);
+            // 
+            // btnPrint
+            // 
+            this.btnPrint.Location = new System.Drawing.Point(604, 56);
+            this.btnPrint.Name = "btnPrint";
+            this.btnPrint.Size = new System.Drawing.Size(185, 23);
+            this.btnPrint.TabIndex = 14;
+            this.btnPrint.Text = "Print";
+            this.btnPrint.UseVisualStyleBackColor = true;
             // 
             // FrmViewDispatch
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2454, 1061);
+            this.Controls.Add(this.btnPrint);
+            this.Controls.Add(this.btnSetPrintArea);
             this.Controls.Add(this.lblLoggedInUser);
             this.Controls.Add(this.lblTotal);
             this.Controls.Add(this.btnNewProject);
@@ -273,5 +296,7 @@
         private System.Windows.Forms.ToolStripMenuItem menuDeleteRow;
         private System.Windows.Forms.ToolStripMenuItem menuCopyRow;
         private System.Windows.Forms.ToolStripMenuItem MenuPurchaseOrder;
+        private System.Windows.Forms.Button btnSetPrintArea;
+        private System.Windows.Forms.Button btnPrint;
     }
 }
