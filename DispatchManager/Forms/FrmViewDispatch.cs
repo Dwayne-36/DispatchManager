@@ -787,6 +787,7 @@ namespace DispatchManager.Forms
                         Qty = weeklyTotal,
                         ProjectColour = $"Total for Week {currentWeek}",
                         DispatchDate = DateTime.MinValue,
+
                     });
                     weeklyTotal = 0;
                 }
@@ -1954,6 +1955,14 @@ namespace DispatchManager.Forms
                 int rowOffset = 2;
                 foreach (var rowGroup in groupedRows)
                 {
+                    // Check if this is a weekly total row (ProjectName contains "Total for Week")
+                    bool isWeeklyTotalRow = rowGroup.Any(c =>
+                    {
+                        var col = dgvSchedule.Columns[c.ColumnIndex];
+                        return col.Name == "ProjectColour" && (c.Value?.ToString()?.ToLower().Contains("total for week") ?? false);
+                    
+                    });
+
                     for (int i = 0; i < colIndexes.Count; i++)
                     {
                         var cell = rowGroup.FirstOrDefault(c => c.ColumnIndex == colIndexes[i]);
@@ -1963,37 +1972,63 @@ namespace DispatchManager.Forms
                             var xlCell = ws.Cell(rowOffset, i + 1);
                             string colName = dgvSchedule.Columns[cell.ColumnIndex].Name;
 
-                            if (colName == "DispatchDate" && DateTime.TryParse(value?.ToString(), out DateTime dt))
+                            // If it's a weekly total row, only allow text or qty — skip invalid junk
+                            if (isWeeklyTotalRow)
                             {
-                                xlCell.Value = dt;
-                                xlCell.Style.DateFormat.Format = "dd-mmm";
-                            }
-                            else if (colName == "FB" || colName == "EB" || colName == "ASS")
-                            {
-                                xlCell.Value = value != null && value.ToString().ToLower() == "true" ? "✓" : "";
-                            }
-                            else
-                            {
-                                xlCell.Value = value?.ToString() ?? "";
+                                if (colName == "Qty" || colName == "ProjectColour")
+                                {
+                                    xlCell.Value = value?.ToString() ?? "";
+                                   
+                                }
+                                else
+                                {
+                                    xlCell.Value = value?.ToString() ?? "";
+
+                                    // Set the font color to match the background (light gray)
+                                    xlCell.Style.Font.FontColor = XLColor.FromArgb(211, 211, 211);
+                                }
                             }
 
+                            else
+                            {
+                                // Format dispatch date
+                                if (colName == "DispatchDate" && DateTime.TryParse(value?.ToString(), out DateTime dt))
+                                {
+                                    xlCell.Value = dt;
+                                    xlCell.Style.DateFormat.Format = "dd-mmm";
+                                }
+                                // Format boolean ticks
+                                else if (colName == "FB" || colName == "EB" || colName == "ASS")
+                                {
+                                    xlCell.Value = value != null && value.ToString().ToLower() == "true" ? "✓" : "";
+                                }
+                                else
+                                {
+                                    xlCell.Value = value?.ToString() ?? "";
+                                }
+                            }
+
+                            // Background color
                             var backColor = cell.Style.BackColor;
                             if (backColor.A > 0)
                             {
                                 xlCell.Style.Fill.BackgroundColor = XLColor.FromColor(backColor);
                             }
 
+                            // Alignment
                             xlCell.Style.Alignment.Horizontal =
                                 cell.Style.Alignment == DataGridViewContentAlignment.MiddleRight ? XLAlignmentHorizontalValues.Right :
                                 cell.Style.Alignment == DataGridViewContentAlignment.MiddleCenter ? XLAlignmentHorizontalValues.Center :
                                 XLAlignmentHorizontalValues.Left;
 
+                            // Borders
                             xlCell.Style.Border.OutsideBorder = XLBorderStyleValues.Hair;
                             xlCell.Style.Border.OutsideBorderColor = XLColor.FromArgb(100, 100, 100);
                         }
                     }
                     rowOffset++;
                 }
+
 
                 for (int i = 0; i < colIndexes.Count; i++)
                 {
@@ -2014,6 +2049,7 @@ namespace DispatchManager.Forms
                 UseShellExecute = true
             });
         }
+
 
 
         private void ConvertExcelToPdf(string excelPath, string pdfPath)
