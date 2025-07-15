@@ -13,6 +13,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
+using ClosedXML.Excel;
 
 
 
@@ -32,10 +33,6 @@ namespace DispatchManager.Forms
         private Timer antTimer = new Timer();
         private float dashOffset = 0f;
         private Dictionary<int, Color> weekColors = new Dictionary<int, Color>();
-
-
-
-
 
         // Place this at the top of your FrmViewDispatch form
         private readonly HashSet<string> editableColumns = new HashSet<string>
@@ -93,6 +90,7 @@ namespace DispatchManager.Forms
             this.KeyPreview = true;
             this.KeyDown += FrmViewDispatch_KeyDown;
 
+            dgvSchedule.CellPainting += dgvSchedule_CellPainting;
 
             dgvSchedule.SelectionChanged += (s, e) =>
             {
@@ -116,6 +114,9 @@ namespace DispatchManager.Forms
 
             //Optional: supress tooltips to reduce flicker
             dgvSchedule.ShowCellToolTips = false;
+
+            
+
         }
 
         private void FrmViewDispatch_Load(object sender, EventArgs e)
@@ -166,9 +167,12 @@ namespace DispatchManager.Forms
                 System.Reflection.BindingFlags.SetProperty,
                 null, dgvSchedule, new object[] { true });
 
-
             antTimer.Interval = 100;
             antTimer.Tick += AntTimer_Tick;
+
+            dgvSchedule.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            dgvSchedule.ColumnHeadersHeight = 105; // or taller if needed
+
         }
 
         private void AntTimer_Tick(object sender, EventArgs e)
@@ -1865,10 +1869,200 @@ namespace DispatchManager.Forms
                 }
             }
         }
+        private void dgvSchedule_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (e.RowIndex == -1 && e.ColumnIndex >= 0)
+            {
+                e.PaintBackground(e.CellBounds, false);
+
+                string headerText = e.FormattedValue?.ToString() ?? "";
+                using (Brush brush = new SolidBrush(e.CellStyle.ForeColor))
+                using (StringFormat format = new StringFormat())
+                {
+                    format.Alignment = StringAlignment.Near; // Left aligned
+                    format.LineAlignment = StringAlignment.Center; // Vertically centered
+
+                    // Rotate origin to bottom-left of cell
+                    e.Graphics.TranslateTransform(e.CellBounds.Left, e.CellBounds.Bottom);
+                    e.Graphics.RotateTransform(-90);
+
+                    RectangleF rect = new RectangleF(0, 0, e.CellBounds.Height, e.CellBounds.Width);
+
+                    e.Graphics.DrawString(
+                        headerText,
+                        e.CellStyle.Font,
+                        brush,
+                        rect,
+                        format
+                    );
+
+                    e.Graphics.ResetTransform();
+                }
+
+                e.Handled = true;
+            }
+        }
+        private void ExportSelectionToExcel()
+        {
+            if (dgvSchedule.SelectedCells.Count == 0)
+            {
+                MessageBox.Show("No cells selected to export.");
+                return;
+            }
+
+            var visibleSelectedCells = dgvSchedule.SelectedCells
+                .Cast<DataGridViewCell>()
+                .Where(c => dgvSchedule.Columns[c.ColumnIndex].Visible)
+                .OrderBy(c => dgvSchedule.Columns[c.ColumnIndex].DisplayIndex)
+                .ThenBy(c => c.RowIndex)
+                .ToList();
+
+            if (!visibleSelectedCells.Any())
+            {
+                MessageBox.Show("No visible selected cells to export.");
+                return;
+            }
+
+            var groupedRows = visibleSelectedCells
+                .GroupBy(c => c.RowIndex)
+                .OrderBy(g => g.Key);
+
+            string tempPath = Path.GetTempPath();
+            string excelPath = Path.Combine(tempPath, "Dispatch_Print.xlsx");
+
+            using (var workbook = new XLWorkbook())
+            {
+                var ws = workbook.Worksheets.Add("PrintArea");
+
+                var colIndexes = visibleSelectedCells
+                    .Select(c => c.ColumnIndex)
+                    .Distinct()
+                    .OrderBy(c => dgvSchedule.Columns[c].DisplayIndex)
+                    .ToList();
+
+                for (int i = 0; i < colIndexes.Count; i++)
+                {
+                    var cell = ws.Cell(1, i + 1);
+                    cell.Value = " " + dgvSchedule.Columns[colIndexes[i]].HeaderText;
+                    cell.Style.Alignment.TextRotation = 90;
+                    cell.Style.Alignment.Vertical = XLAlignmentVerticalValues.Bottom;
+                    cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                    cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    cell.Style.Border.OutsideBorderColor = XLColor.FromArgb(100, 100, 100);
+                }
+
+                int rowOffset = 2;
+                foreach (var rowGroup in groupedRows)
+                {
+                    for (int i = 0; i < colIndexes.Count; i++)
+                    {
+                        var cell = rowGroup.FirstOrDefault(c => c.ColumnIndex == colIndexes[i]);
+                        if (cell != null)
+                        {
+                            var value = cell.Value;
+                            var xlCell = ws.Cell(rowOffset, i + 1);
+                            string colName = dgvSchedule.Columns[cell.ColumnIndex].Name;
+
+                            if (colName == "DispatchDate" && DateTime.TryParse(value?.ToString(), out DateTime dt))
+                            {
+                                xlCell.Value = dt;
+                                xlCell.Style.DateFormat.Format = "dd-mmm";
+                            }
+                            else if (colName == "FB" || colName == "EB" || colName == "ASS")
+                            {
+                                xlCell.Value = value != null && value.ToString().ToLower() == "true" ? "✓" : "";
+                            }
+                            else
+                            {
+                                xlCell.Value = value?.ToString() ?? "";
+                            }
+
+                            var backColor = cell.Style.BackColor;
+                            if (backColor.A > 0)
+                            {
+                                xlCell.Style.Fill.BackgroundColor = XLColor.FromColor(backColor);
+                            }
+
+                            xlCell.Style.Alignment.Horizontal =
+                                cell.Style.Alignment == DataGridViewContentAlignment.MiddleRight ? XLAlignmentHorizontalValues.Right :
+                                cell.Style.Alignment == DataGridViewContentAlignment.MiddleCenter ? XLAlignmentHorizontalValues.Center :
+                                XLAlignmentHorizontalValues.Left;
+
+                            xlCell.Style.Border.OutsideBorder = XLBorderStyleValues.Hair;
+                            xlCell.Style.Border.OutsideBorderColor = XLColor.FromArgb(100, 100, 100);
+                        }
+                    }
+                    rowOffset++;
+                }
+
+                for (int i = 0; i < colIndexes.Count; i++)
+                {
+                    int dgvWidth = dgvSchedule.Columns[colIndexes[i]].Width;
+                    double excelWidth = dgvWidth * 0.142;
+                    ws.Column(i + 1).Width = excelWidth;
+                }
+
+                workbook.SaveAs(excelPath);
+            }
+
+            string pdfPath = Path.Combine(Path.GetTempPath(), "Dispatch_Print.pdf");
+            ConvertExcelToPdf(excelPath, pdfPath);
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = pdfPath,
+                UseShellExecute = true
+            });
+        }
 
 
+        private void ConvertExcelToPdf(string excelPath, string pdfPath)
+        {
+            var excelApp = new Microsoft.Office.Interop.Excel.Application();
+
+            try
+            {
+                var workbook = excelApp.Workbooks.Open(excelPath);
+                var sheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Sheets[1];
+
+                // 👇 Set page to A4 Landscape
+                sheet.PageSetup.Orientation = Microsoft.Office.Interop.Excel.XlPageOrientation.xlLandscape;
+                sheet.PageSetup.PaperSize = Microsoft.Office.Interop.Excel.XlPaperSize.xlPaperA4;
+
+                // Margins (in points: 1 inch = 72 points, so 5mm ≈ 14.17 points)
+                float marginInPoints = 14.17f;
+                sheet.PageSetup.TopMargin = marginInPoints;
+                sheet.PageSetup.BottomMargin = marginInPoints;
+                sheet.PageSetup.LeftMargin = marginInPoints;
+                sheet.PageSetup.RightMargin = marginInPoints;
+
+                // Optional: fit to one page wide
+                sheet.PageSetup.FitToPagesWide = 1;
+                sheet.PageSetup.FitToPagesTall = false;
+
+                workbook.ExportAsFixedFormat(
+                    Microsoft.Office.Interop.Excel.XlFixedFormatType.xlTypePDF,
+                    pdfPath);
+
+                workbook.Close(false);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to convert to PDF: " + ex.Message);
+            }
+            finally
+            {
+                excelApp.Quit();
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
+            }
+        }
 
 
+        private void btnPrint_Click(object sender, EventArgs e)
+        {
+            ExportSelectionToExcel();
+            ExitPrintAreaMode();
+        }
     }
 }
 
