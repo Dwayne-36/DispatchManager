@@ -1955,12 +1955,11 @@ namespace DispatchManager.Forms
                 int rowOffset = 2;
                 foreach (var rowGroup in groupedRows)
                 {
-                    // Check if this is a weekly total row (ProjectName contains "Total for Week")
+                    // Check if this is a weekly total row (ProjectColour contains "Total for Week")
                     bool isWeeklyTotalRow = rowGroup.Any(c =>
                     {
                         var col = dgvSchedule.Columns[c.ColumnIndex];
                         return col.Name == "ProjectColour" && (c.Value?.ToString()?.ToLower().Contains("total for week") ?? false);
-                    
                     });
 
                     for (int i = 0; i < colIndexes.Count; i++)
@@ -1972,32 +1971,42 @@ namespace DispatchManager.Forms
                             var xlCell = ws.Cell(rowOffset, i + 1);
                             string colName = dgvSchedule.Columns[cell.ColumnIndex].Name;
 
-                            // If it's a weekly total row, only allow text or qty — skip invalid junk
                             if (isWeeklyTotalRow)
                             {
                                 if (colName == "Qty" || colName == "ProjectColour")
                                 {
                                     xlCell.Value = value?.ToString() ?? "";
-                                   
                                 }
                                 else
                                 {
                                     xlCell.Value = value?.ToString() ?? "";
-
-                                    // Set the font color to match the background (light gray)
-                                    xlCell.Style.Font.FontColor = XLColor.FromArgb(211, 211, 211);
+                                    xlCell.Style.Font.FontColor = XLColor.LightGray;
                                 }
-                            }
 
+                                // Vertical border logic for total rows
+                                bool isFirst = (i == 0);
+                                bool isLast = (i == colIndexes.Count - 1);
+                                bool isKeyColumn = (colName == "Qty" || colName == "ProjectColour");
+
+                                // Top/Bottom borders always applied
+                                xlCell.Style.Border.TopBorder = XLBorderStyleValues.Hair;
+                                xlCell.Style.Border.TopBorderColor = XLColor.FromArgb(100, 100, 100);
+                                xlCell.Style.Border.BottomBorder = XLBorderStyleValues.Hair;
+                                xlCell.Style.Border.BottomBorderColor = XLColor.FromArgb(100, 100, 100);
+
+                                // Conditionally apply Left/Right borders
+                                xlCell.Style.Border.LeftBorder = (isFirst || isKeyColumn) ? XLBorderStyleValues.Hair : XLBorderStyleValues.None;
+                                xlCell.Style.Border.LeftBorderColor = XLColor.FromArgb(100, 100, 100);
+                                xlCell.Style.Border.RightBorder = (isLast || isKeyColumn) ? XLBorderStyleValues.Hair : XLBorderStyleValues.None;
+                                xlCell.Style.Border.RightBorderColor = XLColor.FromArgb(100, 100, 100);
+                            }
                             else
                             {
-                                // Format dispatch date
                                 if (colName == "DispatchDate" && DateTime.TryParse(value?.ToString(), out DateTime dt))
                                 {
                                     xlCell.Value = dt;
                                     xlCell.Style.DateFormat.Format = "dd-mmm";
                                 }
-                                // Format boolean ticks
                                 else if (colName == "FB" || colName == "EB" || colName == "ASS")
                                 {
                                     xlCell.Value = value != null && value.ToString().ToLower() == "true" ? "✓" : "";
@@ -2006,6 +2015,9 @@ namespace DispatchManager.Forms
                                 {
                                     xlCell.Value = value?.ToString() ?? "";
                                 }
+
+                                xlCell.Style.Border.OutsideBorder = XLBorderStyleValues.Hair;
+                                xlCell.Style.Border.OutsideBorderColor = XLColor.FromArgb(100, 100, 100);
                             }
 
                             // Background color
@@ -2020,15 +2032,10 @@ namespace DispatchManager.Forms
                                 cell.Style.Alignment == DataGridViewContentAlignment.MiddleRight ? XLAlignmentHorizontalValues.Right :
                                 cell.Style.Alignment == DataGridViewContentAlignment.MiddleCenter ? XLAlignmentHorizontalValues.Center :
                                 XLAlignmentHorizontalValues.Left;
-
-                            // Borders
-                            xlCell.Style.Border.OutsideBorder = XLBorderStyleValues.Hair;
-                            xlCell.Style.Border.OutsideBorderColor = XLColor.FromArgb(100, 100, 100);
                         }
                     }
                     rowOffset++;
                 }
-
 
                 for (int i = 0; i < colIndexes.Count; i++)
                 {
@@ -2049,6 +2056,8 @@ namespace DispatchManager.Forms
                 UseShellExecute = true
             });
         }
+
+
 
 
 
