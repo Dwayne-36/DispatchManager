@@ -959,6 +959,8 @@ namespace DispatchManager.Forms
 
         private void dgvSchedule_SelectionChanged(object sender, EventArgs e)
         {
+            
+
             var selectedRows = dgvSchedule.SelectedRows.Cast<DataGridViewRow>()
                 .Where(row => row.DataBoundItem is DispatchRecord && !(row.DataBoundItem is DispatchBlankRow));
 
@@ -1367,6 +1369,8 @@ namespace DispatchManager.Forms
 
         private void dgvSchedule_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            if (!isSelectingPrintArea) return;
+
             if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
             {
                 dgvSchedule.CurrentCell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
@@ -1548,6 +1552,8 @@ namespace DispatchManager.Forms
 
         private void dgvSchedule_MouseDown(object sender, MouseEventArgs e)
         {
+            if (!isSelectingPrintArea) return;
+
             if (e.Button == MouseButtons.Right)
             {
                 var hitTest = dgvSchedule.HitTest(e.X, e.Y);
