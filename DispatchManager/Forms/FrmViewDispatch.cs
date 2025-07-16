@@ -2,9 +2,11 @@
 using DispatchManager;
 using DispatchManager.DataAccess;
 using DispatchManager.Models;
+using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
@@ -16,7 +18,8 @@ using System.Management;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
-using Microsoft.Office.Interop.Excel;
+
+
 
 
 
@@ -121,10 +124,8 @@ namespace DispatchManager.Forms
             
 
         }
-
         private void FrmViewDispatch_Load(object sender, EventArgs e)
         {
-
             dtpDispatch.Visible = false;
             dtpDispatch.Format = DateTimePickerFormat.Custom;
             dtpDispatch.CustomFormat = "d-MMM"; // This will format like 8-Jul
@@ -132,7 +133,6 @@ namespace DispatchManager.Forms
             this.Controls.Add(dtpDispatch);
 
             this.MouseDown += FrmViewDispatch_MouseDown;
-
 
             // Load saved date settings
             dtpFrom.Value = Properties.Settings.Default.dtpFromDate;
@@ -144,8 +144,13 @@ namespace DispatchManager.Forms
             // Load and store colors from database
             dispatchColors = DispatchData.GetDispatchColours();
 
+            // ⛔ Prevent flicker during data load
+            dgvSchedule.SuspendLayout();
+
             // Load data and populate DataGridView
             LoadScheduleData();
+
+            dgvSchedule.ResumeLayout();
 
             // ✅ Hook event to reposition label when columns are reordered
             dgvSchedule.ColumnDisplayIndexChanged += (s, args) => PositionTotalLabelNextToQty();
@@ -161,9 +166,7 @@ namespace DispatchManager.Forms
             // ✅ Restore layout
             RestoreColumnSettings();
 
-            
-
-            // Optional: Apply double buffering to reduce flicker
+            // ✅ Optional: Apply double buffering to reduce flicker
             typeof(DataGridView).InvokeMember("DoubleBuffered",
                 System.Reflection.BindingFlags.NonPublic |
                 System.Reflection.BindingFlags.Instance |
@@ -176,7 +179,197 @@ namespace DispatchManager.Forms
             dgvSchedule.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             dgvSchedule.ColumnHeadersHeight = 105; // or taller if needed
 
+            // ✅ Start SQL Dependency monitoring
+            
+            RegisterDispatchNotification();
+            RegisterDispatchColoursNotification();
+
         }
+
+        //private void FrmViewDispatch_Load(object sender, EventArgs e)
+        //{
+
+        //    dtpDispatch.Visible = false;
+        //    dtpDispatch.Format = DateTimePickerFormat.Custom;
+        //    dtpDispatch.CustomFormat = "d-MMM"; // This will format like 8-Jul
+        //    dtpDispatch.TextChanged += DtpDispatch_TextChanged;
+        //    this.Controls.Add(dtpDispatch);
+
+        //    this.MouseDown += FrmViewDispatch_MouseDown;
+
+
+        //    // Load saved date settings
+        //    dtpFrom.Value = Properties.Settings.Default.dtpFromDate;
+        //    dtpTo.Value = Properties.Settings.Default.dtpToDate;
+
+        //    // Set the logged-in user label
+        //    lblLoggedInUser.Text = $"{Session.CurrentFullName} is logged in";
+
+        //    // Load and store colors from database
+        //    dispatchColors = DispatchData.GetDispatchColours();
+
+        //    // Load data and populate DataGridView
+        //    LoadScheduleData();
+
+        //    // ✅ Hook event to reposition label when columns are reordered
+        //    dgvSchedule.ColumnDisplayIndexChanged += (s, args) => PositionTotalLabelNextToQty();
+        //    dgvSchedule.ColumnWidthChanged += (s, args) => PositionTotalLabelNextToQty();
+
+        //    // ✅ Hook event to handle editing control showing for custom columns
+        //    dgvSchedule.EditingControlShowing += dgvSchedule_EditingControlShowing;
+
+        //    dgvSchedule.DataBindingComplete += dgvSchedule_DataBindingComplete;
+
+        //    dgvSchedule.CellMouseClick += dgvSchedule_CellMouseClick;
+
+        //    // ✅ Restore layout
+        //    RestoreColumnSettings();
+
+
+
+        //    // Optional: Apply double buffering to reduce flicker
+        //    typeof(DataGridView).InvokeMember("DoubleBuffered",
+        //        System.Reflection.BindingFlags.NonPublic |
+        //        System.Reflection.BindingFlags.Instance |
+        //        System.Reflection.BindingFlags.SetProperty,
+        //        null, dgvSchedule, new object[] { true });
+
+        //    antTimer.Interval = 100;
+        //    antTimer.Tick += AntTimer_Tick;
+
+        //    dgvSchedule.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+        //    dgvSchedule.ColumnHeadersHeight = 105; // or taller if needed
+
+        //}
+
+        private void RegisterDispatchNotification()
+        {
+            string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            using (SqlCommand cmd = new SqlCommand(
+                @"SELECT ID, DispatchDate, ProdInput, MaterialsOrdered, ReleasedtoFactory, ProjectName, 
+                    ProjectColour, FB, EB, ASS, BoardETA, BenchTopSupplier, BenchTopColour, Installer, 
+                    DeliveryAddress, Phone, M3, Amount, OrderNumber,
+                    Installed, Comment, Qty
+                        FROM dbo.Dispatch", conn)) // 🔸 Add here any column that users change
+            {
+                cmd.Notification = null;
+
+                SqlDependency dependency = new SqlDependency(cmd);
+                dependency.OnChange += new OnChangeEventHandler(OnDispatchTableChanged);
+
+                conn.Open();
+                cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            }
+        }
+        private void RegisterDispatchColoursNotification()
+        {
+            string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            using (SqlCommand cmd = new SqlCommand(
+                @"SELECT LINKID, ProdInputColor, MaterialsOrderedColor, ReleasedToFactoryColor,
+                 MainContractorColor, FreightColor, AmountColor, ProjectNameColor
+          FROM dbo.DispatchColours", conn))
+            {
+                cmd.Notification = null;
+
+                SqlDependency dependency = new SqlDependency(cmd);
+                dependency.OnChange += new OnChangeEventHandler(OnDispatchColoursChanged);
+
+                conn.Open();
+                cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            }
+        }
+
+
+
+        //private void RegisterDispatchNotification()
+        //{
+        //    string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
+
+        //    using (SqlConnection conn = new SqlConnection(connStr))
+        //    using (SqlCommand cmd = new SqlCommand("SELECT ID, DispatchDate FROM dbo.Dispatch", conn))
+        //    {
+        //        cmd.Notification = null;
+
+        //        SqlDependency dependency = new SqlDependency(cmd);
+        //        dependency.OnChange += new OnChangeEventHandler(OnDispatchTableChanged);
+
+        //        conn.Open();
+        //        cmd.ExecuteReader(CommandBehavior.CloseConnection);
+        //    }
+        //}
+
+
+        private void OnDispatchTableChanged(object sender, SqlNotificationEventArgs e)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new System.Action(() => OnDispatchTableChanged(sender, e)));
+
+                return;
+            }
+
+            // Re-register dependency (SQL dependency notifications are one-shot)
+            RegisterDispatchNotification();
+
+            // Reload grid
+            dispatchColors = DispatchData.GetDispatchColours();
+            LoadScheduleData();
+        }
+        private void OnDispatchColoursChanged(object sender, SqlNotificationEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke(new System.Action(() => OnDispatchColoursChanged(sender, e)));
+                return;
+            }
+
+            // Re-register dependency
+            RegisterDispatchColoursNotification();
+
+            // ✅ Always refresh latest color mapping
+            dispatchColors = DispatchData.GetDispatchColours();
+
+            // ✅ Reload just cell colors (not full dispatch list)
+            foreach (DataGridViewRow row in dgvSchedule.Rows)
+            {
+                if (row.DataBoundItem is DispatchRecord record)
+                {
+                    if (dispatchColors.TryGetValue(record.ID, out var colors))
+                    {
+                        if (colors.TryGetValue("ProdInputColor", out string prodColor))
+                            row.Cells["ProdInput"].Style.BackColor = ColorTranslator.FromHtml(prodColor);
+
+                        if (colors.TryGetValue("MaterialsOrderedColor", out string matColor))
+                            row.Cells["MaterialsOrdered"].Style.BackColor = ColorTranslator.FromHtml(matColor);
+
+                        if (colors.TryGetValue("ReleasedToFactoryColor", out string relColor))
+                            row.Cells["ReleasedtoFactory"].Style.BackColor = ColorTranslator.FromHtml(relColor);
+
+                        if (colors.TryGetValue("MainContractorColor", out string mainColor))
+                            row.Cells["MainContractor"].Style.BackColor = ColorTranslator.FromHtml(mainColor);
+
+                        if (colors.TryGetValue("FreightColor", out string freightColor))
+                            row.Cells["Freight"].Style.BackColor = ColorTranslator.FromHtml(freightColor);
+
+                        if (colors.TryGetValue("AmountColor", out string amountColor))
+                            row.Cells["Amount"].Style.BackColor = ColorTranslator.FromHtml(amountColor);
+
+                        if (colors.TryGetValue("ProjectNameColor", out string projColor))
+                            row.Cells["ProjectName"].Style.BackColor = ColorTranslator.FromHtml(projColor);
+                    }
+                }
+            }
+
+            //// ✅ Re-apply Deztek keyword-based highlighting
+            //LoadDeztekKeywords();
+            //HighlightDeztekRows();
+        }
+
+
 
         private void AntTimer_Tick(object sender, EventArgs e)
         {
@@ -757,8 +950,175 @@ namespace DispatchManager.Forms
             LoadScheduleData(); // Or whatever method you use to repopulate dgvSchedule
 
         }
+        //        private void LoadScheduleData()
+        //        {
+        //            DateTime from = dtpFrom.Value;
+        //            DateTime to = dtpTo.Value;
+
+        //            fullDispatchList = DispatchData.GetDispatchByDateRange(from, to);
+        //            dispatchColors = DispatchData.GetDispatchColours();
+
+        //            var groupedList = fullDispatchList
+        //                .OrderBy(d => d.DispatchDate)
+        //                .ThenBy(d => d.JobNo)
+        //                .ToList();
+
+        //            var withWeeklyTotals = new List<DispatchRecord>();
+        //            int? currentWeek = null;
+        //            int weeklyTotal = 0;
+
+        //            for (int i = 0; i < groupedList.Count; i++)
+        //            {
+        //                var record = groupedList[i];
+
+        //                int recordWeek = System.Globalization.CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+        //                    record.DispatchDate,
+        //                    System.Globalization.CalendarWeekRule.FirstFourDayWeek,
+        //                    DayOfWeek.Monday);
+
+        //                if (currentWeek != null && recordWeek != currentWeek)
+        //                {
+        //                    withWeeklyTotals.Add(new DispatchBlankRow
+        //                    {
+        //                        Qty = weeklyTotal,
+        //                        ProjectColour = $"Total for Week {currentWeek}",
+        //                        DispatchDate = DateTime.MinValue,
+
+        //                    });
+        //                    weeklyTotal = 0;
+        //                }
+
+        //                if (dispatchColors.TryGetValue(record.ID, out var cellColours))
+        //                {
+        //                    record.ProdInputColor = cellColours.TryGetValue("ProdInputColor", out string v1) ? v1 : null;
+        //                    record.MaterialsOrderedColor = cellColours.TryGetValue("MaterialsOrderedColor", out string v2) ? v2 : null;
+        //                    record.ReleasedToFactoryColor = cellColours.TryGetValue("ReleasedToFactoryColor", out string v3) ? v3 : null;
+        //                    record.MainContractorColor = cellColours.TryGetValue("MainContractorColor", out string v4) ? v4 : null;
+        //                    record.FreightColor = cellColours.TryGetValue("FreightColor", out string v6) ? v6 : null;
+        //                    record.AmountColor = cellColours.TryGetValue("AmountColor", out string v7) ? v7 : null;
+        //                    record.ProjectNameColor = cellColours.TryGetValue("ProjectNameColor", out string v5) ? v5 : null;      
+        //                }
+
+        //                withWeeklyTotals.Add(record);
+        //                weeklyTotal += record.Qty;
+        //                currentWeek = recordWeek;
+
+        //                bool isLast = (i == groupedList.Count - 1);
+        //                if (isLast && weeklyTotal > 0)
+        //                {
+        //                    withWeeklyTotals.Add(new DispatchBlankRow
+        //                    {
+        //                        Qty = weeklyTotal,
+        //                        ProjectColour = $"Total for Week {currentWeek}",
+        //                        WeekNo = -1,
+        //                        DispatchDate = DateTime.MinValue,
+        //                        JobNo = -1,
+        //                        Amount = -1,
+        //                        OrderNumber = -1
+        //                    });
+        //                }
+
+        //            }
+
+        //            Color[] palette = new Color[]
+        //            {
+        //        Color.FromArgb(0, 255, 255),
+        //        Color.FromArgb(255, 128, 128),
+        //        Color.FromArgb(0, 255, 0),
+        //        Color.FromArgb(255, 255, 0),
+        //        Color.FromArgb(255, 0, 255)
+        //            };
+
+        //            weekColors.Clear();
+        //            int colorIndex = 0;
+        //            foreach (var record in withWeeklyTotals)
+        //            {
+        //                if (record is DispatchBlankRow) continue;
+        //                int week = record.WeekNo;
+        //                if (!weekColors.ContainsKey(week))
+        //                {
+        //                    weekColors[week] = palette[colorIndex % palette.Length];
+        //                    colorIndex++;
+        //                }
+        //            }
+
+        //            dgvSchedule.DataSource = null;
+        //            dgvSchedule.Rows.Clear();
+        //            dgvSchedule.Columns.Clear();
+        //            dgvSchedule.SuspendLayout();
+
+        //            dgvSchedule.DataSource = withWeeklyTotals;
+        //            foreach (DataGridViewRow row in dgvSchedule.Rows)
+        //            {
+        //                if (row.DataBoundItem is DispatchBlankRow)
+        //                {
+        //                    row.DefaultCellStyle.BackColor = Color.LightGray; // Optional styling
+        //                    row.Cells["ProjectColour"].Style.Alignment = DataGridViewContentAlignment.MiddleRight;
+        //                    row.DefaultCellStyle.Font = new System.Drawing.Font(dgvSchedule.Font, FontStyle.Bold); // Optional bold
+        //                }
+        //            }
+
+
+        //            string[] hiddenColumns = {
+        //    "ID", "MaterialsOrderedBy", "BenchtopOrderedBy",
+        //    "ProdInputColor", "MaterialsOrderedColor", "ReleasedToFactoryColor",
+        //    "MainContractorColor", "FreightColor", "AmountColor", "LinkID", "ProjectNameColor"
+        //};
+
+        //            foreach (string col in hiddenColumns)
+        //            {
+        //                if (dgvSchedule.Columns.Contains(col))
+        //                {
+        //                    dgvSchedule.Columns[col].Visible = false;
+        //                }
+        //            }
+
+
+        //            foreach (DataGridViewColumn column in dgvSchedule.Columns)
+        //            {
+        //                column.SortMode = DataGridViewColumnSortMode.NotSortable;
+        //                column.ReadOnly = !editableColumns.Contains(column.Name);
+        //            }
+
+        //            foreach (DataGridViewRow row in dgvSchedule.Rows)
+        //            {
+        //                if (row.DataBoundItem is DispatchBlankRow)
+        //                {
+        //                    row.DefaultCellStyle.Font = new System.Drawing.Font(dgvSchedule.Font, FontStyle.Bold);
+        //                    row.DefaultCellStyle.ForeColor = Color.DarkSlateGray;
+
+        //                    int qtyColumnIndex = dgvSchedule.Columns["Qty"].Index;
+        //                    row.Cells[qtyColumnIndex].Style.BackColor = Color.FromArgb(255, 204, 0);
+        //                }
+        //            }
+
+        //            // ✅ Disable editing for toggleable double-click cells
+        //            string[] toggleColumns = { "ProdInput", "MaterialsOrdered", "ReleasedToFactory" };
+        //            foreach (string colName in toggleColumns)
+        //            {
+        //                if (dgvSchedule.Columns.Contains(colName))
+        //                {
+        //                    dgvSchedule.Columns[colName].ReadOnly = true;
+        //                }
+        //            }
+
+        //            UpdateTotalLabel(dgvSchedule.Rows.Cast<DataGridViewRow>());
+
+        //            PositionTotalLabelNextToQty();
+
+
+        //            dgvSchedule.Refresh();
+        //            LoadDeztekKeywords();
+        //            HighlightDeztekRows();
+        //            dgvSchedule.ResumeLayout();
+
+        //        }
         private void LoadScheduleData()
         {
+            // ✅ Store scroll position and current cell
+            int firstVisibleRow = dgvSchedule.FirstDisplayedScrollingRowIndex;
+            DataGridViewCell currentCell = dgvSchedule.CurrentCell;
+
             DateTime from = dtpFrom.Value;
             DateTime to = dtpTo.Value;
 
@@ -790,7 +1150,6 @@ namespace DispatchManager.Forms
                         Qty = weeklyTotal,
                         ProjectColour = $"Total for Week {currentWeek}",
                         DispatchDate = DateTime.MinValue,
-
                     });
                     weeklyTotal = 0;
                 }
@@ -803,7 +1162,7 @@ namespace DispatchManager.Forms
                     record.MainContractorColor = cellColours.TryGetValue("MainContractorColor", out string v4) ? v4 : null;
                     record.FreightColor = cellColours.TryGetValue("FreightColor", out string v6) ? v6 : null;
                     record.AmountColor = cellColours.TryGetValue("AmountColor", out string v7) ? v7 : null;
-                    record.ProjectNameColor = cellColours.TryGetValue("ProjectNameColor", out string v5) ? v5 : null;      
+                    record.ProjectNameColor = cellColours.TryGetValue("ProjectNameColor", out string v5) ? v5 : null;
                 }
 
                 withWeeklyTotals.Add(record);
@@ -824,7 +1183,6 @@ namespace DispatchManager.Forms
                         OrderNumber = -1
                     });
                 }
-
             }
 
             Color[] palette = new Color[]
@@ -849,48 +1207,19 @@ namespace DispatchManager.Forms
                 }
             }
 
+            dgvSchedule.SuspendLayout(); // ✅ Start suspend layout
             dgvSchedule.DataSource = null;
             dgvSchedule.Rows.Clear();
             dgvSchedule.Columns.Clear();
-            dgvSchedule.SuspendLayout();
 
             dgvSchedule.DataSource = withWeeklyTotals;
+
             foreach (DataGridViewRow row in dgvSchedule.Rows)
             {
                 if (row.DataBoundItem is DispatchBlankRow)
                 {
-                    row.DefaultCellStyle.BackColor = Color.LightGray; // Optional styling
+                    row.DefaultCellStyle.BackColor = Color.LightGray;
                     row.Cells["ProjectColour"].Style.Alignment = DataGridViewContentAlignment.MiddleRight;
-                    row.DefaultCellStyle.Font = new System.Drawing.Font(dgvSchedule.Font, FontStyle.Bold); // Optional bold
-                }
-            }
-
-
-            string[] hiddenColumns = {
-    "ID", "MaterialsOrderedBy", "BenchtopOrderedBy",
-    "ProdInputColor", "MaterialsOrderedColor", "ReleasedToFactoryColor",
-    "MainContractorColor", "FreightColor", "AmountColor", "LinkID", "ProjectNameColor"
-};
-
-            foreach (string col in hiddenColumns)
-            {
-                if (dgvSchedule.Columns.Contains(col))
-                {
-                    dgvSchedule.Columns[col].Visible = false;
-                }
-            }
-                    
-
-            foreach (DataGridViewColumn column in dgvSchedule.Columns)
-            {
-                column.SortMode = DataGridViewColumnSortMode.NotSortable;
-                column.ReadOnly = !editableColumns.Contains(column.Name);
-            }
-
-            foreach (DataGridViewRow row in dgvSchedule.Rows)
-            {
-                if (row.DataBoundItem is DispatchBlankRow)
-                {
                     row.DefaultCellStyle.Font = new System.Drawing.Font(dgvSchedule.Font, FontStyle.Bold);
                     row.DefaultCellStyle.ForeColor = Color.DarkSlateGray;
 
@@ -899,7 +1228,27 @@ namespace DispatchManager.Forms
                 }
             }
 
-            // ✅ Disable editing for toggleable double-click cells
+            string[] hiddenColumns = {
+        "ID", "MaterialsOrderedBy", "BenchtopOrderedBy",
+        "ProdInputColor", "MaterialsOrderedColor", "ReleasedToFactoryColor",
+        "MainContractorColor", "FreightColor", "AmountColor", "LinkID", "ProjectNameColor"
+    };
+
+            foreach (string col in hiddenColumns)
+            {
+                if (dgvSchedule.Columns.Contains(col))
+                {
+                    dgvSchedule.Columns[col].Visible = false;
+                }
+            }
+
+            foreach (DataGridViewColumn column in dgvSchedule.Columns)
+            {
+                column.SortMode = DataGridViewColumnSortMode.NotSortable;
+                column.ReadOnly = !editableColumns.Contains(column.Name);
+            }
+
+            // Disable editing for double-click toggle columns
             string[] toggleColumns = { "ProdInput", "MaterialsOrdered", "ReleasedToFactory" };
             foreach (string colName in toggleColumns)
             {
@@ -910,15 +1259,31 @@ namespace DispatchManager.Forms
             }
 
             UpdateTotalLabel(dgvSchedule.Rows.Cast<DataGridViewRow>());
-
             PositionTotalLabelNextToQty();
 
-
-            dgvSchedule.Refresh();
             LoadDeztekKeywords();
             HighlightDeztekRows();
-            dgvSchedule.ResumeLayout();
 
+            dgvSchedule.ResumeLayout(); // ✅ Resume layout
+            dgvSchedule.Refresh();
+
+            // ✅ Restore scroll and selection if valid
+            try
+            {
+                if (firstVisibleRow >= 0 && firstVisibleRow < dgvSchedule.RowCount)
+                    dgvSchedule.FirstDisplayedScrollingRowIndex = firstVisibleRow;
+
+                if (currentCell != null &&
+                    currentCell.RowIndex < dgvSchedule.RowCount &&
+                    currentCell.ColumnIndex < dgvSchedule.ColumnCount)
+                {
+                    dgvSchedule.CurrentCell = dgvSchedule.Rows[currentCell.RowIndex].Cells[currentCell.ColumnIndex];
+                }
+            }
+            catch
+            {
+                // Ignore if restoring position fails
+            }
         }
 
         private void LoadDeztekKeywords()
