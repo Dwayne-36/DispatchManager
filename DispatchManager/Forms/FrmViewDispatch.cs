@@ -1,4 +1,5 @@
-﻿using DispatchManager;
+﻿using ClosedXML.Excel;
+using DispatchManager;
 using DispatchManager.DataAccess;
 using DispatchManager.Models;
 using System;
@@ -7,13 +8,15 @@ using System.Configuration;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
-using ClosedXML.Excel;
+using Microsoft.Office.Interop.Excel;
 
 
 
@@ -246,7 +249,7 @@ namespace DispatchManager.Forms
                 // ⛔ Cancel default cell edit behavior
                 dgvSchedule.CurrentCell = null;
 
-                Rectangle rect = dgvSchedule.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
+                System.Drawing.Rectangle rect = dgvSchedule.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
                 int dtpWidth = 120;
                 int dtpHeight = 30;
                 int dtpX = rect.X + (rect.Width - dtpWidth) / 2;
@@ -256,7 +259,7 @@ namespace DispatchManager.Forms
                     ? dateVal
                     : DateTime.Today;
 
-                dtpDispatch.Bounds = new Rectangle(dtpX, dtpY, dtpWidth, dtpHeight);
+                dtpDispatch.Bounds = new System.Drawing.Rectangle(dtpX, dtpY, dtpWidth, dtpHeight);
                 dtpDispatch.Visible = true;
                 dtpDispatch.BringToFront();
                 dtpDispatch.Focus();
@@ -489,7 +492,7 @@ namespace DispatchManager.Forms
         //        // ⛔ Cancel default cell edit behavior
         //        dgvSchedule.CurrentCell = null;
 
-        //        Rectangle rect = dgvSchedule.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
+        //        System.Drawing.Rectangle rect = dgvSchedule.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
         //        //Point screenLoc = dgvSchedule.PointToScreen(rect.Location);
 
         //        int dtpWidth = 120;
@@ -502,7 +505,7 @@ namespace DispatchManager.Forms
         //            ? dateVal
         //            : DateTime.Today;
 
-        //        dtpDispatch.Bounds = new Rectangle(dtpX, dtpY, dtpWidth, dtpHeight);
+        //        dtpDispatch.Bounds = new System.Drawing.Rectangle(dtpX, dtpY, dtpWidth, dtpHeight);
         //        dtpDispatch.Visible = true;
         //        dtpDispatch.BringToFront();
         //        dtpDispatch.Focus();
@@ -858,7 +861,7 @@ namespace DispatchManager.Forms
                 {
                     row.DefaultCellStyle.BackColor = Color.LightGray; // Optional styling
                     row.Cells["ProjectColour"].Style.Alignment = DataGridViewContentAlignment.MiddleRight;
-                    row.DefaultCellStyle.Font = new Font(dgvSchedule.Font, FontStyle.Bold); // Optional bold
+                    row.DefaultCellStyle.Font = new System.Drawing.Font(dgvSchedule.Font, FontStyle.Bold); // Optional bold
                 }
             }
 
@@ -888,7 +891,7 @@ namespace DispatchManager.Forms
             {
                 if (row.DataBoundItem is DispatchBlankRow)
                 {
-                    row.DefaultCellStyle.Font = new Font(dgvSchedule.Font, FontStyle.Bold);
+                    row.DefaultCellStyle.Font = new System.Drawing.Font(dgvSchedule.Font, FontStyle.Bold);
                     row.DefaultCellStyle.ForeColor = Color.DarkSlateGray;
 
                     int qtyColumnIndex = dgvSchedule.Columns["Qty"].Index;
@@ -1281,8 +1284,8 @@ namespace DispatchManager.Forms
                     // Only draw once — on the last row
                     if (e.RowIndex == bottomRow)
                     {
-                        Rectangle topRect = grid.GetRowDisplayRectangle(topRow, true);
-                        Rectangle bottomRect = grid.GetRowDisplayRectangle(bottomRow, true);
+                        System.Drawing.Rectangle topRect = grid.GetRowDisplayRectangle(topRow, true);
+                        System.Drawing.Rectangle bottomRect = grid.GetRowDisplayRectangle(bottomRow, true);
 
                         int left = grid.RowHeadersWidth;
                         int width = grid.Columns.GetColumnsWidth(DataGridViewElementStates.Visible);
@@ -1299,11 +1302,11 @@ namespace DispatchManager.Forms
                     // Non-contiguous selection
                     if (grid.Rows[e.RowIndex].Selected)
                     {
-                        Rectangle rowRect = grid.GetRowDisplayRectangle(e.RowIndex, true);
+                        System.Drawing.Rectangle rowRect = grid.GetRowDisplayRectangle(e.RowIndex, true);
                         int left = grid.RowHeadersWidth;
                         int width = grid.Columns.GetColumnsWidth(DataGridViewElementStates.Visible);
 
-                        e.Graphics.DrawRectangle(pinkPen, new Rectangle(
+                        e.Graphics.DrawRectangle(pinkPen, new System.Drawing.Rectangle(
                             left + 1,
                             rowRect.Top + 1,
                             width - 3,
@@ -1340,7 +1343,7 @@ namespace DispatchManager.Forms
 
         private void dgvSchedule_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
         {
-            if (e.Control is TextBox tb)
+            if (e.Control is System.Windows.Forms.TextBox tb)
             {
                 // Remove any existing handler to prevent multiple subscriptions
                 tb.Enter -= TextBox_EnterMoveToEnd;
@@ -1350,7 +1353,7 @@ namespace DispatchManager.Forms
 
         private void TextBox_EnterMoveToEnd(object sender, EventArgs e)
         {
-            if (sender is TextBox tb)
+            if (sender is System.Windows.Forms.TextBox tb)
             {
                 // Delay placing the caret at the end to let the DataGridView finish processing
                 this.BeginInvoke((MethodInvoker)(() =>
@@ -1381,7 +1384,7 @@ namespace DispatchManager.Forms
                 dgvSchedule.CurrentCell = dgvSchedule.Rows[e.RowIndex].Cells[e.ColumnIndex];
                 dgvSchedule.BeginEdit(true);  // Start editing immediately
 
-                if (dgvSchedule.EditingControl is TextBox tb)
+                if (dgvSchedule.EditingControl is System.Windows.Forms.TextBox tb)
                 {
                     // Delay cursor placement until control is ready
                     BeginInvoke((MethodInvoker)(() =>
@@ -1830,13 +1833,13 @@ namespace DispatchManager.Forms
             int minCol = selectedCells.Min(c => c.ColumnIndex);
             int maxCol = selectedCells.Max(c => c.ColumnIndex);
 
-            Rectangle topLeft = dgvSchedule.GetCellDisplayRectangle(minCol, minRow, true);
-            Rectangle bottomRight = dgvSchedule.GetCellDisplayRectangle(maxCol, maxRow, true);
+            System.Drawing.Rectangle topLeft = dgvSchedule.GetCellDisplayRectangle(minCol, minRow, true);
+            System.Drawing.Rectangle bottomRight = dgvSchedule.GetCellDisplayRectangle(maxCol, maxRow, true);
 
             if (topLeft.IsEmpty || bottomRight.IsEmpty)
                 return;
 
-            Rectangle borderRect = new Rectangle(
+            System.Drawing.Rectangle borderRect = new System.Drawing.Rectangle(
                 topLeft.X,
                 topLeft.Y,
                 bottomRight.Right - topLeft.Left - 1,
@@ -1973,7 +1976,7 @@ namespace DispatchManager.Forms
 
                             if (isWeeklyTotalRow)
                             {
-                                if (colName == "Qty" || colName == "ProjectColour")
+                                if (colName == "Qty" || colName == "ProjectColour" || colName == "Amount")
                                 {
                                     xlCell.Value = value?.ToString() ?? "";
                                 }
@@ -1986,7 +1989,7 @@ namespace DispatchManager.Forms
                                 // Vertical border logic for total rows
                                 bool isFirst = (i == 0);
                                 bool isLast = (i == colIndexes.Count - 1);
-                                bool isKeyColumn = (colName == "Qty" || colName == "ProjectColour");
+                                bool isKeyColumn = (colName == "Qty" || colName == "ProjectColour" || colName == "Amount");
 
                                 // Top/Bottom borders always applied
                                 xlCell.Style.Border.TopBorder = XLBorderStyleValues.Hair;
@@ -2057,34 +2060,89 @@ namespace DispatchManager.Forms
             });
         }
 
+        //private void ConvertExcelToPdf(string excelPath, string pdfPath)
+        //{
+        //    var excelApp = new Microsoft.Office.Interop.Excel.Application();
 
+        //    try
+        //    {
+        //        var workbook = excelApp.Workbooks.Open(excelPath);
+        //        var sheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Sheets[1];
 
+        //        // 👇 Set page to A4 Landscape
+        //        sheet.PageSetup.Orientation = Microsoft.Office.Interop.Excel.XlPageOrientation.xlLandscape;
+        //        sheet.PageSetup.PaperSize = Microsoft.Office.Interop.Excel.XlPaperSize.xlPaperA4;
 
+        //        // Margins (in points: 1 inch = 72 points, so 5mm ≈ 14.17 points)
+        //        float marginInPoints = 14.17f;
+        //        sheet.PageSetup.TopMargin = marginInPoints;
+        //        sheet.PageSetup.BottomMargin = marginInPoints;
+        //        sheet.PageSetup.LeftMargin = marginInPoints;
+        //        sheet.PageSetup.RightMargin = marginInPoints;
 
+        //        // Optional: fit to one page wide
+        //        sheet.PageSetup.FitToPagesWide = 1;
+        //        sheet.PageSetup.FitToPagesTall = false;
+
+        //        workbook.ExportAsFixedFormat(
+        //            Microsoft.Office.Interop.Excel.XlFixedFormatType.xlTypePDF,
+        //            pdfPath);
+
+        //        workbook.Close(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Failed to convert to PDF: " + ex.Message);
+        //    }
+        //    finally
+        //    {
+        //        excelApp.Quit();
+        //        System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
+
+        //    }
+        //}
         private void ConvertExcelToPdf(string excelPath, string pdfPath)
         {
             var excelApp = new Microsoft.Office.Interop.Excel.Application();
+            Workbook workbook = null;
 
             try
             {
-                var workbook = excelApp.Workbooks.Open(excelPath);
+                workbook = excelApp.Workbooks.Open(excelPath);
                 var sheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Sheets[1];
 
-                // 👇 Set page to A4 Landscape
-                sheet.PageSetup.Orientation = Microsoft.Office.Interop.Excel.XlPageOrientation.xlLandscape;
-                sheet.PageSetup.PaperSize = Microsoft.Office.Interop.Excel.XlPaperSize.xlPaperA4;
+                // Check if A4 is supported by the default printer
+                bool a4Supported = false;
+                PrinterSettings settings = new PrinterSettings();
+                foreach (PaperSize size in settings.PaperSizes)
+                {
+                    if (size.Kind == PaperKind.A4)
+                    {
+                        a4Supported = true;
+                        break;
+                    }
+                }
 
-                // Margins (in points: 1 inch = 72 points, so 5mm ≈ 14.17 points)
+                // Only set to A4 if supported
+                if (a4Supported)
+                {
+                    sheet.PageSetup.PaperSize = Microsoft.Office.Interop.Excel.XlPaperSize.xlPaperA4;
+                }
+
+                sheet.PageSetup.Orientation = Microsoft.Office.Interop.Excel.XlPageOrientation.xlLandscape;
+
+                // Margins (5mm = 14.17 points)
                 float marginInPoints = 14.17f;
                 sheet.PageSetup.TopMargin = marginInPoints;
                 sheet.PageSetup.BottomMargin = marginInPoints;
                 sheet.PageSetup.LeftMargin = marginInPoints;
                 sheet.PageSetup.RightMargin = marginInPoints;
 
-                // Optional: fit to one page wide
+                // Fit to one page wide
                 sheet.PageSetup.FitToPagesWide = 1;
                 sheet.PageSetup.FitToPagesTall = false;
 
+                // Convert to PDF
                 workbook.ExportAsFixedFormat(
                     Microsoft.Office.Interop.Excel.XlFixedFormatType.xlTypePDF,
                     pdfPath);
@@ -2097,9 +2155,55 @@ namespace DispatchManager.Forms
             }
             finally
             {
+                if (workbook != null)
+                {
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+                }
+
                 excelApp.Quit();
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
             }
+        }
+
+
+
+        public static class PrinterHelper
+        {
+            [DllImport("winspool.drv", CharSet = CharSet.Auto, SetLastError = true)]
+            public static extern bool SetDefaultPrinter(string Name);
+
+            public static string GetDefaultPrinter()
+            {
+                string defaultPrinter = "";
+                using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Printer WHERE Default = true"))
+                {
+                    foreach (ManagementObject printer in searcher.Get())
+                    {
+                        defaultPrinter = printer["Name"].ToString();
+                        break;
+                    }
+                }
+                return defaultPrinter;
+            }
+        }
+        private string SetTemporaryPrinter(string preferredPrinter = "Microsoft XPS Document Writer")
+        {
+            var excelApp = new Microsoft.Office.Interop.Excel.Application();
+            string originalPrinter = excelApp.ActivePrinter;
+
+            foreach (string printer in System.Drawing.Printing.PrinterSettings.InstalledPrinters)
+            {
+                if (printer.Contains(preferredPrinter))
+                {
+                    excelApp.ActivePrinter = printer;
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
+                    return originalPrinter; // Save old printer so we can restore it later
+                }
+            }
+
+            // If preferred printer not found, return original
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
+            return originalPrinter;
         }
 
 

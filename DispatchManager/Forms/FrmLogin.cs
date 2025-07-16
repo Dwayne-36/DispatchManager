@@ -35,7 +35,7 @@ namespace DispatchManager.Forms
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand(@"SELECT ID, Initials, FullName FROM Employees 
+                SqlCommand cmd = new SqlCommand(@"SELECT ID, Initials, FullName, IsAdmin FROM Employees 
                                           WHERE Username = @username AND Password = @password", conn);
                 cmd.Parameters.AddWithValue("@username", username);
                 cmd.Parameters.AddWithValue("@password", password);
@@ -46,6 +46,9 @@ namespace DispatchManager.Forms
                     Guid employeeId = reader.GetGuid(0);
                     string initials = reader.GetString(1);
                     string fullName = reader.GetString(2); // Assuming FullName is the same as Initials for this example
+                    bool isAdmin = reader.GetBoolean(3);
+                    Session.IsAdmin = isAdmin;
+
                     Session.CurrentUserId = employeeId;
                     Session.CurrentInitials = initials;
                     Session.CurrentFullName = fullName;

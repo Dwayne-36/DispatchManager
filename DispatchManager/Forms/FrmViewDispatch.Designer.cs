@@ -40,7 +40,6 @@
             this.lblTo = new System.Windows.Forms.Label();
             this.tbSearch = new System.Windows.Forms.TextBox();
             this.lblSearch = new System.Windows.Forms.Label();
-            this.btnSearch = new System.Windows.Forms.Button();
             this.btnNewProject = new System.Windows.Forms.Button();
             this.lblTotal = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -66,7 +65,7 @@
             this.dgvSchedule.Location = new System.Drawing.Point(1, 126);
             this.dgvSchedule.Name = "dgvSchedule";
             this.dgvSchedule.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvSchedule.Size = new System.Drawing.Size(2455, 883);
+            this.dgvSchedule.Size = new System.Drawing.Size(1905, 863);
             this.dgvSchedule.TabIndex = 0;
             // 
             // contextMenuGrid
@@ -148,21 +147,11 @@
             this.lblSearch.TabIndex = 6;
             this.lblSearch.Text = "Search:";
             // 
-            // btnSearch
-            // 
-            this.btnSearch.Location = new System.Drawing.Point(304, 87);
-            this.btnSearch.Name = "btnSearch";
-            this.btnSearch.Size = new System.Drawing.Size(75, 23);
-            this.btnSearch.TabIndex = 7;
-            this.btnSearch.Text = "Search";
-            this.btnSearch.UseVisualStyleBackColor = true;
-            this.btnSearch.Click += new System.EventHandler(this.btnSearch_Click);
-            // 
             // btnNewProject
             // 
-            this.btnNewProject.Location = new System.Drawing.Point(499, 25);
+            this.btnNewProject.Location = new System.Drawing.Point(321, 24);
             this.btnNewProject.Name = "btnNewProject";
-            this.btnNewProject.Size = new System.Drawing.Size(70, 59);
+            this.btnNewProject.Size = new System.Drawing.Size(185, 25);
             this.btnNewProject.TabIndex = 8;
             this.btnNewProject.Text = "New Project";
             this.btnNewProject.UseVisualStyleBackColor = true;
@@ -174,7 +163,7 @@
             this.lblTotal.AutoSize = true;
             this.lblTotal.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTotal.ForeColor = System.Drawing.Color.Red;
-            this.lblTotal.Location = new System.Drawing.Point(2269, 1021);
+            this.lblTotal.Location = new System.Drawing.Point(1719, 1001);
             this.lblTotal.Name = "lblTotal";
             this.lblTotal.Size = new System.Drawing.Size(45, 17);
             this.lblTotal.TabIndex = 10;
@@ -186,7 +175,7 @@
             this.menuOptions});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(2454, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1904, 24);
             this.menuStrip1.TabIndex = 11;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -218,7 +207,7 @@
             this.lblLoggedInUser.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblLoggedInUser.AutoSize = true;
             this.lblLoggedInUser.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLoggedInUser.Location = new System.Drawing.Point(2196, 29);
+            this.lblLoggedInUser.Location = new System.Drawing.Point(1646, 29);
             this.lblLoggedInUser.Name = "lblLoggedInUser";
             this.lblLoggedInUser.Size = new System.Drawing.Size(92, 13);
             this.lblLoggedInUser.TabIndex = 12;
@@ -226,9 +215,9 @@
             // 
             // btnSetPrintArea
             // 
-            this.btnSetPrintArea.Location = new System.Drawing.Point(604, 21);
+            this.btnSetPrintArea.Location = new System.Drawing.Point(321, 54);
             this.btnSetPrintArea.Name = "btnSetPrintArea";
-            this.btnSetPrintArea.Size = new System.Drawing.Size(185, 23);
+            this.btnSetPrintArea.Size = new System.Drawing.Size(185, 25);
             this.btnSetPrintArea.TabIndex = 13;
             this.btnSetPrintArea.Text = "Set Print Area";
             this.btnSetPrintArea.UseVisualStyleBackColor = true;
@@ -236,9 +225,9 @@
             // 
             // btnPrint
             // 
-            this.btnPrint.Location = new System.Drawing.Point(604, 56);
+            this.btnPrint.Location = new System.Drawing.Point(321, 85);
             this.btnPrint.Name = "btnPrint";
-            this.btnPrint.Size = new System.Drawing.Size(185, 23);
+            this.btnPrint.Size = new System.Drawing.Size(185, 25);
             this.btnPrint.TabIndex = 14;
             this.btnPrint.Text = "Print";
             this.btnPrint.UseVisualStyleBackColor = true;
@@ -248,13 +237,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2454, 1061);
+            this.ClientSize = new System.Drawing.Size(1904, 1041);
             this.Controls.Add(this.btnPrint);
             this.Controls.Add(this.btnSetPrintArea);
             this.Controls.Add(this.lblLoggedInUser);
             this.Controls.Add(this.lblTotal);
             this.Controls.Add(this.btnNewProject);
-            this.Controls.Add(this.btnSearch);
             this.Controls.Add(this.lblSearch);
             this.Controls.Add(this.tbSearch);
             this.Controls.Add(this.lblTo);
@@ -285,7 +273,6 @@
         private System.Windows.Forms.Label lblTo;
         private System.Windows.Forms.TextBox tbSearch;
         private System.Windows.Forms.Label lblSearch;
-        private System.Windows.Forms.Button btnSearch;
         private System.Windows.Forms.Button btnNewProject;
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.MenuStrip menuStrip1;

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="HayloSyncInstaller" Language="1033" Version="1.0.1.0" Manufacturer="HayloSync" UpgradeCode="2a12950d-2909-4dae-9a5a-83b378e42334">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate />
+
+		<Feature Id="ProductFeature" Title="HayloSyncInstaller" Level="1">
+			<ComponentGroupRef Id="AppFiles" />
+		</Feature>
+
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="HayloSyncInstaller" />
+			</Directory>
+			<Directory Id="DesktopFolder" Name="Desktop" />
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<Component Id="MainExecutable" Guid="{87E63886-9860-41E1-A876-D334A98F0BCD}">
+				<File Id="DispatchExe" Source="$(var.DispatchManager.TargetPath)" KeyPath="yes">
+					<Shortcut Id="desktopShortcut"
+							  Directory="DesktopFolder"
+							  Name="Dispatch Manager"
+							  WorkingDirectory="INSTALLFOLDER"
+							  Icon="AppIcon.ico"
+							  Advertise="no" />
+				</File>
+			</Component>
+
+		</ComponentGroup>
+	</Fragment>
+
+</Wix>
