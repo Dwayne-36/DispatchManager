@@ -161,6 +161,9 @@ namespace DispatchManager.Forms
 
             dgvSchedule.CellValueChanged += dgvSchedule_CellValueChanged;
 
+            dgvSchedule.EnableHeadersVisualStyles = false;
+            dgvSchedule.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            dgvSchedule.ColumnHeadersDefaultCellStyle.SelectionBackColor = dgvSchedule.ColumnHeadersDefaultCellStyle.BackColor;
 
 
 
@@ -178,7 +181,7 @@ namespace DispatchManager.Forms
             antTimer.Tick += AntTimer_Tick;
 
             dgvSchedule.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dgvSchedule.ColumnHeadersHeight = 105; // or taller if needed
+            dgvSchedule.ColumnHeadersHeight = 140; // or taller if needed
 
             // ✅ Start SQL Dependency monitoring
             
@@ -863,6 +866,33 @@ namespace DispatchManager.Forms
             LoadDeztekKeywords();
             HighlightDeztekRows();
 
+            dgvSchedule.Columns["DispatchDate"].HeaderText = " Dispatch Date";
+            dgvSchedule.Columns["ProdInput"].HeaderText = " Production Input";
+            dgvSchedule.Columns["MaterialsOrdered"].HeaderText = " Materials Ordered";
+            dgvSchedule.Columns["ReleasedtoFactory"].HeaderText = " Released to Factory";
+            dgvSchedule.Columns["FB"].HeaderText = " FB ✔";
+            dgvSchedule.Columns["EB"].HeaderText = " EB ✔";
+            dgvSchedule.Columns["ASS"].HeaderText = " AS ✔";
+            dgvSchedule.Columns["Installer"].HeaderText = " Installer Name";
+            dgvSchedule.Columns["Qty"].HeaderText = " Quantity";
+            dgvSchedule.Columns["Amount"].HeaderText = " Invoice Amount ($)";
+            dgvSchedule.Columns["ProjectName"].HeaderText = " Project Name";
+            dgvSchedule.Columns["ProjectColour"].HeaderText = " Project Colour";
+            dgvSchedule.Columns["BenchTopSupplier"].HeaderText = " Bench Top Supplier";
+            dgvSchedule.Columns["BenchTopColour"].HeaderText = " Bench Top Colour";
+            dgvSchedule.Columns["DeliveryAddress"].HeaderText = " Delivery Address";
+            dgvSchedule.Columns["Phone"].HeaderText = " Contact Phone";
+            dgvSchedule.Columns["Comment"].HeaderText = " Comment";
+            dgvSchedule.Columns["OrderNumber"].HeaderText = " Order Number";
+            dgvSchedule.Columns["Day"].HeaderText = " Day";
+            dgvSchedule.Columns["WeekNo"].HeaderText = " Week No";
+            dgvSchedule.Columns["DateOrdered"].HeaderText = " Date Ordered";
+            dgvSchedule.Columns["LeadTime"].HeaderText = " Lead Time";
+            dgvSchedule.Columns["JobNo"].HeaderText = " Job No";
+            dgvSchedule.Columns["M3"].HeaderText = " Volume (m³)";
+            dgvSchedule.Columns["BoardETA"].HeaderText = " Assembler";
+            dgvSchedule.Columns["MainContractor"].HeaderText = " Main Contractor";
+
             dgvSchedule.ResumeLayout(); // ✅ Resume layout
             dgvSchedule.Refresh();
 
@@ -1329,15 +1359,36 @@ namespace DispatchManager.Forms
         }
         private void dgvSchedule_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (!isSelectingPrintArea) return;
+            if (isSelectingPrintArea)
+            {
+                // 🛑 Ignore header clicks during print area selection
+                if (e.RowIndex == -1 || e.ColumnIndex == -1)
+                {
+                    dgvSchedule.ClearSelection();
+                    return;
+                }
 
-            var cell = dgvSchedule[e.ColumnIndex, e.RowIndex];
-            if (!selectedPrintCells.Contains(cell))
-                selectedPrintCells.Add(cell);
+                var cell = dgvSchedule[e.ColumnIndex, e.RowIndex];
+                if (!selectedPrintCells.Contains(cell))
+                    selectedPrintCells.Add(cell);
 
-            dgvSchedule.ClearSelection(); // optional: don't show highlight
-            dgvSchedule.Invalidate();
+                dgvSchedule.ClearSelection(); // optional: don't show highlight
+                dgvSchedule.Invalidate();
+            }
         }
+
+
+        //private void dgvSchedule_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        //{
+        //    if (!isSelectingPrintArea) return;
+
+        //    var cell = dgvSchedule[e.ColumnIndex, e.RowIndex];
+        //    if (!selectedPrintCells.Contains(cell))
+        //        selectedPrintCells.Add(cell);
+
+        //    dgvSchedule.ClearSelection(); // optional: don't show highlight
+        //    dgvSchedule.Invalidate();
+        //}
 
         private void dgvSchedule_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
@@ -1829,37 +1880,84 @@ namespace DispatchManager.Forms
         }
         private void dgvSchedule_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
+            // === HEADER STYLE: Vertical Header Font and Text Formatting ===
             if (e.RowIndex == -1 && e.ColumnIndex >= 0)
             {
                 e.PaintBackground(e.CellBounds, false);
 
                 string headerText = e.FormattedValue?.ToString() ?? "";
-                using (Brush brush = new SolidBrush(e.CellStyle.ForeColor))
-                using (StringFormat format = new StringFormat())
+
+                // Save original settings to restore later
+                var oldHint = e.Graphics.TextRenderingHint;
+                var oldOffset = e.Graphics.PixelOffsetMode;
+
+                // Apply crisp text settings just for header
+                e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+                e.Graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+                using (System.Drawing.Font font = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Bold))
+                using (System.Drawing.Brush brush = new System.Drawing.SolidBrush(System.Drawing.Color.Black))
+                using (System.Drawing.StringFormat format = new System.Drawing.StringFormat())
                 {
-                    format.Alignment = StringAlignment.Near; // Left aligned
-                    format.LineAlignment = StringAlignment.Center; // Vertically centered
+                    format.Alignment = System.Drawing.StringAlignment.Near;     // Left aligned (after rotate)
+                    format.LineAlignment = System.Drawing.StringAlignment.Center; // Vertically centered
 
                     // Rotate origin to bottom-left of cell
                     e.Graphics.TranslateTransform(e.CellBounds.Left, e.CellBounds.Bottom);
                     e.Graphics.RotateTransform(-90);
 
-                    RectangleF rect = new RectangleF(0, 0, e.CellBounds.Height, e.CellBounds.Width);
-
-                    e.Graphics.DrawString(
-                        headerText,
-                        e.CellStyle.Font,
-                        brush,
-                        rect,
-                        format
-                    );
+                    System.Drawing.RectangleF rect = new System.Drawing.RectangleF(0, 0, e.CellBounds.Height, e.CellBounds.Width);
+                    e.Graphics.DrawString(headerText, font, brush, rect, format);
 
                     e.Graphics.ResetTransform();
                 }
 
+                // Restore original graphics settings
+                e.Graphics.TextRenderingHint = oldHint;
+                e.Graphics.PixelOffsetMode = oldOffset;
+
                 e.Handled = true;
             }
         }
+
+
+
+
+
+
+        //private void dgvSchedule_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        //{
+        //    if (e.RowIndex == -1 && e.ColumnIndex >= 0)
+        //    {
+        //        e.PaintBackground(e.CellBounds, false);
+
+        //        string headerText = e.FormattedValue?.ToString() ?? "";
+        //        using (Brush brush = new SolidBrush(e.CellStyle.ForeColor))
+        //        using (StringFormat format = new StringFormat())
+        //        {
+        //            format.Alignment = StringAlignment.Near; // Left aligned
+        //            format.LineAlignment = StringAlignment.Center; // Vertically centered
+
+        //            // Rotate origin to bottom-left of cell
+        //            e.Graphics.TranslateTransform(e.CellBounds.Left, e.CellBounds.Bottom);
+        //            e.Graphics.RotateTransform(-90);
+
+        //            RectangleF rect = new RectangleF(0, 0, e.CellBounds.Height, e.CellBounds.Width);
+
+        //            e.Graphics.DrawString(
+        //                headerText,
+        //                e.CellStyle.Font,
+        //                brush,
+        //                rect,
+        //                format
+        //            );
+
+        //            e.Graphics.ResetTransform();
+        //        }
+
+        //        e.Handled = true;
+        //    }
+        //}
         private void ExportSelectionToExcel()
         {
             if (dgvSchedule.SelectedCells.Count == 0)
