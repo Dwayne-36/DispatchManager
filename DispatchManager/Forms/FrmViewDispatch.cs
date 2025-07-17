@@ -155,6 +155,15 @@ namespace DispatchManager.Forms
 
             dgvSchedule.CellMouseClick += dgvSchedule_CellMouseClick;
 
+            //dgvSchedule.CellValueChanged += dgvSchedule_CellValueChanged;
+
+            dgvSchedule.CurrentCellDirtyStateChanged += dgvSchedule_CurrentCellDirtyStateChanged;
+
+            dgvSchedule.CellValueChanged += dgvSchedule_CellValueChanged;
+
+
+
+
             // ✅ Restore layout
             RestoreColumnSettings();
 
@@ -218,23 +227,6 @@ namespace DispatchManager.Forms
                 cmd.ExecuteReader(CommandBehavior.CloseConnection);
             }
         }
-
-        //private void OnDispatchTableChanged(object sender, SqlNotificationEventArgs e)
-        //{
-        //    if (this.InvokeRequired)
-        //    {
-        //        this.Invoke(new System.Action(() => OnDispatchTableChanged(sender, e)));
-
-        //        return;
-        //    }
-
-        //    // Re-register dependency (SQL dependency notifications are one-shot)
-        //    RegisterDispatchNotification();
-
-        //    // Reload grid
-        //    dispatchColors = DispatchData.GetDispatchColours();
-        //    LoadScheduleData();
-        //}
         private void OnDispatchTableChanged(object sender, SqlNotificationEventArgs e)
         {
             if (InvokeRequired)
@@ -243,13 +235,32 @@ namespace DispatchManager.Forms
                 return;
             }
 
-            // Re-register dependency
-            RegisterDispatchNotification();
+            RegisterDispatchNotification(); // Re-register dependency
 
-            // ✅ Get latest updated records from SQL
             var latestRecords = DispatchData.GetDispatchByDateRange(dtpFrom.Value, dtpTo.Value);
+            bool reloadNeeded = false;
 
-            // ✅ Update only modified cells
+            foreach (DataGridViewRow row in dgvSchedule.Rows)
+            {
+                if (row.DataBoundItem is DispatchRecord oldRecord)
+                {
+                    var updatedRecord = latestRecords.FirstOrDefault(r => r.ID == oldRecord.ID);
+                    if (updatedRecord == null) continue;
+
+                    if (!Equals(oldRecord.DispatchDate, updatedRecord.DispatchDate))
+                    {
+                        reloadNeeded = true;
+                        break;
+                    }
+                }
+            }
+
+            if (reloadNeeded)
+            {
+                LoadScheduleData();
+                return;
+            }
+
             foreach (DataGridViewRow row in dgvSchedule.Rows)
             {
                 if (row.DataBoundItem is DispatchRecord oldRecord)
@@ -265,22 +276,19 @@ namespace DispatchManager.Forms
                             if (!Equals(cell.Value, newValue))
                             {
                                 cell.Value = newValue;
-                                dgvSchedule.InvalidateCell(cell);
                             }
                         }
                     }
 
-                    // ✅ List fields users can change
-                    TryUpdateCell("DispatchDate", updatedRecord.DispatchDate);
                     TryUpdateCell("ProdInput", updatedRecord.ProdInput);
                     TryUpdateCell("MaterialsOrdered", updatedRecord.MaterialsOrdered);
                     TryUpdateCell("ReleasedtoFactory", updatedRecord.ReleasedToFactory);
                     TryUpdateCell("ProjectName", updatedRecord.ProjectName);
-                    TryUpdateCell("ProjectColour", updatedRecord.ProjectColour); // Note: use correct property name
+                    TryUpdateCell("ProjectColour", updatedRecord.ProjectColour);
                     TryUpdateCell("FB", updatedRecord.FB);
                     TryUpdateCell("EB", updatedRecord.EB);
                     TryUpdateCell("ASS", updatedRecord.ASS);
-                    TryUpdateCell("BoardETA", updatedRecord.BoardETA); // Adjust if mismatched
+                    TryUpdateCell("BoardETA", updatedRecord.BoardETA);
                     TryUpdateCell("BenchTopSupplier", updatedRecord.BenchTopSupplier);
                     TryUpdateCell("BenchTopColour", updatedRecord.BenchTopColour);
                     TryUpdateCell("Installer", updatedRecord.Installer);
@@ -342,15 +350,38 @@ namespace DispatchManager.Forms
             }
 
         }
-
-
-
         private void AntTimer_Tick(object sender, EventArgs e)
         {
             dashOffset += 1f;
             if (dashOffset > 10f) dashOffset = 0f;
             dgvSchedule.Invalidate(); // Force border redraw
         }
+        private void dgvSchedule_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && dgvSchedule.Columns[e.ColumnIndex] is DataGridViewCheckBoxColumn)
+            {
+                dgvSchedule.CommitEdit(DataGridViewDataErrorContexts.Commit);
+
+                // Save the updated value to SQL
+                var row = dgvSchedule.Rows[e.RowIndex];
+                if (row.DataBoundItem is DispatchRecord record)
+                {
+                    DispatchData.UpdateSingleField(record.ID, dgvSchedule.Columns[e.ColumnIndex].Name, row.Cells[e.ColumnIndex].Value);
+                }
+            }
+        }
+
+        
+
+        private void dgvSchedule_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            if (dgvSchedule.IsCurrentCellDirty &&
+                dgvSchedule.CurrentCell is DataGridViewCheckBoxCell)
+            {
+                dgvSchedule.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
+
 
         private void DtpDispatch_TextChanged(object sender, EventArgs e)
         {
@@ -398,47 +429,6 @@ namespace DispatchManager.Forms
 
             dtpDispatch.Visible = false;
         }
-
-
-
-        //private void DtpDispatch_TextChanged(object sender, EventArgs e)
-        //{
-        //    if (currentDateCell == null) return;
-
-        //    int rowIndex = currentDateCell.RowIndex;
-        //    if (rowIndex < 0 || rowIndex >= dgvSchedule.Rows.Count) return;
-
-        //    var row = dgvSchedule.Rows[rowIndex];
-
-        //    if (row.DataBoundItem is DispatchRecord record)
-        //    {
-        //        DateTime newDate = dtpDispatch.Value;
-
-        //        // Update WeekNo and Day
-        //        CultureInfo culture = CultureInfo.CurrentCulture;
-        //        int newWeekNo = culture.Calendar.GetWeekOfYear(
-        //            newDate,
-        //            CalendarWeekRule.FirstFourDayWeek,
-        //            DayOfWeek.Monday);
-
-        //        record.DispatchDate = newDate;
-        //        record.WeekNo = newWeekNo;
-        //        record.Day = newDate.ToString("ddd");
-
-        //        // Update DataGridView cells
-        //        row.Cells["DispatchDate"].Value = newDate;
-        //        row.Cells["WeekNo"].Value = newWeekNo;
-        //        row.Cells["Day"].Value = record.Day;
-
-        //        // Update SQL
-        //        DispatchData.UpdateDispatchField(record.ID, "DispatchDate", newDate);
-        //        DispatchData.UpdateDispatchField(record.ID, "WeekNo", newWeekNo);
-        //        DispatchData.UpdateDispatchField(record.ID, "Day", record.Day);
-        //    }
-
-        //    // Hide the picker after selecting
-        //    dtpDispatch.Visible = false;
-        //}
         private void dgvSchedule_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             

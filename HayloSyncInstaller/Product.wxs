@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="HayloSyncInstaller" Language="1033" Version="25.07.17.11" Manufacturer="HayloSync" UpgradeCode="2a12950d-2909-4dae-9a5a-83b378e42334">
+	<Product Id="*" Name="HayloSyncInstaller" Language="1033" Version="25.07.17.15" Manufacturer="HayloSync" UpgradeCode="2a12950d-2909-4dae-9a5a-83b378e42334">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />

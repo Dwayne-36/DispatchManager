@@ -234,7 +234,19 @@ namespace DispatchManager.DataAccess
                 }
             }
         }
+        public static void UpdateSingleField(Guid id, string columnName, object value)
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
 
+            using (var conn = new SqlConnection(connectionString))
+            using (var cmd = new SqlCommand($"UPDATE Dispatch SET [{columnName}] = @value WHERE ID = @id", conn))
+            {
+                cmd.Parameters.AddWithValue("@value", value ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@id", id);
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
 
 
 
