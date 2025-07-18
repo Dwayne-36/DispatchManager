@@ -74,7 +74,7 @@ namespace DispatchManager.DataAccess
                                 EdgeColour = SafeRead<bool>(reader, "EdgeColour"),
                                 PreAssemble = SafeRead<bool>(reader, "PreAssemble"),
                                 CarcassAssemble = SafeRead<bool>(reader, "CarcassAssemble"),
-                                FitOut = SafeRead<bool>(reader, "FitOut"),
+                                Invoiced = SafeRead<bool>(reader, "Invoiced"),
                                 Stacked = SafeRead<bool>(reader, "Stacked")
 
 
@@ -139,11 +139,11 @@ namespace DispatchManager.DataAccess
         {
             // Only allow updates to these fields
             var allowedColumns = new HashSet<string> {
-        "DispatchDate", "WeekNo", "Day", "ProdInput", "MaterialsOrdered", "ReleasedToFactory", "ProjectName",
-        "ProjectColour", "Qty", "FB", "EB", "ASS", "BoardETA", "Installed", "Freight",
-        "BenchTopSupplier", "BenchTopColour", "Installer", "Comment", "DeliveryAddress",
-        "Phone", "M3", "Amount", "OrderNumber","FlatBedColour", "EdgeColour", "PreAssemble", 
-        "CarcassAssemble","FitOut","Stacked"
+            "DispatchDate", "WeekNo", "Day", "ProdInput", "MaterialsOrdered", "ReleasedToFactory", "ProjectName",
+            "ProjectColour", "Qty", "FB", "EB", "ASS", "BoardETA", "Installed", "Freight",
+            "BenchTopSupplier", "BenchTopColour", "Installer", "Comment", "DeliveryAddress",
+            "Phone", "M3", "Amount", "OrderNumber","FlatBedColour", "EdgeColour", "PreAssemble", 
+            "CarcassAssemble","Invoiced","Stacked"
          };
 
             if (!allowedColumns.Contains(columnName))

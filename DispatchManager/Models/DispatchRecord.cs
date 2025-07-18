@@ -47,7 +47,7 @@ namespace DispatchManager.Models
         public bool EdgeColour { get; set; }
         public bool PreAssemble { get; set; }
         public bool CarcassAssemble { get; set; }
-        public bool FitOut { get; set; }
+        public bool Invoiced { get; set; }
         public bool Stacked { get; set; }
 
     }
@@ -78,7 +78,7 @@ namespace DispatchManager.Models
             EdgeColour = false;
             PreAssemble = false;
             CarcassAssemble = false;
-            FitOut = false;
+            Invoiced = false;
             Stacked = false;
             BoardETA = "";
             Installed = "";
