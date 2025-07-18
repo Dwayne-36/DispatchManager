@@ -33,7 +33,7 @@ namespace DispatchManager
             Session.CurrentUsername = "dwayne";
             Session.CurrentInitials = "DK";
             Session.CurrentFullName = "Dwayne Keast";
-            Session.IsAdmin = true;
+            Session.IsAdmin = false;
 
             Application.Run(new FrmViewDispatch());
 

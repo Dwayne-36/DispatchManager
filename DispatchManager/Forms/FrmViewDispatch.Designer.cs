@@ -49,6 +49,7 @@
             this.lblLoggedInUser = new System.Windows.Forms.Label();
             this.btnSetPrintArea = new System.Windows.Forms.Button();
             this.btnPrint = new System.Windows.Forms.Button();
+            this.lblSelectionTotal = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
             this.contextMenuGrid.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -215,7 +216,7 @@
             // 
             // btnSetPrintArea
             // 
-            this.btnSetPrintArea.Location = new System.Drawing.Point(321, 54);
+            this.btnSetPrintArea.Location = new System.Drawing.Point(321, 50);
             this.btnSetPrintArea.Name = "btnSetPrintArea";
             this.btnSetPrintArea.Size = new System.Drawing.Size(185, 25);
             this.btnSetPrintArea.TabIndex = 13;
@@ -233,11 +234,21 @@
             this.btnPrint.UseVisualStyleBackColor = true;
             this.btnPrint.Click += new System.EventHandler(this.btnPrint_Click);
             // 
+            // lblSelectionTotal
+            // 
+            this.lblSelectionTotal.AutoSize = true;
+            this.lblSelectionTotal.Location = new System.Drawing.Point(1604, 91);
+            this.lblSelectionTotal.Name = "lblSelectionTotal";
+            this.lblSelectionTotal.Size = new System.Drawing.Size(288, 13);
+            this.lblSelectionTotal.TabIndex = 15;
+            this.lblSelectionTotal.Text = "lblSelectionTotal.Text = \"Selection Total: $0.00 | M3: 0.00\";";
+            // 
             // FrmViewDispatch
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1904, 1041);
+            this.Controls.Add(this.lblSelectionTotal);
             this.Controls.Add(this.btnPrint);
             this.Controls.Add(this.btnSetPrintArea);
             this.Controls.Add(this.lblLoggedInUser);
@@ -286,5 +297,6 @@
         private System.Windows.Forms.ToolStripMenuItem MenuPurchaseOrder;
         private System.Windows.Forms.Button btnSetPrintArea;
         private System.Windows.Forms.Button btnPrint;
+        private System.Windows.Forms.Label lblSelectionTotal;
     }
 }

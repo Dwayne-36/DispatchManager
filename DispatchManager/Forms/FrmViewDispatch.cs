@@ -171,7 +171,8 @@ namespace DispatchManager.Forms
             dgvSchedule.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             dgvSchedule.ColumnHeadersDefaultCellStyle.SelectionBackColor = dgvSchedule.ColumnHeadersDefaultCellStyle.BackColor;
 
-
+            // Hide label by default if not admin
+            lblSelectionTotal.Visible = Session.IsAdmin;
 
             // ✅ Restore layout
             RestoreColumnSettings();
@@ -915,7 +916,7 @@ namespace DispatchManager.Forms
             dgvSchedule.Columns["PreAssemble"].HeaderText = " Pre-Assemble";
             dgvSchedule.Columns["CarcassAssemble"].HeaderText = " Carcass Assemble";
             dgvSchedule.Columns["Invoiced"].HeaderText = " Invoiced";
-            dgvSchedule.Columns["Stacked"].HeaderText = " Dipatched";
+            dgvSchedule.Columns["Stacked"].HeaderText = " Dispatched";
 
             dgvSchedule.ResumeLayout(); // ✅ Resume layout
             dgvSchedule.Refresh();
@@ -984,9 +985,7 @@ namespace DispatchManager.Forms
         }
 
         private void dgvSchedule_SelectionChanged(object sender, EventArgs e)
-        {
-            
-
+        {          
             var selectedRows = dgvSchedule.SelectedRows.Cast<DataGridViewRow>()
                 .Where(row => row.DataBoundItem is DispatchRecord && !(row.DataBoundItem is DispatchBlankRow));
 
@@ -999,6 +998,38 @@ namespace DispatchManager.Forms
                 // Use all rows if 1 or 0 selected
                 UpdateTotalLabel(dgvSchedule.Rows.Cast<DataGridViewRow>());
             }
+            
+                UpdateSelectionTotals();            
+        }
+        private void UpdateSelectionTotals()
+        {
+
+            if (dgvSchedule.SelectedCells.Count == 0)
+            {
+                lblSelectionTotal.Text = "Selection Total: $0.00 | M3: 0.00";
+                return;
+            }
+
+            double totalM3 = 0;
+            double totalAmount = 0;
+
+            foreach (DataGridViewCell cell in dgvSchedule.SelectedCells)
+            {
+                string colName = dgvSchedule.Columns[cell.ColumnIndex].Name;
+                if (cell.Value == null) continue;
+
+                if (colName == "M3" && double.TryParse(cell.Value.ToString(), out double m3Value))
+                {
+                    totalM3 += m3Value;
+                }
+                else if (colName == "Amount" && double.TryParse(cell.Value.ToString(), out double amtValue))
+                {
+                    totalAmount += amtValue;
+                }
+                
+            }
+
+            lblSelectionTotal.Text = $"Selection Total: ${totalAmount:N2} | M3: {totalM3:N2}";
         }
         private void UpdateTotalLabel(IEnumerable<DataGridViewRow> rows)
         {
@@ -1989,11 +2020,22 @@ namespace DispatchManager.Forms
 
             int minRow = selectedCells.Min(c => c.RowIndex);
             int maxRow = selectedCells.Max(c => c.RowIndex);
-            int minCol = selectedCells.Min(c => c.ColumnIndex);
-            int maxCol = selectedCells.Max(c => c.ColumnIndex);
 
-            System.Drawing.Rectangle topLeft = dgvSchedule.GetCellDisplayRectangle(minCol, minRow, true);
-            System.Drawing.Rectangle bottomRight = dgvSchedule.GetCellDisplayRectangle(maxCol, maxRow, true);
+            // Use DisplayIndex for min/max columns
+            int minDisplayIndex = selectedCells.Min(c => dgvSchedule.Columns[c.ColumnIndex].DisplayIndex);
+            int maxDisplayIndex = selectedCells.Max(c => dgvSchedule.Columns[c.ColumnIndex].DisplayIndex);
+
+            // Map DisplayIndex back to real column indexes
+            int minColIndex = dgvSchedule.Columns
+                .Cast<DataGridViewColumn>()
+                .First(c => c.DisplayIndex == minDisplayIndex).Index;
+
+            int maxColIndex = dgvSchedule.Columns
+                .Cast<DataGridViewColumn>()
+                .First(c => c.DisplayIndex == maxDisplayIndex).Index;
+
+            System.Drawing.Rectangle topLeft = dgvSchedule.GetCellDisplayRectangle(minColIndex, minRow, true);
+            System.Drawing.Rectangle bottomRight = dgvSchedule.GetCellDisplayRectangle(maxColIndex, maxRow, true);
 
             if (topLeft.IsEmpty || bottomRight.IsEmpty)
                 return;
@@ -2012,6 +2054,44 @@ namespace DispatchManager.Forms
                 e.Graphics.DrawRectangle(pinkPen, borderRect);
             }
         }
+
+
+        //private void dgvSchedule_Paint(object sender, PaintEventArgs e)
+        //{
+        //    if (!isSelectingPrintArea || dgvSchedule.SelectedCells.Count == 0) return;
+
+        //    var selectedCells = dgvSchedule.SelectedCells
+        //        .Cast<DataGridViewCell>()
+        //        .ToList();
+
+        //    int minRow = selectedCells.Min(c => c.RowIndex);
+        //    int maxRow = selectedCells.Max(c => c.RowIndex);
+        //    //int minCol = selectedCells.Min(c => c.ColumnIndex);
+        //    //int maxCol = selectedCells.Max(c => c.ColumnIndex);
+        //    int minCol = selectedCells.Min(c => dgvSchedule.Columns[c.ColumnIndex].DisplayIndex);
+        //    int maxCol = selectedCells.Max(c => dgvSchedule.Columns[c.ColumnIndex].DisplayIndex);
+
+
+        //    System.Drawing.Rectangle topLeft = dgvSchedule.GetCellDisplayRectangle(minCol, minRow, true);
+        //    System.Drawing.Rectangle bottomRight = dgvSchedule.GetCellDisplayRectangle(maxCol, maxRow, true);
+
+        //    if (topLeft.IsEmpty || bottomRight.IsEmpty)
+        //        return;
+
+        //    System.Drawing.Rectangle borderRect = new System.Drawing.Rectangle(
+        //        topLeft.X,
+        //        topLeft.Y,
+        //        bottomRight.Right - topLeft.Left - 1,
+        //        bottomRight.Bottom - topLeft.Top - 1
+        //    );
+
+        //    using (Pen pinkPen = new Pen(Color.DeepPink, 2))
+        //    {
+        //        pinkPen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+        //        pinkPen.DashOffset = dashOffset; // animate here
+        //        e.Graphics.DrawRectangle(pinkPen, borderRect);
+        //    }
+        //}
         private void FrmViewDispatch_KeyDown(object sender, KeyEventArgs e)
         {
             if (isSelectingPrintArea && e.KeyCode == Keys.Escape)
@@ -2096,86 +2176,7 @@ namespace DispatchManager.Forms
         }
 
 
-        //private void dgvSchedule_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
-        //{
-        //    // === HEADER STYLE: Vertical Header Font and Text Formatting ===
-        //    if (e.RowIndex == -1 && e.ColumnIndex >= 0)
-        //    {
-        //        e.PaintBackground(e.CellBounds, false);
 
-        //        string headerText = e.FormattedValue?.ToString() ?? "";
-
-        //        // Save original settings to restore later
-        //        var oldHint = e.Graphics.TextRenderingHint;
-        //        var oldOffset = e.Graphics.PixelOffsetMode;
-
-        //        // Apply crisp text settings just for header
-        //        e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
-        //        e.Graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-
-        //        using (System.Drawing.Font font = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Bold))
-        //        using (System.Drawing.Brush brush = new System.Drawing.SolidBrush(System.Drawing.Color.Black))
-        //        using (System.Drawing.StringFormat format = new System.Drawing.StringFormat())
-        //        {
-        //            format.Alignment = System.Drawing.StringAlignment.Near;     // Left aligned (after rotate)
-        //            format.LineAlignment = System.Drawing.StringAlignment.Center; // Vertically centered
-
-        //            // Rotate origin to bottom-left of cell
-        //            e.Graphics.TranslateTransform(e.CellBounds.Left, e.CellBounds.Bottom);
-        //            e.Graphics.RotateTransform(-90);
-
-        //            System.Drawing.RectangleF rect = new System.Drawing.RectangleF(0, 0, e.CellBounds.Height, e.CellBounds.Width);
-        //            e.Graphics.DrawString(headerText, font, brush, rect, format);
-
-        //            e.Graphics.ResetTransform();
-        //        }
-
-        //        // Restore original graphics settings
-        //        e.Graphics.TextRenderingHint = oldHint;
-        //        e.Graphics.PixelOffsetMode = oldOffset;
-
-        //        e.Handled = true;
-        //    }
-        //}
-
-
-
-
-
-
-        //private void dgvSchedule_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
-        //{
-        //    if (e.RowIndex == -1 && e.ColumnIndex >= 0)
-        //    {
-        //        e.PaintBackground(e.CellBounds, false);
-
-        //        string headerText = e.FormattedValue?.ToString() ?? "";
-        //        using (Brush brush = new SolidBrush(e.CellStyle.ForeColor))
-        //        using (StringFormat format = new StringFormat())
-        //        {
-        //            format.Alignment = StringAlignment.Near; // Left aligned
-        //            format.LineAlignment = StringAlignment.Center; // Vertically centered
-
-        //            // Rotate origin to bottom-left of cell
-        //            e.Graphics.TranslateTransform(e.CellBounds.Left, e.CellBounds.Bottom);
-        //            e.Graphics.RotateTransform(-90);
-
-        //            RectangleF rect = new RectangleF(0, 0, e.CellBounds.Height, e.CellBounds.Width);
-
-        //            e.Graphics.DrawString(
-        //                headerText,
-        //                e.CellStyle.Font,
-        //                brush,
-        //                rect,
-        //                format
-        //            );
-
-        //            e.Graphics.ResetTransform();
-        //        }
-
-        //        e.Handled = true;
-        //    }
-        //}
         private void ExportSelectionToExcel()
         {
             if (dgvSchedule.SelectedCells.Count == 0)
@@ -2444,6 +2445,8 @@ namespace DispatchManager.Forms
             ExportSelectionToExcel();
             ExitPrintAreaMode();
         }
+        private bool isTKeyHeld = false;
+
     }
 }
 
