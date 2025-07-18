@@ -1,5 +1,6 @@
 ﻿using DispatchManager.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -68,7 +69,14 @@ namespace DispatchManager.DataAccess
                                 OrderNumber = SafeRead<int>(reader, "OrderNumber"),
                                 DateOrdered = SafeRead<DateTime>(reader, "DateOrdered"),
                                 LeadTime = SafeRead<string>(reader, "LeadTime"),
-                                LinkId = SafeRead<string>(reader, "LinkId")
+                                LinkId = SafeRead<string>(reader, "LinkId"),
+                                FlatBedColour = SafeRead<bool>(reader, "FlatBedColour"),
+                                EdgeColour = SafeRead<bool>(reader, "EdgeColour"),
+                                PreAssemble = SafeRead<bool>(reader, "PreAssemble"),
+                                CarcassAssemble = SafeRead<bool>(reader, "CarcassAssemble"),
+                                FitOut = SafeRead<bool>(reader, "FitOut"),
+                                Stacked = SafeRead<bool>(reader, "Stacked")
+
 
                             };
 
@@ -134,7 +142,8 @@ namespace DispatchManager.DataAccess
         "DispatchDate", "WeekNo", "Day", "ProdInput", "MaterialsOrdered", "ReleasedToFactory", "ProjectName",
         "ProjectColour", "Qty", "FB", "EB", "ASS", "BoardETA", "Installed", "Freight",
         "BenchTopSupplier", "BenchTopColour", "Installer", "Comment", "DeliveryAddress",
-        "Phone", "M3", "Amount", "OrderNumber"
+        "Phone", "M3", "Amount", "OrderNumber","FlatBedColour", "EdgeColour", "PreAssemble", 
+        "CarcassAssemble","FitOut","Stacked"
          };
 
             if (!allowedColumns.Contains(columnName))

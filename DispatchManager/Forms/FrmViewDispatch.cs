@@ -59,7 +59,13 @@ namespace DispatchManager.Forms
     "Phone",
     "M3",
     "Amount",
-    "OrderNumber"
+    "OrderNumber",
+    "FlatBedColour",
+    "EdgeColour",
+    "PreAssemble",
+    "CarcassAssemble",
+    "FitOut",
+    "Stacked"
 };
 
         public FrmViewDispatch()
@@ -197,9 +203,11 @@ namespace DispatchManager.Forms
             using (SqlConnection conn = new SqlConnection(connStr))
             using (SqlCommand cmd = new SqlCommand(
                 @"SELECT ID, DispatchDate, ProdInput, MaterialsOrdered, ReleasedtoFactory, ProjectName, 
-                    ProjectColour, FB, EB, ASS, BoardETA, BenchTopSupplier, BenchTopColour, Installer, 
-                    DeliveryAddress, Phone, M3, Amount, OrderNumber,
-                    Installed, Comment, Qty
+                            ProjectColour, FB, EB, ASS, FlatBedColour, EdgeColour, PreAssemble, CarcassAssemble, 
+                            FitOut, Stacked, BoardETA, BenchTopSupplier, BenchTopColour, Installer, 
+                            DeliveryAddress, Phone, M3, Amount, OrderNumber, 
+                            Installed, Comment, Qty
+
                         FROM dbo.Dispatch", conn)) // 🔸 Add here any column that users change
             {
                 cmd.Notification = null;
@@ -291,6 +299,12 @@ namespace DispatchManager.Forms
                     TryUpdateCell("FB", updatedRecord.FB);
                     TryUpdateCell("EB", updatedRecord.EB);
                     TryUpdateCell("ASS", updatedRecord.ASS);
+                    TryUpdateCell("FlatBedColour", updatedRecord.FlatBedColour);
+                    TryUpdateCell("EdgeColour", updatedRecord.EdgeColour);
+                    TryUpdateCell("PreAssemble", updatedRecord.PreAssemble);
+                    TryUpdateCell("CarcassAssemble", updatedRecord.CarcassAssemble);
+                    TryUpdateCell("FitOut", updatedRecord.FitOut);
+                    TryUpdateCell("Stacked", updatedRecord.Stacked);
                     TryUpdateCell("BoardETA", updatedRecord.BoardETA);
                     TryUpdateCell("BenchTopSupplier", updatedRecord.BenchTopSupplier);
                     TryUpdateCell("BenchTopColour", updatedRecord.BenchTopColour);
@@ -303,6 +317,7 @@ namespace DispatchManager.Forms
                     TryUpdateCell("Installed", updatedRecord.Installed);
                     TryUpdateCell("Comment", updatedRecord.Comment);
                     TryUpdateCell("Qty", updatedRecord.Qty);
+
                 }
             }
         }
@@ -817,6 +832,9 @@ namespace DispatchManager.Forms
 
             dgvSchedule.DataSource = withWeeklyTotals;
 
+           
+
+
             foreach (DataGridViewRow row in dgvSchedule.Rows)
             {
                 if (row.DataBoundItem is DispatchBlankRow)
@@ -870,9 +888,9 @@ namespace DispatchManager.Forms
             dgvSchedule.Columns["ProdInput"].HeaderText = " Production Input";
             dgvSchedule.Columns["MaterialsOrdered"].HeaderText = " Materials Ordered";
             dgvSchedule.Columns["ReleasedtoFactory"].HeaderText = " Released to Factory";
-            dgvSchedule.Columns["FB"].HeaderText = " FB ✔";
-            dgvSchedule.Columns["EB"].HeaderText = " EB ✔";
-            dgvSchedule.Columns["ASS"].HeaderText = " AS ✔";
+            dgvSchedule.Columns["FB"].HeaderText = " Flatbed White ✔";
+            dgvSchedule.Columns["EB"].HeaderText = " Edge White ✔";
+            dgvSchedule.Columns["ASS"].HeaderText = " Assembled ✔";
             dgvSchedule.Columns["Installer"].HeaderText = " Installer Name";
             dgvSchedule.Columns["Qty"].HeaderText = " Quantity";
             dgvSchedule.Columns["Amount"].HeaderText = " Invoice Amount ($)";
@@ -892,6 +910,12 @@ namespace DispatchManager.Forms
             dgvSchedule.Columns["M3"].HeaderText = " Volume (m³)";
             dgvSchedule.Columns["BoardETA"].HeaderText = " Assembler";
             dgvSchedule.Columns["MainContractor"].HeaderText = " Main Contractor";
+            dgvSchedule.Columns["FlatBedColour"].HeaderText = "Flatbed Colour ✔";
+            dgvSchedule.Columns["EdgeColour"].HeaderText = "Edge Colour ✔";
+            dgvSchedule.Columns["PreAssemble"].HeaderText = "Pre-Assemble ✔";
+            dgvSchedule.Columns["CarcassAssemble"].HeaderText = "Carcass Assemble ✔";
+            dgvSchedule.Columns["FitOut"].HeaderText = "Fit-Out ✔";
+            dgvSchedule.Columns["Stacked"].HeaderText = "Dipatched ✔";
 
             dgvSchedule.ResumeLayout(); // ✅ Resume layout
             dgvSchedule.Refresh();
@@ -1378,17 +1402,7 @@ namespace DispatchManager.Forms
         }
 
 
-        //private void dgvSchedule_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
-        //{
-        //    if (!isSelectingPrintArea) return;
-
-        //    var cell = dgvSchedule[e.ColumnIndex, e.RowIndex];
-        //    if (!selectedPrintCells.Contains(cell))
-        //        selectedPrintCells.Add(cell);
-
-        //    dgvSchedule.ClearSelection(); // optional: don't show highlight
-        //    dgvSchedule.Invalidate();
-        //}
+      
 
         private void dgvSchedule_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
@@ -1639,7 +1653,8 @@ namespace DispatchManager.Forms
                     "WeekNo", "DispatchDate", "MaterialsOrderedBy", "BenchtopOrderedBy", "Day", "JobNo",
                     "ProdInput", "MaterialsOrdered", "ReleasedtoFactory", "MainContractor", "ProjectName", "ProjectColour", "Qty",
                     "FB", "EB", "ASS", "Installed", "Freight", "BenchTopSupplier", "BenchTopColour", "Installer",
-                    "Comment", "DeliveryAddress", "Phone", "M3", "Amount", "OrderNumber", "DateOrdered", "LeadTime", "ID", "LinkId"
+                    "Comment", "DeliveryAddress", "Phone", "M3", "Amount", "OrderNumber", "DateOrdered", "LeadTime", "ID", "LinkId",
+                    "FlatBedColour", "EdgeColour", "PreAssemble", "CarcassAssemble", "FitOut", "Stacked"
                 };
 
                 var values = new List<string>();
@@ -1656,7 +1671,11 @@ namespace DispatchManager.Forms
                     {
                         values.Add("NULL");
                     }
-                    else if (column == "FB" || column == "EB" || column == "ASS")
+                    else if (column == "FB" || column == "EB" || column == "ASS"
+                          || column == "FlatBedColour" || column == "EdgeColour"
+                          || column == "PreAssemble" || column == "CarcassAssemble"
+                          || column == "FitOut" || column == "Stacked")
+
                     {
                         values.Add("0"); // false
                     }
@@ -2062,7 +2081,11 @@ namespace DispatchManager.Forms
                                     xlCell.Value = dt;
                                     xlCell.Style.DateFormat.Format = "dd-mmm";
                                 }
-                                else if (colName == "FB" || colName == "EB" || colName == "ASS")
+                                else if (colName == "FB" || colName == "EB" || colName == "ASS" ||
+                                         colName == "FlatBedColour" || colName == "EdgeColour" ||
+                                         colName == "PreAssemble" || colName == "CarcassAssemble" ||
+                                         colName == "FitOut" || colName == "Stacked")
+
                                 {
                                     xlCell.Value = value != null && value.ToString().ToLower() == "true" ? "✓" : "";
                                 }

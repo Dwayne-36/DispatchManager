@@ -43,11 +43,12 @@ namespace DispatchManager.Models
         public string AmountColor { get; set; }
         public string LinkId { get; set; }
         public string ProjectNameColor { get; set; }
-
-        
-
-
-
+        public bool FlatBedColour { get; set; }
+        public bool EdgeColour { get; set; }
+        public bool PreAssemble { get; set; }
+        public bool CarcassAssemble { get; set; }
+        public bool FitOut { get; set; }
+        public bool Stacked { get; set; }
 
     }
     public class DispatchBlankRow : DispatchRecord
@@ -73,6 +74,12 @@ namespace DispatchManager.Models
             FB = false;
             EB = false;
             ASS = false;
+            FlatBedColour = false;
+            EdgeColour = false;
+            PreAssemble = false;
+            CarcassAssemble = false;
+            FitOut = false;
+            Stacked = false;
             BoardETA = "";
             Installed = "";
             Freight = "";
@@ -87,6 +94,7 @@ namespace DispatchManager.Models
             OrderNumber = 0;
             DateOrdered = DateTime.MinValue;
             LeadTime = "";
+
         }
     }
 

@@ -123,10 +123,13 @@ namespace DispatchManager.Forms
                 // Dispatch table columns (in correct order)
                 string[] dispatchColumns = new string[]
                 {
-            "WeekNo", "DispatchDate", "MaterialsOrderedBy", "BenchtopOrderedBy", "Day", "JobNo",
-            "ProdInput", "MaterialsOrdered", "ReleasedtoFactory", "MainContractor", "ProjectName", "ProjectColour", "Qty",
-            "FB", "EB", "ASS", "Installed", "Freight", "BenchTopSupplier", "BenchTopColour", "Installer",
-            "Comment", "DeliveryAddress", "Phone", "M3", "Amount", "OrderNumber", "DateOrdered", "LeadTime", "ID", "LinkID"
+                "WeekNo", "DispatchDate", "MaterialsOrderedBy", "BenchtopOrderedBy", "Day", "JobNo",
+                "ProdInput", "MaterialsOrdered", "ReleasedtoFactory", "MainContractor", "ProjectName",
+                "ProjectColour", "Qty", "FB", "EB", "ASS", "FlatBedColour", "EdgeColour", "PreAssemble",
+                "CarcassAssemble", "FitOut", "Stacked", "Installed", "Freight", "BenchTopSupplier",
+                "BenchTopColour", "Installer", "Comment", "DeliveryAddress", "Phone", "M3", "Amount",
+                "OrderNumber", "DateOrdered", "LeadTime", "ID", "LinkID"
+
                 };
 
                 var values = new List<string>();
