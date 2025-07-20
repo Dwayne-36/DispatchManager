@@ -34,6 +34,10 @@ namespace DispatchManager.Forms
         private Timer antTimer = new Timer();
         private float dashOffset = 0f;
         private Dictionary<int, Color> weekColors = new Dictionary<int, Color>();
+        private Timer autoScrollTimer = new Timer();
+        private System.Drawing.Point lastMousePosition;
+
+
 
         // Place this at the top of your FrmViewDispatch form
         private readonly HashSet<string> editableColumns = new HashSet<string>
@@ -121,6 +125,13 @@ namespace DispatchManager.Forms
 
             //Optional: supress tooltips to reduce flicker
             dgvSchedule.ShowCellToolTips = false;
+
+            autoScrollTimer.Interval = 50; // scroll every 50ms
+            autoScrollTimer.Tick += AutoScrollTimer_Tick;
+
+            dgvSchedule.MouseMove += dgvSchedule_MouseMove;
+
+
         }
         private void FrmViewDispatch_Load(object sender, EventArgs e)
         {
@@ -1986,6 +1997,8 @@ namespace DispatchManager.Forms
 
         private void btnSetPrintArea_Click(object sender, EventArgs e)
         {
+            autoScrollTimer.Start();
+
             isSelectingPrintArea = true;
             selectedPrintCells.Clear();
 
@@ -2003,6 +2016,8 @@ namespace DispatchManager.Forms
 
         private void ExitPrintAreaMode()
         {
+            autoScrollTimer.Stop();
+
             isSelectingPrintArea = false;
             antTimer.Stop();
             dgvSchedule.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -2054,88 +2069,6 @@ namespace DispatchManager.Forms
             }
         }
 
-        //private void dgvSchedule_Paint(object sender, PaintEventArgs e)
-        //{
-        //    if (!isSelectingPrintArea || dgvSchedule.SelectedCells.Count == 0) return;
-
-        //    var selectedCells = dgvSchedule.SelectedCells
-        //        .Cast<DataGridViewCell>()
-        //        .ToList();
-
-        //    int minRow = selectedCells.Min(c => c.RowIndex);
-        //    int maxRow = selectedCells.Max(c => c.RowIndex);
-
-        //    // Use DisplayIndex for min/max columns
-        //    int minDisplayIndex = selectedCells.Min(c => dgvSchedule.Columns[c.ColumnIndex].DisplayIndex);
-        //    int maxDisplayIndex = selectedCells.Max(c => dgvSchedule.Columns[c.ColumnIndex].DisplayIndex);
-
-        //    // Map DisplayIndex back to real column indexes
-        //    int minColIndex = dgvSchedule.Columns
-        //        .Cast<DataGridViewColumn>()
-        //        .First(c => c.DisplayIndex == minDisplayIndex).Index;
-
-        //    int maxColIndex = dgvSchedule.Columns
-        //        .Cast<DataGridViewColumn>()
-        //        .First(c => c.DisplayIndex == maxDisplayIndex).Index;
-
-        //    System.Drawing.Rectangle topLeft = dgvSchedule.GetCellDisplayRectangle(minColIndex, minRow, true);
-        //    System.Drawing.Rectangle bottomRight = dgvSchedule.GetCellDisplayRectangle(maxColIndex, maxRow, true);
-
-        //    if (topLeft.IsEmpty || bottomRight.IsEmpty)
-        //        return;
-
-        //    System.Drawing.Rectangle borderRect = new System.Drawing.Rectangle(
-        //        topLeft.X,
-        //        topLeft.Y,
-        //        bottomRight.Right - topLeft.Left - 1,
-        //        bottomRight.Bottom - topLeft.Top - 1
-        //    );
-
-        //    using (Pen pinkPen = new Pen(Color.DeepPink, 2))
-        //    {
-        //        pinkPen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
-        //        pinkPen.DashOffset = dashOffset; // animate here
-        //        e.Graphics.DrawRectangle(pinkPen, borderRect);
-        //    }
-        //}
-
-
-        //private void dgvSchedule_Paint(object sender, PaintEventArgs e)
-        //{
-        //    if (!isSelectingPrintArea || dgvSchedule.SelectedCells.Count == 0) return;
-
-        //    var selectedCells = dgvSchedule.SelectedCells
-        //        .Cast<DataGridViewCell>()
-        //        .ToList();
-
-        //    int minRow = selectedCells.Min(c => c.RowIndex);
-        //    int maxRow = selectedCells.Max(c => c.RowIndex);
-        //    //int minCol = selectedCells.Min(c => c.ColumnIndex);
-        //    //int maxCol = selectedCells.Max(c => c.ColumnIndex);
-        //    int minCol = selectedCells.Min(c => dgvSchedule.Columns[c.ColumnIndex].DisplayIndex);
-        //    int maxCol = selectedCells.Max(c => dgvSchedule.Columns[c.ColumnIndex].DisplayIndex);
-
-
-        //    System.Drawing.Rectangle topLeft = dgvSchedule.GetCellDisplayRectangle(minCol, minRow, true);
-        //    System.Drawing.Rectangle bottomRight = dgvSchedule.GetCellDisplayRectangle(maxCol, maxRow, true);
-
-        //    if (topLeft.IsEmpty || bottomRight.IsEmpty)
-        //        return;
-
-        //    System.Drawing.Rectangle borderRect = new System.Drawing.Rectangle(
-        //        topLeft.X,
-        //        topLeft.Y,
-        //        bottomRight.Right - topLeft.Left - 1,
-        //        bottomRight.Bottom - topLeft.Top - 1
-        //    );
-
-        //    using (Pen pinkPen = new Pen(Color.DeepPink, 2))
-        //    {
-        //        pinkPen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
-        //        pinkPen.DashOffset = dashOffset; // animate here
-        //        e.Graphics.DrawRectangle(pinkPen, borderRect);
-        //    }
-        //}
         private void FrmViewDispatch_KeyDown(object sender, KeyEventArgs e)
         {
             if (isSelectingPrintArea && e.KeyCode == Keys.Escape)
@@ -2490,6 +2423,73 @@ namespace DispatchManager.Forms
             ExitPrintAreaMode();
         }
         private bool isTKeyHeld = false;
+        private void dgvSchedule_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isSelectingPrintArea)
+            {
+                lastMousePosition = e.Location;
+            }
+        }
+        private void AutoScrollTimer_Tick(object sender, EventArgs e)
+        {
+            if (!isSelectingPrintArea) return;
+
+            int scrollStep = 1; // rows/columns per tick
+            var hitTest = dgvSchedule.HitTest(lastMousePosition.X, lastMousePosition.Y);
+
+            // Vertical scrolling
+            if (lastMousePosition.Y < 20 && dgvSchedule.FirstDisplayedScrollingRowIndex > 0)
+            {
+                dgvSchedule.FirstDisplayedScrollingRowIndex = Math.Max(0, dgvSchedule.FirstDisplayedScrollingRowIndex - scrollStep);
+            }
+            else if (lastMousePosition.Y > dgvSchedule.Height - 20)
+            {
+                int lastRow = dgvSchedule.Rows.GetLastRow(DataGridViewElementStates.Visible);
+                dgvSchedule.FirstDisplayedScrollingRowIndex = Math.Min(lastRow, dgvSchedule.FirstDisplayedScrollingRowIndex + scrollStep);
+            }
+
+            // Horizontal scrolling
+            if (lastMousePosition.X < 20)
+            {
+                int firstCol = dgvSchedule.Columns.GetFirstColumn(DataGridViewElementStates.Visible).DisplayIndex;
+                if (firstCol > 0)
+                {
+                    dgvSchedule.FirstDisplayedScrollingColumnIndex = dgvSchedule.Columns
+                        .Cast<DataGridViewColumn>()
+                        .Where(c => c.Visible)
+                        .OrderBy(c => c.DisplayIndex)
+                        .First().Index;
+                }
+            }
+            else if (lastMousePosition.X > dgvSchedule.Width - 20)
+            {
+                // Get all visible columns, sorted by DisplayIndex
+                var visibleColumns = dgvSchedule.Columns
+                    .Cast<DataGridViewColumn>()
+                    .Where(c => c.Visible)
+                    .OrderBy(c => c.DisplayIndex)
+                    .ToList();
+
+                if (visibleColumns.Count > 0)
+                {
+                    // Find the current first visible column
+                    var currentFirst = visibleColumns
+                        .FirstOrDefault(c => c.Index == dgvSchedule.FirstDisplayedScrollingColumnIndex);
+
+                    if (currentFirst != null)
+                    {
+                        int currentPos = visibleColumns.IndexOf(currentFirst);
+
+                        if (currentPos < visibleColumns.Count - 1)
+                        {
+                            dgvSchedule.FirstDisplayedScrollingColumnIndex = visibleColumns[currentPos + 1].Index;
+                        }
+                    }
+                }
+            }
+
+
+        }
 
     }
 }
