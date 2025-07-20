@@ -2009,7 +2009,6 @@ namespace DispatchManager.Forms
             dgvSchedule.ClearSelection();
             dgvSchedule.Invalidate();
         }
-
         private void dgvSchedule_Paint(object sender, PaintEventArgs e)
         {
             if (!isSelectingPrintArea || dgvSchedule.SelectedCells.Count == 0) return;
@@ -2054,6 +2053,51 @@ namespace DispatchManager.Forms
                 e.Graphics.DrawRectangle(pinkPen, borderRect);
             }
         }
+
+        //private void dgvSchedule_Paint(object sender, PaintEventArgs e)
+        //{
+        //    if (!isSelectingPrintArea || dgvSchedule.SelectedCells.Count == 0) return;
+
+        //    var selectedCells = dgvSchedule.SelectedCells
+        //        .Cast<DataGridViewCell>()
+        //        .ToList();
+
+        //    int minRow = selectedCells.Min(c => c.RowIndex);
+        //    int maxRow = selectedCells.Max(c => c.RowIndex);
+
+        //    // Use DisplayIndex for min/max columns
+        //    int minDisplayIndex = selectedCells.Min(c => dgvSchedule.Columns[c.ColumnIndex].DisplayIndex);
+        //    int maxDisplayIndex = selectedCells.Max(c => dgvSchedule.Columns[c.ColumnIndex].DisplayIndex);
+
+        //    // Map DisplayIndex back to real column indexes
+        //    int minColIndex = dgvSchedule.Columns
+        //        .Cast<DataGridViewColumn>()
+        //        .First(c => c.DisplayIndex == minDisplayIndex).Index;
+
+        //    int maxColIndex = dgvSchedule.Columns
+        //        .Cast<DataGridViewColumn>()
+        //        .First(c => c.DisplayIndex == maxDisplayIndex).Index;
+
+        //    System.Drawing.Rectangle topLeft = dgvSchedule.GetCellDisplayRectangle(minColIndex, minRow, true);
+        //    System.Drawing.Rectangle bottomRight = dgvSchedule.GetCellDisplayRectangle(maxColIndex, maxRow, true);
+
+        //    if (topLeft.IsEmpty || bottomRight.IsEmpty)
+        //        return;
+
+        //    System.Drawing.Rectangle borderRect = new System.Drawing.Rectangle(
+        //        topLeft.X,
+        //        topLeft.Y,
+        //        bottomRight.Right - topLeft.Left - 1,
+        //        bottomRight.Bottom - topLeft.Top - 1
+        //    );
+
+        //    using (Pen pinkPen = new Pen(Color.DeepPink, 2))
+        //    {
+        //        pinkPen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+        //        pinkPen.DashOffset = dashOffset; // animate here
+        //        e.Graphics.DrawRectangle(pinkPen, borderRect);
+        //    }
+        //}
 
 
         //private void dgvSchedule_Paint(object sender, PaintEventArgs e)
