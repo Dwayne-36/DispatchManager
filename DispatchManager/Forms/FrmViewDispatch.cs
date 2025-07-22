@@ -1747,14 +1747,14 @@ namespace DispatchManager.Forms
 
         private void btnNewProject_Click(object sender, EventArgs e)
         {
-            using (var newProjectForm = new FrmNewProject())
-            {
-                newProjectForm.ShowDialog();
+            //using (var newProjectForm = new FrmNewProject())
+            //{
+            //    newProjectForm.ShowDialog();
 
-                // Optionally refresh the main view after closing
-                LoadScheduleData(); // Reload to reflect new project
-                RestoreColumnSettings(); // Keep column widths/order
-            }
+            //    // Optionally refresh the main view after closing
+            //    LoadScheduleData(); // Reload to reflect new project
+            //    RestoreColumnSettings(); // Keep column widths/order
+            //}
         }
 
 
@@ -2052,21 +2052,21 @@ namespace DispatchManager.Forms
 
         private void btnSetPrintArea_Click(object sender, EventArgs e)
         {
-            autoScrollTimer.Start();
+            //autoScrollTimer.Start();
 
-            isSelectingPrintArea = true;
-            selectedPrintCells.Clear();
+            //isSelectingPrintArea = true;
+            //selectedPrintCells.Clear();
 
-            dgvSchedule.SelectionMode = DataGridViewSelectionMode.CellSelect; // ✅ allows multi-cell drag
-            dgvSchedule.MultiSelect = true;
+            //dgvSchedule.SelectionMode = DataGridViewSelectionMode.CellSelect; // ✅ allows multi-cell drag
+            //dgvSchedule.MultiSelect = true;
 
-            dgvSchedule.ClearSelection();
-            dgvSchedule.CurrentCell = null;
+            //dgvSchedule.ClearSelection();
+            //dgvSchedule.CurrentCell = null;
 
-            dashOffset = 0f;
-            antTimer.Start();
+            //dashOffset = 0f;
+            //antTimer.Start();
 
-            dgvSchedule.Invalidate();
+            //dgvSchedule.Invalidate();
         }
        
 
@@ -2475,10 +2475,10 @@ namespace DispatchManager.Forms
 
         private void btnPrint_Click(object sender, EventArgs e)
         {
-            ExportSelectionToExcel();
-            ExitPrintAreaMode();
+            //ExportSelectionToExcel();
+            //ExitPrintAreaMode();
         }
-        private bool isTKeyHeld = false;
+        //private bool isTKeyHeld = false;
         private void dgvSchedule_MouseMove(object sender, MouseEventArgs e)
         {
             if (isSelectingPrintArea)
@@ -2572,7 +2572,42 @@ namespace DispatchManager.Forms
     }
 }
 
+        private void newProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var newProjectForm = new FrmNewProject())
+            {
+                newProjectForm.ShowDialog();
 
+                // Optionally refresh the main view after closing
+                LoadScheduleData(); // Reload to reflect new project
+                RestoreColumnSettings(); // Keep column widths/order
+            }
+        }
+
+        private void setPrintAreaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            autoScrollTimer.Start();
+
+            isSelectingPrintArea = true;
+            selectedPrintCells.Clear();
+
+            dgvSchedule.SelectionMode = DataGridViewSelectionMode.CellSelect; // ✅ allows multi-cell drag
+            dgvSchedule.MultiSelect = true;
+
+            dgvSchedule.ClearSelection();
+            dgvSchedule.CurrentCell = null;
+
+            dashOffset = 0f;
+            antTimer.Start();
+
+            dgvSchedule.Invalidate();
+        }
+
+        private void printToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ExportSelectionToExcel();
+            ExitPrintAreaMode();
+        }
     }
 }
 

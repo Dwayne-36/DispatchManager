@@ -40,15 +40,16 @@
             this.lblTo = new System.Windows.Forms.Label();
             this.tbSearch = new System.Windows.Forms.TextBox();
             this.lblSearch = new System.Windows.Forms.Label();
-            this.btnNewProject = new System.Windows.Forms.Button();
             this.lblTotal = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuEmployees = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuDeletedProjects = new System.Windows.Forms.ToolStripMenuItem();
+            this.newProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.printingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setPrintAreaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblLoggedInUser = new System.Windows.Forms.Label();
-            this.btnSetPrintArea = new System.Windows.Forms.Button();
-            this.btnPrint = new System.Windows.Forms.Button();
             this.lblSelectionTotal = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
             this.contextMenuGrid.SuspendLayout();
@@ -148,16 +149,6 @@
             this.lblSearch.TabIndex = 6;
             this.lblSearch.Text = "Search:";
             // 
-            // btnNewProject
-            // 
-            this.btnNewProject.Location = new System.Drawing.Point(465, 20);
-            this.btnNewProject.Name = "btnNewProject";
-            this.btnNewProject.Size = new System.Drawing.Size(185, 25);
-            this.btnNewProject.TabIndex = 8;
-            this.btnNewProject.Text = "New Project";
-            this.btnNewProject.UseVisualStyleBackColor = true;
-            this.btnNewProject.Click += new System.EventHandler(this.btnNewProject_Click);
-            // 
             // lblTotal
             // 
             this.lblTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -173,7 +164,9 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuOptions});
+            this.menuOptions,
+            this.newProjectToolStripMenuItem,
+            this.printingToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1904, 24);
@@ -192,16 +185,46 @@
             // menuEmployees
             // 
             this.menuEmployees.Name = "menuEmployees";
-            this.menuEmployees.Size = new System.Drawing.Size(180, 22);
+            this.menuEmployees.Size = new System.Drawing.Size(159, 22);
             this.menuEmployees.Text = "Employees";
             this.menuEmployees.Click += new System.EventHandler(this.menuEmployees_Click);
             // 
             // MenuDeletedProjects
             // 
             this.MenuDeletedProjects.Name = "MenuDeletedProjects";
-            this.MenuDeletedProjects.Size = new System.Drawing.Size(180, 22);
+            this.MenuDeletedProjects.Size = new System.Drawing.Size(159, 22);
             this.MenuDeletedProjects.Text = "Deleted Projects";
             this.MenuDeletedProjects.Click += new System.EventHandler(this.MenuDeletedProjects_Click);
+            // 
+            // newProjectToolStripMenuItem
+            // 
+            this.newProjectToolStripMenuItem.Name = "newProjectToolStripMenuItem";
+            this.newProjectToolStripMenuItem.Size = new System.Drawing.Size(83, 20);
+            this.newProjectToolStripMenuItem.Text = "New Project";
+            this.newProjectToolStripMenuItem.Click += new System.EventHandler(this.newProjectToolStripMenuItem_Click);
+            // 
+            // printingToolStripMenuItem
+            // 
+            this.printingToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setPrintAreaToolStripMenuItem,
+            this.printToolStripMenuItem});
+            this.printingToolStripMenuItem.Name = "printingToolStripMenuItem";
+            this.printingToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.printingToolStripMenuItem.Text = "Printing";
+            // 
+            // setPrintAreaToolStripMenuItem
+            // 
+            this.setPrintAreaToolStripMenuItem.Name = "setPrintAreaToolStripMenuItem";
+            this.setPrintAreaToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.setPrintAreaToolStripMenuItem.Text = "Set Print Area";
+            this.setPrintAreaToolStripMenuItem.Click += new System.EventHandler(this.setPrintAreaToolStripMenuItem_Click);
+            // 
+            // printToolStripMenuItem
+            // 
+            this.printToolStripMenuItem.Name = "printToolStripMenuItem";
+            this.printToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.printToolStripMenuItem.Text = "Print";
+            this.printToolStripMenuItem.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
             // 
             // lblLoggedInUser
             // 
@@ -213,26 +236,6 @@
             this.lblLoggedInUser.Size = new System.Drawing.Size(92, 13);
             this.lblLoggedInUser.TabIndex = 12;
             this.lblLoggedInUser.Text = "Logged in as...";
-            // 
-            // btnSetPrintArea
-            // 
-            this.btnSetPrintArea.Location = new System.Drawing.Point(1482, 25);
-            this.btnSetPrintArea.Name = "btnSetPrintArea";
-            this.btnSetPrintArea.Size = new System.Drawing.Size(80, 25);
-            this.btnSetPrintArea.TabIndex = 13;
-            this.btnSetPrintArea.Text = "Set Print Area";
-            this.btnSetPrintArea.UseVisualStyleBackColor = true;
-            this.btnSetPrintArea.Click += new System.EventHandler(this.btnSetPrintArea_Click);
-            // 
-            // btnPrint
-            // 
-            this.btnPrint.Location = new System.Drawing.Point(1482, 52);
-            this.btnPrint.Name = "btnPrint";
-            this.btnPrint.Size = new System.Drawing.Size(80, 25);
-            this.btnPrint.TabIndex = 14;
-            this.btnPrint.Text = "Print";
-            this.btnPrint.UseVisualStyleBackColor = true;
-            this.btnPrint.Click += new System.EventHandler(this.btnPrint_Click);
             // 
             // lblSelectionTotal
             // 
@@ -249,11 +252,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1904, 1041);
             this.Controls.Add(this.lblSelectionTotal);
-            this.Controls.Add(this.btnPrint);
-            this.Controls.Add(this.btnSetPrintArea);
             this.Controls.Add(this.lblLoggedInUser);
             this.Controls.Add(this.lblTotal);
-            this.Controls.Add(this.btnNewProject);
             this.Controls.Add(this.lblSearch);
             this.Controls.Add(this.tbSearch);
             this.Controls.Add(this.lblTo);
@@ -284,7 +284,6 @@
         private System.Windows.Forms.Label lblTo;
         private System.Windows.Forms.TextBox tbSearch;
         private System.Windows.Forms.Label lblSearch;
-        private System.Windows.Forms.Button btnNewProject;
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem menuOptions;
@@ -295,8 +294,10 @@
         private System.Windows.Forms.ToolStripMenuItem menuDeleteRow;
         private System.Windows.Forms.ToolStripMenuItem menuCopyRow;
         private System.Windows.Forms.ToolStripMenuItem MenuPurchaseOrder;
-        private System.Windows.Forms.Button btnSetPrintArea;
-        private System.Windows.Forms.Button btnPrint;
         private System.Windows.Forms.Label lblSelectionTotal;
+        private System.Windows.Forms.ToolStripMenuItem newProjectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem printingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setPrintAreaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem printToolStripMenuItem;
     }
 }
