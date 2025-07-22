@@ -177,6 +177,7 @@ namespace DispatchManager.Forms
             dgvSchedule.CurrentCellDirtyStateChanged += dgvSchedule_CurrentCellDirtyStateChanged;
 
             dgvSchedule.CellValueChanged += dgvSchedule_CellValueChanged;
+            
 
             dgvSchedule.EnableHeadersVisualStyles = false;
             dgvSchedule.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
@@ -861,7 +862,10 @@ namespace DispatchManager.Forms
                     "ID", "MaterialsOrderedBy", "BenchtopOrderedBy",
                     "ProdInputColor", "MaterialsOrderedColor", "ReleasedToFactoryColor",
                     "MainContractorColor", "FreightColor", "AmountColor", "LinkID",
-                    "ProjectNameColor", "LeadTime"                     };
+                    "ProjectNameColor", "LeadTime" };
+
+            dgvSchedule.Columns["Amount"].Visible = Session.IsAdmin;
+            dgvSchedule.Columns["Invoiced"].Visible = Session.IsAdmin;
 
             foreach (string col in hiddenColumns)
             {
@@ -1056,7 +1060,6 @@ namespace DispatchManager.Forms
 
 
         }
-
         private void dgvSchedule_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             var row = dgvSchedule.Rows[e.RowIndex];
@@ -1095,8 +1098,7 @@ namespace DispatchManager.Forms
                     e.FormattingApplied = false; // Let it keep the value, don't break binding
                 }
 
-
-                // Make totals yellow ONLY in Qty column
+                // Make totals yellow ONLY in Qty or ProjectColour columns
                 if (columnName == "Qty" || columnName == "ProjectColour")
                 {
                     row.Cells[e.ColumnIndex].Style.BackColor = Color.FromArgb(255, 204, 0); // Yellow
@@ -1112,6 +1114,20 @@ namespace DispatchManager.Forms
                     row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.DarkSlateGray;
                 }
                 return;
+            }
+
+            // ✅ Format Amount as currency
+            if (columnName == "Amount" && e.Value != null && decimal.TryParse(e.Value.ToString(), out decimal amount))
+            {
+                e.Value = string.Format("${0:N2}", amount);
+                e.FormattingApplied = true;
+            }
+
+            // ✅ Format Qty and M3 as numbers (no decimals)
+            if ((columnName == "Qty" || columnName == "M3") && e.Value != null && double.TryParse(e.Value.ToString(), out double qtyVal))
+            {
+                e.Value = string.Format("{0:N0}", qtyVal);
+                e.FormattingApplied = true;
             }
 
             // ✅ Apply week color
@@ -1175,6 +1191,125 @@ namespace DispatchManager.Forms
                 }
             }
         }
+
+        //private void dgvSchedule_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        //{
+        //    var row = dgvSchedule.Rows[e.RowIndex];
+        //    string columnName = dgvSchedule.Columns[e.ColumnIndex].Name;
+
+        //    // ✅ Blank total rows
+        //    if (row.DataBoundItem is DispatchBlankRow)
+        //    {
+        //        if ((columnName == "WeekNo" || columnName == "JobNo" || columnName == "OrderNumber" || columnName == "Qty")
+        //            && e.Value is int intVal && intVal <= 0)
+        //        {
+        //            e.Value = "";
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        if (columnName == "Amount" && e.Value is decimal decVal && decVal <= 0)
+        //        {
+        //            e.Value = "";
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        if (columnName == "DispatchDate" && e.Value is DateTime dt && dt == DateTime.MinValue)
+        //        {
+        //            e.Value = "";
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        // ✅ Hide checkboxes for DispatchBlankRow
+        //        string[] checkboxCols = {
+        //    "FB", "EB", "ASS", "FlatBedColour", "EdgeColour",
+        //    "PreAssemble", "CarcassAssemble", "FitOut", "Stacked"
+        //};
+
+        //        if (checkboxCols.Contains(columnName))
+        //        {
+        //            e.FormattingApplied = false; // Let it keep the value, don't break binding
+        //        }
+
+
+        //        // Make totals yellow ONLY in Qty column
+        //        if (columnName == "Qty" || columnName == "ProjectColour")
+        //        {
+        //            row.Cells[e.ColumnIndex].Style.BackColor = Color.FromArgb(255, 204, 0); // Yellow
+        //            row.Cells[e.ColumnIndex].Style.SelectionBackColor = Color.FromArgb(255, 204, 0);
+        //            row.Cells[e.ColumnIndex].Style.ForeColor = Color.Black;
+        //            row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.Black;
+        //        }
+        //        else
+        //        {
+        //            row.Cells[e.ColumnIndex].Style.BackColor = Color.LightGray;
+        //            row.Cells[e.ColumnIndex].Style.SelectionBackColor = Color.LightGray;
+        //            row.Cells[e.ColumnIndex].Style.ForeColor = Color.DarkSlateGray;
+        //            row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.DarkSlateGray;
+        //        }
+        //        return;
+        //    }
+
+        //    // ✅ Apply week color
+        //    if (columnName == "Day")
+        //    {
+        //        if (columnName == "DispatchDate" && e.Value is DateTime dtValue && dtValue != DateTime.MinValue)
+        //        {
+        //            e.Value = dtValue.ToString("dd-MMM");
+        //            e.FormattingApplied = true;
+        //        }
+
+        //        var weekObj = row.Cells["WeekNo"].Value;
+        //        if (weekObj is int week && weekColors.TryGetValue(week, out var color))
+        //        {
+        //            row.Cells[e.ColumnIndex].Style.BackColor = color;
+        //            row.Cells[e.ColumnIndex].Style.SelectionBackColor = color;
+        //            row.Cells[e.ColumnIndex].Style.ForeColor = Color.Black;
+        //            row.Cells[e.ColumnIndex].Style.SelectionForeColor = Color.Black;
+        //        }
+        //    }
+
+        //    if ((columnName == "DispatchDate" || columnName == "DateOrdered") &&
+        //         e.Value is DateTime realDate && realDate != DateTime.MinValue)
+        //    {
+        //        e.Value = realDate.ToString("dd-MMM");
+        //        e.FormattingApplied = true;
+        //    }
+
+        //    // ✅ Apply saved cell background colors
+        //    if (row.DataBoundItem is DispatchRecord rec)
+        //    {
+        //        string colorValue = null;
+
+        //        if (columnName == "ProdInput")
+        //            colorValue = rec.ProdInputColor;
+        //        else if (columnName == "MaterialsOrdered")
+        //            colorValue = rec.MaterialsOrderedColor;
+        //        else if (columnName == "ReleasedToFactory")
+        //            colorValue = rec.ReleasedToFactoryColor;
+        //        else if (columnName == "MainContractor")
+        //            colorValue = rec.MainContractorColor;
+        //        else if (columnName == "Freight")
+        //            colorValue = rec.FreightColor;
+        //        else if (columnName == "Amount")
+        //            colorValue = rec.AmountColor;
+        //        else if (columnName == "ProjectName")
+        //            colorValue = rec.ProjectNameColor;
+
+        //        if (!string.IsNullOrWhiteSpace(colorValue))
+        //        {
+        //            string[] rgb = colorValue.Split(',');
+        //            if (rgb.Length == 3 &&
+        //                int.TryParse(rgb[0], out int r) &&
+        //                int.TryParse(rgb[1], out int g) &&
+        //                int.TryParse(rgb[2], out int b))
+        //            {
+        //                Color dbColor = Color.FromArgb(r, g, b);
+        //                row.Cells[e.ColumnIndex].Style.BackColor = dbColor;
+        //                row.Cells[e.ColumnIndex].Style.SelectionBackColor = dbColor;
+        //            }
+        //        }
+        //    }
+        //}
 
         private Color ParseColor(string input)
         {
@@ -1429,11 +1564,25 @@ namespace DispatchManager.Forms
         {
             if (e.Control is System.Windows.Forms.TextBox tb)
             {
-                // Remove any existing handler to prevent multiple subscriptions
+                // Remove previous handlers to avoid duplicates
                 tb.Enter -= TextBox_EnterMoveToEnd;
+                tb.KeyPress -= NumericColumn_KeyPress;
+
+                // Always attach the "move caret to end" behavior
                 tb.Enter += TextBox_EnterMoveToEnd;
+
+                // Check the current column
+                string columnName = dgvSchedule.Columns[dgvSchedule.CurrentCell.ColumnIndex].Name;
+
+                // Attach numeric restriction handler for specific columns
+                if (columnName == "Amount" || columnName == "Qty" || columnName == "Phone" ||
+                    columnName == "M3" || columnName == "OrderNumber")
+                {
+                    tb.KeyPress += NumericColumn_KeyPress;
+                }
             }
         }
+
 
         private void TextBox_EnterMoveToEnd(object sender, EventArgs e)
         {
@@ -1466,9 +1615,6 @@ namespace DispatchManager.Forms
                 dgvSchedule.Invalidate();
             }
         }
-
-
-
 
         private void dgvSchedule_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
@@ -1564,7 +1710,17 @@ namespace DispatchManager.Forms
 
         private void dgvSchedule_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-            RestoreColumnSettings();           
+            RestoreColumnSettings();
+
+            // Hide columns for non-admin users
+            if (!Session.IsAdmin)
+            {
+                if (dgvSchedule.Columns.Contains("Amount"))
+                    dgvSchedule.Columns["Amount"].Visible = false;
+
+                if (dgvSchedule.Columns.Contains("Invoiced"))
+                    dgvSchedule.Columns["Invoiced"].Visible = false;
+            }
         }
 
         private void tbSearch_TextChanged(object sender, EventArgs e)
@@ -2390,6 +2546,32 @@ namespace DispatchManager.Forms
 
 
         }
+        private void NumericColumn_KeyPress(object sender, KeyPressEventArgs e)
+{
+    string columnName = dgvSchedule.Columns[dgvSchedule.CurrentCell.ColumnIndex].Name;
+
+    if (columnName == "Amount")
+    {
+        // Allow digits, one decimal point, and backspace
+        if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '.')
+        {
+            e.Handled = true;
+        }
+        else if (e.KeyChar == '.' && (sender as System.Windows.Forms.TextBox)?.Text.Contains('.') == true)
+        {
+            e.Handled = true;
+        }
+    }
+    else
+    {
+        // For Qty, Phone, M3, OrderNumber: allow digits and backspace only
+        if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+        {
+            e.Handled = true;
+        }
+    }
+}
+
 
     }
 }

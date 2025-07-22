@@ -101,7 +101,7 @@
             // 
             // dtpFrom
             // 
-            this.dtpFrom.Location = new System.Drawing.Point(97, 25);
+            this.dtpFrom.Location = new System.Drawing.Point(86, 30);
             this.dtpFrom.Name = "dtpFrom";
             this.dtpFrom.Size = new System.Drawing.Size(200, 20);
             this.dtpFrom.TabIndex = 1;
@@ -109,7 +109,7 @@
             // lblFrom
             // 
             this.lblFrom.AutoSize = true;
-            this.lblFrom.Location = new System.Drawing.Point(16, 29);
+            this.lblFrom.Location = new System.Drawing.Point(5, 34);
             this.lblFrom.Name = "lblFrom";
             this.lblFrom.Size = new System.Drawing.Size(66, 13);
             this.lblFrom.TabIndex = 2;
@@ -117,7 +117,7 @@
             // 
             // dtpTo
             // 
-            this.dtpTo.Location = new System.Drawing.Point(97, 52);
+            this.dtpTo.Location = new System.Drawing.Point(86, 57);
             this.dtpTo.Name = "dtpTo";
             this.dtpTo.Size = new System.Drawing.Size(200, 20);
             this.dtpTo.TabIndex = 3;
@@ -125,7 +125,7 @@
             // lblTo
             // 
             this.lblTo.AutoSize = true;
-            this.lblTo.Location = new System.Drawing.Point(26, 56);
+            this.lblTo.Location = new System.Drawing.Point(15, 61);
             this.lblTo.Name = "lblTo";
             this.lblTo.Size = new System.Drawing.Size(56, 13);
             this.lblTo.TabIndex = 4;
@@ -133,7 +133,7 @@
             // 
             // tbSearch
             // 
-            this.tbSearch.Location = new System.Drawing.Point(97, 88);
+            this.tbSearch.Location = new System.Drawing.Point(86, 83);
             this.tbSearch.Name = "tbSearch";
             this.tbSearch.Size = new System.Drawing.Size(200, 20);
             this.tbSearch.TabIndex = 5;
@@ -142,7 +142,7 @@
             // lblSearch
             // 
             this.lblSearch.AutoSize = true;
-            this.lblSearch.Location = new System.Drawing.Point(38, 93);
+            this.lblSearch.Location = new System.Drawing.Point(27, 88);
             this.lblSearch.Name = "lblSearch";
             this.lblSearch.Size = new System.Drawing.Size(44, 13);
             this.lblSearch.TabIndex = 6;
@@ -150,7 +150,7 @@
             // 
             // btnNewProject
             // 
-            this.btnNewProject.Location = new System.Drawing.Point(321, 24);
+            this.btnNewProject.Location = new System.Drawing.Point(465, 20);
             this.btnNewProject.Name = "btnNewProject";
             this.btnNewProject.Size = new System.Drawing.Size(185, 25);
             this.btnNewProject.TabIndex = 8;
@@ -192,14 +192,14 @@
             // menuEmployees
             // 
             this.menuEmployees.Name = "menuEmployees";
-            this.menuEmployees.Size = new System.Drawing.Size(159, 22);
+            this.menuEmployees.Size = new System.Drawing.Size(180, 22);
             this.menuEmployees.Text = "Employees";
             this.menuEmployees.Click += new System.EventHandler(this.menuEmployees_Click);
             // 
             // MenuDeletedProjects
             // 
             this.MenuDeletedProjects.Name = "MenuDeletedProjects";
-            this.MenuDeletedProjects.Size = new System.Drawing.Size(159, 22);
+            this.MenuDeletedProjects.Size = new System.Drawing.Size(180, 22);
             this.MenuDeletedProjects.Text = "Deleted Projects";
             this.MenuDeletedProjects.Click += new System.EventHandler(this.MenuDeletedProjects_Click);
             // 
@@ -216,9 +216,9 @@
             // 
             // btnSetPrintArea
             // 
-            this.btnSetPrintArea.Location = new System.Drawing.Point(321, 50);
+            this.btnSetPrintArea.Location = new System.Drawing.Point(1482, 25);
             this.btnSetPrintArea.Name = "btnSetPrintArea";
-            this.btnSetPrintArea.Size = new System.Drawing.Size(185, 25);
+            this.btnSetPrintArea.Size = new System.Drawing.Size(80, 25);
             this.btnSetPrintArea.TabIndex = 13;
             this.btnSetPrintArea.Text = "Set Print Area";
             this.btnSetPrintArea.UseVisualStyleBackColor = true;
@@ -226,9 +226,9 @@
             // 
             // btnPrint
             // 
-            this.btnPrint.Location = new System.Drawing.Point(321, 85);
+            this.btnPrint.Location = new System.Drawing.Point(1482, 52);
             this.btnPrint.Name = "btnPrint";
-            this.btnPrint.Size = new System.Drawing.Size(185, 25);
+            this.btnPrint.Size = new System.Drawing.Size(80, 25);
             this.btnPrint.TabIndex = 14;
             this.btnPrint.Text = "Print";
             this.btnPrint.UseVisualStyleBackColor = true;
