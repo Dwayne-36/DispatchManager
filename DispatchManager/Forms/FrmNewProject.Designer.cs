@@ -82,7 +82,7 @@
             // lblLeadTime
             // 
             this.lblLeadTime.AutoSize = true;
-            this.lblLeadTime.Location = new System.Drawing.Point(12, 9);
+            this.lblLeadTime.Location = new System.Drawing.Point(24, 109);
             this.lblLeadTime.Name = "lblLeadTime";
             this.lblLeadTime.Size = new System.Drawing.Size(57, 13);
             this.lblLeadTime.TabIndex = 0;
@@ -91,7 +91,7 @@
             // lblDispatchDate
             // 
             this.lblDispatchDate.AutoSize = true;
-            this.lblDispatchDate.Location = new System.Drawing.Point(179, 10);
+            this.lblDispatchDate.Location = new System.Drawing.Point(191, 110);
             this.lblDispatchDate.Name = "lblDispatchDate";
             this.lblDispatchDate.Size = new System.Drawing.Size(75, 13);
             this.lblDispatchDate.TabIndex = 1;
@@ -100,7 +100,7 @@
             // lblDay
             // 
             this.lblDay.AutoSize = true;
-            this.lblDay.Location = new System.Drawing.Point(309, 9);
+            this.lblDay.Location = new System.Drawing.Point(321, 109);
             this.lblDay.Name = "lblDay";
             this.lblDay.Size = new System.Drawing.Size(26, 13);
             this.lblDay.TabIndex = 2;
@@ -109,7 +109,7 @@
             // lblWeekNumber
             // 
             this.lblWeekNumber.AutoSize = true;
-            this.lblWeekNumber.Location = new System.Drawing.Point(383, 9);
+            this.lblWeekNumber.Location = new System.Drawing.Point(395, 109);
             this.lblWeekNumber.Name = "lblWeekNumber";
             this.lblWeekNumber.Size = new System.Drawing.Size(76, 13);
             this.lblWeekNumber.TabIndex = 3;
@@ -118,7 +118,7 @@
             // lblMainContractor
             // 
             this.lblMainContractor.AutoSize = true;
-            this.lblMainContractor.Location = new System.Drawing.Point(496, 9);
+            this.lblMainContractor.Location = new System.Drawing.Point(508, 109);
             this.lblMainContractor.Name = "lblMainContractor";
             this.lblMainContractor.Size = new System.Drawing.Size(82, 13);
             this.lblMainContractor.TabIndex = 4;
@@ -127,7 +127,7 @@
             // lblProjectName
             // 
             this.lblProjectName.AutoSize = true;
-            this.lblProjectName.Location = new System.Drawing.Point(692, 9);
+            this.lblProjectName.Location = new System.Drawing.Point(704, 109);
             this.lblProjectName.Name = "lblProjectName";
             this.lblProjectName.Size = new System.Drawing.Size(71, 13);
             this.lblProjectName.TabIndex = 5;
@@ -136,7 +136,7 @@
             // lblProjectColour
             // 
             this.lblProjectColour.AutoSize = true;
-            this.lblProjectColour.Location = new System.Drawing.Point(10, 62);
+            this.lblProjectColour.Location = new System.Drawing.Point(12, 163);
             this.lblProjectColour.Name = "lblProjectColour";
             this.lblProjectColour.Size = new System.Drawing.Size(73, 13);
             this.lblProjectColour.TabIndex = 6;
@@ -145,7 +145,7 @@
             // lblQty
             // 
             this.lblQty.AutoSize = true;
-            this.lblQty.Location = new System.Drawing.Point(319, 63);
+            this.lblQty.Location = new System.Drawing.Point(321, 164);
             this.lblQty.Name = "lblQty";
             this.lblQty.Size = new System.Drawing.Size(23, 13);
             this.lblQty.TabIndex = 7;
@@ -154,7 +154,7 @@
             // lblInstalled
             // 
             this.lblInstalled.AutoSize = true;
-            this.lblInstalled.Location = new System.Drawing.Point(379, 57);
+            this.lblInstalled.Location = new System.Drawing.Point(381, 158);
             this.lblInstalled.Name = "lblInstalled";
             this.lblInstalled.Size = new System.Drawing.Size(46, 13);
             this.lblInstalled.TabIndex = 8;
@@ -163,7 +163,7 @@
             // lblFreight
             // 
             this.lblFreight.AutoSize = true;
-            this.lblFreight.Location = new System.Drawing.Point(476, 57);
+            this.lblFreight.Location = new System.Drawing.Point(478, 158);
             this.lblFreight.Name = "lblFreight";
             this.lblFreight.Size = new System.Drawing.Size(33, 13);
             this.lblFreight.TabIndex = 9;
@@ -172,7 +172,7 @@
             // lblBenchtopSupplier
             // 
             this.lblBenchtopSupplier.AutoSize = true;
-            this.lblBenchtopSupplier.Location = new System.Drawing.Point(594, 57);
+            this.lblBenchtopSupplier.Location = new System.Drawing.Point(596, 158);
             this.lblBenchtopSupplier.Name = "lblBenchtopSupplier";
             this.lblBenchtopSupplier.Size = new System.Drawing.Size(94, 13);
             this.lblBenchtopSupplier.TabIndex = 10;
@@ -181,7 +181,7 @@
             // lblBenchtopColour
             // 
             this.lblBenchtopColour.AutoSize = true;
-            this.lblBenchtopColour.Location = new System.Drawing.Point(726, 57);
+            this.lblBenchtopColour.Location = new System.Drawing.Point(728, 158);
             this.lblBenchtopColour.Name = "lblBenchtopColour";
             this.lblBenchtopColour.Size = new System.Drawing.Size(86, 13);
             this.lblBenchtopColour.TabIndex = 11;
@@ -190,7 +190,7 @@
             // lblInstaller
             // 
             this.lblInstaller.AutoSize = true;
-            this.lblInstaller.Location = new System.Drawing.Point(21, 126);
+            this.lblInstaller.Location = new System.Drawing.Point(23, 227);
             this.lblInstaller.Name = "lblInstaller";
             this.lblInstaller.Size = new System.Drawing.Size(43, 13);
             this.lblInstaller.TabIndex = 12;
@@ -199,7 +199,7 @@
             // lblComment
             // 
             this.lblComment.AutoSize = true;
-            this.lblComment.Location = new System.Drawing.Point(147, 125);
+            this.lblComment.Location = new System.Drawing.Point(149, 226);
             this.lblComment.Name = "lblComment";
             this.lblComment.Size = new System.Drawing.Size(51, 13);
             this.lblComment.TabIndex = 13;
@@ -208,7 +208,7 @@
             // lblDeliveryAddress
             // 
             this.lblDeliveryAddress.AutoSize = true;
-            this.lblDeliveryAddress.Location = new System.Drawing.Point(264, 125);
+            this.lblDeliveryAddress.Location = new System.Drawing.Point(266, 226);
             this.lblDeliveryAddress.Name = "lblDeliveryAddress";
             this.lblDeliveryAddress.Size = new System.Drawing.Size(86, 13);
             this.lblDeliveryAddress.TabIndex = 14;
@@ -217,7 +217,7 @@
             // lblMobilePhone
             // 
             this.lblMobilePhone.AutoSize = true;
-            this.lblMobilePhone.Location = new System.Drawing.Point(409, 135);
+            this.lblMobilePhone.Location = new System.Drawing.Point(411, 236);
             this.lblMobilePhone.Name = "lblMobilePhone";
             this.lblMobilePhone.Size = new System.Drawing.Size(72, 13);
             this.lblMobilePhone.TabIndex = 15;
@@ -226,7 +226,7 @@
             // lblM3
             // 
             this.lblM3.AutoSize = true;
-            this.lblM3.Location = new System.Drawing.Point(517, 135);
+            this.lblM3.Location = new System.Drawing.Point(519, 236);
             this.lblM3.Name = "lblM3";
             this.lblM3.Size = new System.Drawing.Size(22, 13);
             this.lblM3.TabIndex = 16;
@@ -235,7 +235,7 @@
             // lblAmount
             // 
             this.lblAmount.AutoSize = true;
-            this.lblAmount.Location = new System.Drawing.Point(591, 135);
+            this.lblAmount.Location = new System.Drawing.Point(593, 236);
             this.lblAmount.Name = "lblAmount";
             this.lblAmount.Size = new System.Drawing.Size(43, 13);
             this.lblAmount.TabIndex = 17;
@@ -244,7 +244,7 @@
             // lblOrderNumber
             // 
             this.lblOrderNumber.AutoSize = true;
-            this.lblOrderNumber.Location = new System.Drawing.Point(12, 198);
+            this.lblOrderNumber.Location = new System.Drawing.Point(14, 299);
             this.lblOrderNumber.Name = "lblOrderNumber";
             this.lblOrderNumber.Size = new System.Drawing.Size(73, 13);
             this.lblOrderNumber.TabIndex = 18;
@@ -253,7 +253,7 @@
             // lblDateOrdered
             // 
             this.lblDateOrdered.AutoSize = true;
-            this.lblDateOrdered.Location = new System.Drawing.Point(124, 198);
+            this.lblDateOrdered.Location = new System.Drawing.Point(126, 299);
             this.lblDateOrdered.Name = "lblDateOrdered";
             this.lblDateOrdered.Size = new System.Drawing.Size(71, 13);
             this.lblDateOrdered.TabIndex = 19;
@@ -262,7 +262,7 @@
             // lblProjectNumber
             // 
             this.lblProjectNumber.AutoSize = true;
-            this.lblProjectNumber.Location = new System.Drawing.Point(230, 198);
+            this.lblProjectNumber.Location = new System.Drawing.Point(232, 299);
             this.lblProjectNumber.Name = "lblProjectNumber";
             this.lblProjectNumber.Size = new System.Drawing.Size(80, 13);
             this.lblProjectNumber.TabIndex = 20;
@@ -272,7 +272,7 @@
             // 
             this.cbxLeadTime.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxLeadTime.FormattingEnabled = true;
-            this.cbxLeadTime.Location = new System.Drawing.Point(12, 25);
+            this.cbxLeadTime.Location = new System.Drawing.Point(14, 126);
             this.cbxLeadTime.Name = "cbxLeadTime";
             this.cbxLeadTime.Size = new System.Drawing.Size(121, 21);
             this.cbxLeadTime.TabIndex = 21;
@@ -281,7 +281,7 @@
             // 
             this.cbxMainContractor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxMainContractor.FormattingEnabled = true;
-            this.cbxMainContractor.Location = new System.Drawing.Point(499, 25);
+            this.cbxMainContractor.Location = new System.Drawing.Point(501, 126);
             this.cbxMainContractor.Name = "cbxMainContractor";
             this.cbxMainContractor.Size = new System.Drawing.Size(135, 21);
             this.cbxMainContractor.TabIndex = 22;
@@ -290,7 +290,7 @@
             // 
             this.cbxInstalled.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxInstalled.FormattingEnabled = true;
-            this.cbxInstalled.Location = new System.Drawing.Point(382, 82);
+            this.cbxInstalled.Location = new System.Drawing.Point(384, 183);
             this.cbxInstalled.Name = "cbxInstalled";
             this.cbxInstalled.Size = new System.Drawing.Size(54, 21);
             this.cbxInstalled.TabIndex = 23;
@@ -298,7 +298,7 @@
             // lblWeekNumber1
             // 
             this.lblWeekNumber1.AutoSize = true;
-            this.lblWeekNumber1.Location = new System.Drawing.Point(412, 28);
+            this.lblWeekNumber1.Location = new System.Drawing.Point(414, 129);
             this.lblWeekNumber1.Name = "lblWeekNumber1";
             this.lblWeekNumber1.Size = new System.Drawing.Size(19, 13);
             this.lblWeekNumber1.TabIndex = 24;
@@ -307,7 +307,7 @@
             // lblProjectNumber1
             // 
             this.lblProjectNumber1.AutoSize = true;
-            this.lblProjectNumber1.Location = new System.Drawing.Point(249, 215);
+            this.lblProjectNumber1.Location = new System.Drawing.Point(251, 308);
             this.lblProjectNumber1.Name = "lblProjectNumber1";
             this.lblProjectNumber1.Size = new System.Drawing.Size(0, 13);
             this.lblProjectNumber1.TabIndex = 25;
@@ -315,7 +315,7 @@
             // lblDay1
             // 
             this.lblDay1.AutoSize = true;
-            this.lblDay1.Location = new System.Drawing.Point(297, 32);
+            this.lblDay1.Location = new System.Drawing.Point(299, 133);
             this.lblDay1.Name = "lblDay1";
             this.lblDay1.Size = new System.Drawing.Size(64, 13);
             this.lblDay1.TabIndex = 26;
@@ -323,112 +323,113 @@
             // 
             // tbDispatchDate
             // 
-            this.tbDispatchDate.Location = new System.Drawing.Point(182, 29);
+            this.tbDispatchDate.Location = new System.Drawing.Point(184, 130);
             this.tbDispatchDate.Name = "tbDispatchDate";
             this.tbDispatchDate.Size = new System.Drawing.Size(100, 20);
             this.tbDispatchDate.TabIndex = 27;
             // 
             // tbProjectName
             // 
-            this.tbProjectName.Location = new System.Drawing.Point(695, 28);
+            this.tbProjectName.Location = new System.Drawing.Point(697, 129);
             this.tbProjectName.Name = "tbProjectName";
             this.tbProjectName.Size = new System.Drawing.Size(237, 20);
             this.tbProjectName.TabIndex = 28;
             // 
             // tbProjectColour
             // 
-            this.tbProjectColour.Location = new System.Drawing.Point(13, 82);
+            this.tbProjectColour.Location = new System.Drawing.Point(15, 183);
             this.tbProjectColour.Name = "tbProjectColour";
             this.tbProjectColour.Size = new System.Drawing.Size(161, 20);
             this.tbProjectColour.TabIndex = 29;
             // 
             // tbQty
             // 
-            this.tbQty.Location = new System.Drawing.Point(303, 82);
+            this.tbQty.Location = new System.Drawing.Point(305, 183);
             this.tbQty.Name = "tbQty";
             this.tbQty.Size = new System.Drawing.Size(47, 20);
             this.tbQty.TabIndex = 30;
             // 
             // tbFreight
             // 
-            this.tbFreight.Location = new System.Drawing.Point(479, 83);
+            this.tbFreight.Location = new System.Drawing.Point(481, 184);
             this.tbFreight.Name = "tbFreight";
             this.tbFreight.Size = new System.Drawing.Size(100, 20);
             this.tbFreight.TabIndex = 31;
             // 
             // tbBenchtopSupplier
             // 
-            this.tbBenchtopSupplier.Location = new System.Drawing.Point(597, 83);
+            this.tbBenchtopSupplier.Location = new System.Drawing.Point(599, 184);
             this.tbBenchtopSupplier.Name = "tbBenchtopSupplier";
             this.tbBenchtopSupplier.Size = new System.Drawing.Size(100, 20);
             this.tbBenchtopSupplier.TabIndex = 32;
             // 
             // tbBenchtopColour
             // 
-            this.tbBenchtopColour.Location = new System.Drawing.Point(729, 83);
+            this.tbBenchtopColour.Location = new System.Drawing.Point(731, 184);
             this.tbBenchtopColour.Name = "tbBenchtopColour";
             this.tbBenchtopColour.Size = new System.Drawing.Size(100, 20);
             this.tbBenchtopColour.TabIndex = 33;
             // 
             // tbInstaller
             // 
-            this.tbInstaller.Location = new System.Drawing.Point(24, 152);
+            this.tbInstaller.Location = new System.Drawing.Point(26, 253);
             this.tbInstaller.Name = "tbInstaller";
             this.tbInstaller.Size = new System.Drawing.Size(100, 20);
             this.tbInstaller.TabIndex = 34;
             // 
             // tbComment
             // 
-            this.tbComment.Location = new System.Drawing.Point(150, 152);
+            this.tbComment.Location = new System.Drawing.Point(152, 253);
             this.tbComment.Name = "tbComment";
             this.tbComment.Size = new System.Drawing.Size(100, 20);
             this.tbComment.TabIndex = 35;
             // 
             // tbDeliveryAddress
             // 
-            this.tbDeliveryAddress.Location = new System.Drawing.Point(267, 151);
+            this.tbDeliveryAddress.Location = new System.Drawing.Point(269, 252);
             this.tbDeliveryAddress.Name = "tbDeliveryAddress";
             this.tbDeliveryAddress.Size = new System.Drawing.Size(100, 20);
             this.tbDeliveryAddress.TabIndex = 36;
             // 
             // tbPhone
             // 
-            this.tbPhone.Location = new System.Drawing.Point(409, 152);
+            this.tbPhone.Location = new System.Drawing.Point(411, 253);
             this.tbPhone.Name = "tbPhone";
             this.tbPhone.Size = new System.Drawing.Size(100, 20);
             this.tbPhone.TabIndex = 37;
             // 
             // tbM3
             // 
-            this.tbM3.Location = new System.Drawing.Point(520, 152);
+            this.tbM3.Location = new System.Drawing.Point(522, 253);
             this.tbM3.Name = "tbM3";
             this.tbM3.Size = new System.Drawing.Size(34, 20);
             this.tbM3.TabIndex = 38;
             // 
             // tbAmount
             // 
-            this.tbAmount.Location = new System.Drawing.Point(594, 152);
+            this.tbAmount.Location = new System.Drawing.Point(596, 253);
             this.tbAmount.Name = "tbAmount";
             this.tbAmount.Size = new System.Drawing.Size(100, 20);
             this.tbAmount.TabIndex = 39;
             // 
             // tbOrderNumber
             // 
-            this.tbOrderNumber.Location = new System.Drawing.Point(15, 215);
+            this.tbOrderNumber.Location = new System.Drawing.Point(17, 324);
             this.tbOrderNumber.Name = "tbOrderNumber";
             this.tbOrderNumber.Size = new System.Drawing.Size(100, 20);
             this.tbOrderNumber.TabIndex = 40;
             // 
             // tbDateOrdered
             // 
-            this.tbDateOrdered.Location = new System.Drawing.Point(127, 215);
+            this.tbDateOrdered.Location = new System.Drawing.Point(129, 324);
             this.tbDateOrdered.Name = "tbDateOrdered";
             this.tbDateOrdered.Size = new System.Drawing.Size(100, 20);
             this.tbDateOrdered.TabIndex = 41;
             // 
             // btnEnterProject
             // 
-            this.btnEnterProject.Location = new System.Drawing.Point(779, 253);
+            this.btnEnterProject.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnEnterProject.Location = new System.Drawing.Point(781, 346);
             this.btnEnterProject.Name = "btnEnterProject";
             this.btnEnterProject.Size = new System.Drawing.Size(255, 23);
             this.btnEnterProject.TabIndex = 43;
@@ -438,7 +439,8 @@
             // 
             // btnEnterClose
             // 
-            this.btnEnterClose.Location = new System.Drawing.Point(779, 282);
+            this.btnEnterClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnEnterClose.Location = new System.Drawing.Point(781, 375);
             this.btnEnterClose.Name = "btnEnterClose";
             this.btnEnterClose.Size = new System.Drawing.Size(255, 23);
             this.btnEnterClose.TabIndex = 44;
@@ -448,7 +450,8 @@
             // 
             // btnClose
             // 
-            this.btnClose.Location = new System.Drawing.Point(779, 311);
+            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClose.Location = new System.Drawing.Point(781, 404);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(255, 23);
             this.btnClose.TabIndex = 45;
@@ -458,7 +461,7 @@
             // 
             // btnAddMainContractor
             // 
-            this.btnAddMainContractor.Location = new System.Drawing.Point(640, 22);
+            this.btnAddMainContractor.Location = new System.Drawing.Point(642, 123);
             this.btnAddMainContractor.Name = "btnAddMainContractor";
             this.btnAddMainContractor.Size = new System.Drawing.Size(25, 25);
             this.btnAddMainContractor.TabIndex = 46;
@@ -468,7 +471,7 @@
             // 
             // btnAddLeadTime
             // 
-            this.btnAddLeadTime.Location = new System.Drawing.Point(139, 23);
+            this.btnAddLeadTime.Location = new System.Drawing.Point(141, 124);
             this.btnAddLeadTime.Name = "btnAddLeadTime";
             this.btnAddLeadTime.Size = new System.Drawing.Size(25, 25);
             this.btnAddLeadTime.TabIndex = 47;
@@ -478,7 +481,7 @@
             // chkIsDeztek
             // 
             this.chkIsDeztek.AutoSize = true;
-            this.chkIsDeztek.Location = new System.Drawing.Point(180, 82);
+            this.chkIsDeztek.Location = new System.Drawing.Point(182, 183);
             this.chkIsDeztek.Name = "chkIsDeztek";
             this.chkIsDeztek.Size = new System.Drawing.Size(71, 17);
             this.chkIsDeztek.TabIndex = 48;
@@ -487,7 +490,7 @@
             // 
             // btnAddKeyword
             // 
-            this.btnAddKeyword.Location = new System.Drawing.Point(257, 77);
+            this.btnAddKeyword.Location = new System.Drawing.Point(259, 178);
             this.btnAddKeyword.Name = "btnAddKeyword";
             this.btnAddKeyword.Size = new System.Drawing.Size(25, 25);
             this.btnAddKeyword.TabIndex = 49;
@@ -498,7 +501,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1060, 372);
+            this.ClientSize = new System.Drawing.Size(1060, 600);
             this.Controls.Add(this.btnAddKeyword);
             this.Controls.Add(this.chkIsDeztek);
             this.Controls.Add(this.btnAddLeadTime);
@@ -551,6 +554,55 @@
             this.Name = "FrmNewProject";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "FrmNewProject";
+            this.Controls.SetChildIndex(this.lblLeadTime, 0);
+            this.Controls.SetChildIndex(this.lblDispatchDate, 0);
+            this.Controls.SetChildIndex(this.lblDay, 0);
+            this.Controls.SetChildIndex(this.lblWeekNumber, 0);
+            this.Controls.SetChildIndex(this.lblMainContractor, 0);
+            this.Controls.SetChildIndex(this.lblProjectName, 0);
+            this.Controls.SetChildIndex(this.lblProjectColour, 0);
+            this.Controls.SetChildIndex(this.lblQty, 0);
+            this.Controls.SetChildIndex(this.lblInstalled, 0);
+            this.Controls.SetChildIndex(this.lblFreight, 0);
+            this.Controls.SetChildIndex(this.lblBenchtopSupplier, 0);
+            this.Controls.SetChildIndex(this.lblBenchtopColour, 0);
+            this.Controls.SetChildIndex(this.lblInstaller, 0);
+            this.Controls.SetChildIndex(this.lblComment, 0);
+            this.Controls.SetChildIndex(this.lblDeliveryAddress, 0);
+            this.Controls.SetChildIndex(this.lblMobilePhone, 0);
+            this.Controls.SetChildIndex(this.lblM3, 0);
+            this.Controls.SetChildIndex(this.lblAmount, 0);
+            this.Controls.SetChildIndex(this.lblOrderNumber, 0);
+            this.Controls.SetChildIndex(this.lblDateOrdered, 0);
+            this.Controls.SetChildIndex(this.lblProjectNumber, 0);
+            this.Controls.SetChildIndex(this.cbxLeadTime, 0);
+            this.Controls.SetChildIndex(this.cbxMainContractor, 0);
+            this.Controls.SetChildIndex(this.cbxInstalled, 0);
+            this.Controls.SetChildIndex(this.lblWeekNumber1, 0);
+            this.Controls.SetChildIndex(this.lblProjectNumber1, 0);
+            this.Controls.SetChildIndex(this.lblDay1, 0);
+            this.Controls.SetChildIndex(this.tbDispatchDate, 0);
+            this.Controls.SetChildIndex(this.tbProjectName, 0);
+            this.Controls.SetChildIndex(this.tbProjectColour, 0);
+            this.Controls.SetChildIndex(this.tbQty, 0);
+            this.Controls.SetChildIndex(this.tbFreight, 0);
+            this.Controls.SetChildIndex(this.tbBenchtopSupplier, 0);
+            this.Controls.SetChildIndex(this.tbBenchtopColour, 0);
+            this.Controls.SetChildIndex(this.tbInstaller, 0);
+            this.Controls.SetChildIndex(this.tbComment, 0);
+            this.Controls.SetChildIndex(this.tbDeliveryAddress, 0);
+            this.Controls.SetChildIndex(this.tbPhone, 0);
+            this.Controls.SetChildIndex(this.tbM3, 0);
+            this.Controls.SetChildIndex(this.tbAmount, 0);
+            this.Controls.SetChildIndex(this.tbOrderNumber, 0);
+            this.Controls.SetChildIndex(this.tbDateOrdered, 0);
+            this.Controls.SetChildIndex(this.btnEnterProject, 0);
+            this.Controls.SetChildIndex(this.btnEnterClose, 0);
+            this.Controls.SetChildIndex(this.btnClose, 0);
+            this.Controls.SetChildIndex(this.btnAddMainContractor, 0);
+            this.Controls.SetChildIndex(this.btnAddLeadTime, 0);
+            this.Controls.SetChildIndex(this.chkIsDeztek, 0);
+            this.Controls.SetChildIndex(this.btnAddKeyword, 0);
             this.ResumeLayout(false);
             this.PerformLayout();
 
