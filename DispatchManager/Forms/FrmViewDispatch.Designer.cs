@@ -51,9 +51,14 @@
             this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblLoggedInUser = new System.Windows.Forms.Label();
             this.lblSelectionTotal = new System.Windows.Forms.Label();
+            this.panelTop = new System.Windows.Forms.Panel();
+            this.btnClose = new System.Windows.Forms.Button();
+            this.btnMaximize = new System.Windows.Forms.Button();
+            this.btnMinimize = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
             this.contextMenuGrid.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            this.panelTop.SuspendLayout();
             this.SuspendLayout();
             // 
             // dgvSchedule
@@ -64,10 +69,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvSchedule.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvSchedule.ContextMenuStrip = this.contextMenuGrid;
-            this.dgvSchedule.Location = new System.Drawing.Point(1, 126);
+            this.dgvSchedule.Location = new System.Drawing.Point(1, 130);
             this.dgvSchedule.Name = "dgvSchedule";
             this.dgvSchedule.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvSchedule.Size = new System.Drawing.Size(1905, 863);
+            this.dgvSchedule.Size = new System.Drawing.Size(1905, 859);
             this.dgvSchedule.TabIndex = 0;
             // 
             // contextMenuGrid
@@ -102,7 +107,7 @@
             // 
             // dtpFrom
             // 
-            this.dtpFrom.Location = new System.Drawing.Point(86, 30);
+            this.dtpFrom.Location = new System.Drawing.Point(87, 41);
             this.dtpFrom.Name = "dtpFrom";
             this.dtpFrom.Size = new System.Drawing.Size(200, 20);
             this.dtpFrom.TabIndex = 1;
@@ -110,7 +115,7 @@
             // lblFrom
             // 
             this.lblFrom.AutoSize = true;
-            this.lblFrom.Location = new System.Drawing.Point(5, 34);
+            this.lblFrom.Location = new System.Drawing.Point(6, 45);
             this.lblFrom.Name = "lblFrom";
             this.lblFrom.Size = new System.Drawing.Size(66, 13);
             this.lblFrom.TabIndex = 2;
@@ -118,7 +123,7 @@
             // 
             // dtpTo
             // 
-            this.dtpTo.Location = new System.Drawing.Point(86, 57);
+            this.dtpTo.Location = new System.Drawing.Point(87, 68);
             this.dtpTo.Name = "dtpTo";
             this.dtpTo.Size = new System.Drawing.Size(200, 20);
             this.dtpTo.TabIndex = 3;
@@ -126,7 +131,7 @@
             // lblTo
             // 
             this.lblTo.AutoSize = true;
-            this.lblTo.Location = new System.Drawing.Point(15, 61);
+            this.lblTo.Location = new System.Drawing.Point(16, 72);
             this.lblTo.Name = "lblTo";
             this.lblTo.Size = new System.Drawing.Size(56, 13);
             this.lblTo.TabIndex = 4;
@@ -134,7 +139,7 @@
             // 
             // tbSearch
             // 
-            this.tbSearch.Location = new System.Drawing.Point(86, 83);
+            this.tbSearch.Location = new System.Drawing.Point(87, 94);
             this.tbSearch.Name = "tbSearch";
             this.tbSearch.Size = new System.Drawing.Size(200, 20);
             this.tbSearch.TabIndex = 5;
@@ -143,7 +148,7 @@
             // lblSearch
             // 
             this.lblSearch.AutoSize = true;
-            this.lblSearch.Location = new System.Drawing.Point(27, 88);
+            this.lblSearch.Location = new System.Drawing.Point(28, 99);
             this.lblSearch.Name = "lblSearch";
             this.lblSearch.Size = new System.Drawing.Size(44, 13);
             this.lblSearch.TabIndex = 6;
@@ -155,7 +160,7 @@
             this.lblTotal.AutoSize = true;
             this.lblTotal.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTotal.ForeColor = System.Drawing.Color.Red;
-            this.lblTotal.Location = new System.Drawing.Point(1719, 1001);
+            this.lblTotal.Location = new System.Drawing.Point(1487, 1002);
             this.lblTotal.Name = "lblTotal";
             this.lblTotal.Size = new System.Drawing.Size(45, 17);
             this.lblTotal.TabIndex = 10;
@@ -163,13 +168,15 @@
             // 
             // menuStrip1
             // 
+            this.menuStrip1.BackColor = System.Drawing.Color.CornflowerBlue;
+            this.menuStrip1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuOptions,
             this.newProjectToolStripMenuItem,
             this.printingToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1904, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1904, 25);
             this.menuStrip1.TabIndex = 11;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -179,27 +186,27 @@
             this.menuEmployees,
             this.MenuDeletedProjects});
             this.menuOptions.Name = "menuOptions";
-            this.menuOptions.Size = new System.Drawing.Size(61, 20);
+            this.menuOptions.Size = new System.Drawing.Size(61, 21);
             this.menuOptions.Text = "Options";
             // 
             // menuEmployees
             // 
             this.menuEmployees.Name = "menuEmployees";
-            this.menuEmployees.Size = new System.Drawing.Size(159, 22);
+            this.menuEmployees.Size = new System.Drawing.Size(180, 22);
             this.menuEmployees.Text = "Employees";
             this.menuEmployees.Click += new System.EventHandler(this.menuEmployees_Click);
             // 
             // MenuDeletedProjects
             // 
             this.MenuDeletedProjects.Name = "MenuDeletedProjects";
-            this.MenuDeletedProjects.Size = new System.Drawing.Size(159, 22);
+            this.MenuDeletedProjects.Size = new System.Drawing.Size(180, 22);
             this.MenuDeletedProjects.Text = "Deleted Projects";
             this.MenuDeletedProjects.Click += new System.EventHandler(this.MenuDeletedProjects_Click);
             // 
             // newProjectToolStripMenuItem
             // 
             this.newProjectToolStripMenuItem.Name = "newProjectToolStripMenuItem";
-            this.newProjectToolStripMenuItem.Size = new System.Drawing.Size(83, 20);
+            this.newProjectToolStripMenuItem.Size = new System.Drawing.Size(83, 21);
             this.newProjectToolStripMenuItem.Text = "New Project";
             this.newProjectToolStripMenuItem.Click += new System.EventHandler(this.newProjectToolStripMenuItem_Click);
             // 
@@ -209,20 +216,20 @@
             this.setPrintAreaToolStripMenuItem,
             this.printToolStripMenuItem});
             this.printingToolStripMenuItem.Name = "printingToolStripMenuItem";
-            this.printingToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.printingToolStripMenuItem.Size = new System.Drawing.Size(61, 21);
             this.printingToolStripMenuItem.Text = "Printing";
             // 
             // setPrintAreaToolStripMenuItem
             // 
             this.setPrintAreaToolStripMenuItem.Name = "setPrintAreaToolStripMenuItem";
-            this.setPrintAreaToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.setPrintAreaToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.setPrintAreaToolStripMenuItem.Text = "Set Print Area";
             this.setPrintAreaToolStripMenuItem.Click += new System.EventHandler(this.setPrintAreaToolStripMenuItem_Click);
             // 
             // printToolStripMenuItem
             // 
             this.printToolStripMenuItem.Name = "printToolStripMenuItem";
-            this.printToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.printToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.printToolStripMenuItem.Text = "Print";
             this.printToolStripMenuItem.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
             // 
@@ -239,18 +246,67 @@
             // 
             // lblSelectionTotal
             // 
+            this.lblSelectionTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblSelectionTotal.AutoSize = true;
-            this.lblSelectionTotal.Location = new System.Drawing.Point(1604, 91);
+            this.lblSelectionTotal.Location = new System.Drawing.Point(1590, 1004);
             this.lblSelectionTotal.Name = "lblSelectionTotal";
             this.lblSelectionTotal.Size = new System.Drawing.Size(288, 13);
             this.lblSelectionTotal.TabIndex = 15;
             this.lblSelectionTotal.Text = "lblSelectionTotal.Text = \"Selection Total: $0.00 | M3: 0.00\";";
+            // 
+            // panelTop
+            // 
+            this.panelTop.BackColor = System.Drawing.Color.CornflowerBlue;
+            this.panelTop.Controls.Add(this.btnMinimize);
+            this.panelTop.Controls.Add(this.btnMaximize);
+            this.panelTop.Controls.Add(this.btnClose);
+            this.panelTop.Controls.Add(this.menuStrip1);
+            this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelTop.ForeColor = System.Drawing.Color.White;
+            this.panelTop.Location = new System.Drawing.Point(0, 0);
+            this.panelTop.Name = "panelTop";
+            this.panelTop.Size = new System.Drawing.Size(1904, 25);
+            this.panelTop.TabIndex = 16;
+            // 
+            // btnClose
+            // 
+            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClose.Location = new System.Drawing.Point(1878, 0);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(25, 25);
+            this.btnClose.TabIndex = 12;
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
+            // btnMaximize
+            // 
+            this.btnMaximize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMaximize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMaximize.Location = new System.Drawing.Point(1853, 0);
+            this.btnMaximize.Name = "btnMaximize";
+            this.btnMaximize.Size = new System.Drawing.Size(25, 25);
+            this.btnMaximize.TabIndex = 13;
+            this.btnMaximize.UseVisualStyleBackColor = true;
+            this.btnMaximize.Click += new System.EventHandler(this.btnMaximize_Click);
+            // 
+            // btnMinimize
+            // 
+            this.btnMinimize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMinimize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMinimize.Location = new System.Drawing.Point(1828, 0);
+            this.btnMinimize.Name = "btnMinimize";
+            this.btnMinimize.Size = new System.Drawing.Size(25, 25);
+            this.btnMinimize.TabIndex = 14;
+            this.btnMinimize.UseVisualStyleBackColor = true;
+            this.btnMinimize.Click += new System.EventHandler(this.btnMinimize_Click);
             // 
             // FrmViewDispatch
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1904, 1041);
+            this.Controls.Add(this.panelTop);
             this.Controls.Add(this.lblSelectionTotal);
             this.Controls.Add(this.lblLoggedInUser);
             this.Controls.Add(this.lblTotal);
@@ -261,7 +317,6 @@
             this.Controls.Add(this.lblFrom);
             this.Controls.Add(this.dtpFrom);
             this.Controls.Add(this.dgvSchedule);
-            this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "FrmViewDispatch";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -270,6 +325,8 @@
             this.contextMenuGrid.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.panelTop.ResumeLayout(false);
+            this.panelTop.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -299,5 +356,9 @@
         private System.Windows.Forms.ToolStripMenuItem printingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setPrintAreaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem printToolStripMenuItem;
+        private System.Windows.Forms.Panel panelTop;
+        private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.Button btnMinimize;
+        private System.Windows.Forms.Button btnMaximize;
     }
 }

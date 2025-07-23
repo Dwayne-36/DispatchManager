@@ -36,7 +36,7 @@ namespace DispatchManager.Forms
         private Dictionary<int, Color> weekColors = new Dictionary<int, Color>();
         private Timer autoScrollTimer = new Timer();
         private System.Drawing.Point lastMousePosition;
-
+        private System.Drawing.Point lastValidCell = System.Drawing.Point.Empty;
 
 
         // Place this at the top of your FrmViewDispatch form
@@ -76,12 +76,16 @@ namespace DispatchManager.Forms
         {
             InitializeComponent();
 
+            this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
+
             // ✅ Allow user to reorder columns
             dgvSchedule.AllowUserToOrderColumns = true;
 
             // Form Level Events
             this.Load += FrmViewDispatch_Load;
             this.FormClosing += FrmViewDispatch_FormClosing;
+            this.MinimumSize = new Size(1400, 400); // Width x Height
+
 
             // Control Level Events
             this.dtpFrom.ValueChanged += dtpFrom_ValueChanged;
@@ -114,6 +118,25 @@ namespace DispatchManager.Forms
                 dtpDispatch.Visible = false;
             };
 
+            //Making the form borderless and white background
+
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.BackColor = Color.White;  // or dark theme colors
+
+            menuStrip1.AutoSize = false;
+            menuStrip1.Height = 35;  // match your top panel
+            //menuStrip1.Dock = DockStyle.Left;
+            menuStrip1.BackColor = panelTop.BackColor;
+            menuStrip1.RenderMode = ToolStripRenderMode.System; // Avoid default gradient
+            menuStrip1.Renderer = new ToolStripProfessionalRenderer(new NoBorderColorTable());
+
+            //btnClose.FlatStyle = FlatStyle.Flat;
+            btnClose.FlatAppearance.BorderSize = 0;
+            btnMinimize.FlatAppearance.BorderSize = 0;  
+            btnMaximize.FlatAppearance.BorderSize = 0;
+            //btnClose.BackColor = panelTop.BackColor; // match background
+            //btnClose.ForeColor = Color.White;
+
 
             //colour and style events
             dgvSchedule.RowPostPaint += dgvSchedule_RowPostPaint;
@@ -131,8 +154,9 @@ namespace DispatchManager.Forms
 
             dgvSchedule.MouseMove += dgvSchedule_MouseMove;
 
-
         }
+       
+
         private void FrmViewDispatch_Load(object sender, EventArgs e)
         {
             dtpDispatch.Visible = false;
@@ -142,6 +166,20 @@ namespace DispatchManager.Forms
             this.Controls.Add(dtpDispatch);
 
             this.MouseDown += FrmViewDispatch_MouseDown;
+            btnClose.MouseEnter += btnClose_MouseEnter;
+            btnClose.MouseLeave += btnClose_MouseLeave;
+            btnMinimize.MouseEnter += btnMinimize_MouseEnter;
+            btnMinimize.MouseLeave += btnMinimize_MouseLeave;
+            btnMaximize.MouseEnter += btnMaximize_MouseEnter;
+            btnMaximize.MouseLeave += btnMaximize_MouseLeave;
+
+
+
+            btnClose.Paint += btnClose_Paint;
+            btnMinimize.Paint += btnMinimize_Paint;
+            btnMaximize.Paint += btnMaximize_Paint;
+
+
 
             // Load saved date settings
             dtpFrom.Value = Properties.Settings.Default.dtpFromDate;
@@ -208,7 +246,7 @@ namespace DispatchManager.Forms
             RegisterDispatchColoursNotification();
 
         }
-
+        
         private void RegisterDispatchNotification()
         {
             string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
@@ -1745,19 +1783,6 @@ namespace DispatchManager.Forms
             dgvSchedule.DataSource = filteredList;
         }
 
-        private void btnNewProject_Click(object sender, EventArgs e)
-        {
-            //using (var newProjectForm = new FrmNewProject())
-            //{
-            //    newProjectForm.ShowDialog();
-
-            //    // Optionally refresh the main view after closing
-            //    LoadScheduleData(); // Reload to reflect new project
-            //    RestoreColumnSettings(); // Keep column widths/order
-            //}
-        }
-
-
         private void AppendDeletedRowToCsv(DataGridViewRow row)
         {
             try
@@ -2474,24 +2499,46 @@ namespace DispatchManager.Forms
 
 
         private void btnPrint_Click(object sender, EventArgs e)
-        {
-            //ExportSelectionToExcel();
-            //ExitPrintAreaMode();
+        {           
         }
-        //private bool isTKeyHeld = false;
+        
         private void dgvSchedule_MouseMove(object sender, MouseEventArgs e)
         {
             if (isSelectingPrintArea)
             {
                 lastMousePosition = e.Location;
+
+                var hit = dgvSchedule.HitTest(e.X, e.Y);
+
+                // Get the last visible column
+                int lastVisibleColIndex = dgvSchedule.Columns
+                    .Cast<DataGridViewColumn>()
+                    .Where(c => c.Visible)
+                    .OrderBy(c => c.DisplayIndex)
+                    .Last().Index;
+
+                int colIndex = hit.ColumnIndex;
+
+                // Clamp to last visible column if beyond the right edge
+                if (e.X > dgvSchedule.DisplayRectangle.Right)
+                {
+                    colIndex = lastVisibleColIndex;
+                }
+
+                // Track the last valid cell
+                if (colIndex >= 0 && hit.RowIndex >= 0)
+                {
+                    lastValidCell = new System.Drawing.Point(colIndex, hit.RowIndex);
+                }
             }
         }
+
+
         private void AutoScrollTimer_Tick(object sender, EventArgs e)
         {
             if (!isSelectingPrintArea) return;
 
-            int scrollStep = 1; // rows/columns per tick
-            var hitTest = dgvSchedule.HitTest(lastMousePosition.X, lastMousePosition.Y);
+            int scrollStep = 1;
 
             // Vertical scrolling
             if (lastMousePosition.Y < 20 && dgvSchedule.FirstDisplayedScrollingRowIndex > 0)
@@ -2505,47 +2552,37 @@ namespace DispatchManager.Forms
             }
 
             // Horizontal scrolling
+            var visibleColumns = dgvSchedule.Columns
+                .Cast<DataGridViewColumn>()
+                .Where(c => c.Visible)
+                .OrderBy(c => c.DisplayIndex)
+                .ToList();
+
             if (lastMousePosition.X < 20)
             {
-                int firstCol = dgvSchedule.Columns.GetFirstColumn(DataGridViewElementStates.Visible).DisplayIndex;
-                if (firstCol > 0)
-                {
-                    dgvSchedule.FirstDisplayedScrollingColumnIndex = dgvSchedule.Columns
-                        .Cast<DataGridViewColumn>()
-                        .Where(c => c.Visible)
-                        .OrderBy(c => c.DisplayIndex)
-                        .First().Index;
-                }
+                dgvSchedule.FirstDisplayedScrollingColumnIndex = visibleColumns.First().Index;
             }
             else if (lastMousePosition.X > dgvSchedule.Width - 20)
             {
-                // Get all visible columns, sorted by DisplayIndex
-                var visibleColumns = dgvSchedule.Columns
-                    .Cast<DataGridViewColumn>()
-                    .Where(c => c.Visible)
-                    .OrderBy(c => c.DisplayIndex)
-                    .ToList();
-
-                if (visibleColumns.Count > 0)
+                var currentFirst = visibleColumns.FirstOrDefault(c => c.Index == dgvSchedule.FirstDisplayedScrollingColumnIndex);
+                if (currentFirst != null)
                 {
-                    // Find the current first visible column
-                    var currentFirst = visibleColumns
-                        .FirstOrDefault(c => c.Index == dgvSchedule.FirstDisplayedScrollingColumnIndex);
-
-                    if (currentFirst != null)
+                    int currentPos = visibleColumns.IndexOf(currentFirst);
+                    if (currentPos < visibleColumns.Count - 1)
                     {
-                        int currentPos = visibleColumns.IndexOf(currentFirst);
-
-                        if (currentPos < visibleColumns.Count - 1)
-                        {
-                            dgvSchedule.FirstDisplayedScrollingColumnIndex = visibleColumns[currentPos + 1].Index;
-                        }
+                        dgvSchedule.FirstDisplayedScrollingColumnIndex = visibleColumns[currentPos + 1].Index;
                     }
                 }
+
+                // Use the last valid cell to maintain selection
+                if (lastValidCell != System.Drawing.Point.Empty)
+                {
+                    dgvSchedule.CurrentCell = dgvSchedule[lastValidCell.X, lastValidCell.Y];
+                }
+
             }
-
-
         }
+
         private void NumericColumn_KeyPress(object sender, KeyPressEventArgs e)
 {
     string columnName = dgvSchedule.Columns[dgvSchedule.CurrentCell.ColumnIndex].Name;
@@ -2608,6 +2645,174 @@ namespace DispatchManager.Forms
             ExportSelectionToExcel();
             ExitPrintAreaMode();
         }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            this.Close();
+            
+        }
+        private void btnClose_Paint(object sender, PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            // Pen for the cross
+            using (Pen pen = new Pen(Color.White, 1))
+            {
+                int padding = 8;
+                g.DrawLine(pen, padding, padding, btnClose.Width - padding, btnClose.Height - padding);
+                g.DrawLine(pen, btnClose.Width - padding, padding, padding, btnClose.Height - padding);
+            }
+        }
+        private void btnMinimize_Paint(object sender, PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            using (Pen pen = new Pen(Color.White, 1))
+            {
+                int y = btnMinimize.Height / 2 + 5;
+                g.DrawLine(pen, 8, y, btnMinimize.Width - 8, y);
+            }
+        }
+        private void btnMaximize_Paint(object sender, PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            using (Pen pen = new Pen(Color.White, 1))
+            {
+                int padding = 8;
+                g.DrawRectangle(pen, padding, padding, btnMaximize.Width - padding * 2, btnMaximize.Height - padding * 2);
+            }
+        }
+
+        private void btnClose_MouseEnter(object sender, EventArgs e)
+        {
+            btnClose.BackColor = Color.Red; // Highlight when hovering
+        }
+
+        private void btnClose_MouseLeave(object sender, EventArgs e)
+        {
+            btnClose.BackColor = Color.CornflowerBlue; // Original color
+        }
+        private void btnMinimize_MouseEnter(object sender, EventArgs e)
+        {
+            btnMinimize.BackColor = Color.Red; // Highlight color when hovering
+        }
+
+        private void btnMinimize_MouseLeave(object sender, EventArgs e)
+        {
+            btnMinimize.BackColor = Color.CornflowerBlue; // Original color
+        }
+        private void btnMaximize_MouseEnter(object sender, EventArgs e)
+        {
+            btnMaximize.BackColor = Color.Red; // Highlight color when hovering
+        }
+
+        private void btnMaximize_MouseLeave(object sender, EventArgs e)
+        {
+            btnMaximize.BackColor = Color.CornflowerBlue; // Original color
+        }
+
+
+        private void SetupWindowButtons()
+        {
+            // Common settings with CornflowerBlue background
+            SetupFlatButton(this.btnClose, Color.CornflowerBlue);
+            SetupFlatButton(this.btnMinimize, Color.CornflowerBlue);
+            SetupFlatButton(this.btnMaximize, Color.CornflowerBlue);
+
+            // Event wiring
+            btnClose.Paint += btnClose_Paint;
+            btnClose.MouseEnter += (s, e) => btnClose.BackColor = Color.Red;
+            btnClose.MouseLeave += (s, e) => btnClose.BackColor = Color.CornflowerBlue;
+            btnClose.Click += (s, e) => this.Close();
+
+            btnMinimize.Paint += btnMinimize_Paint;
+            btnMinimize.MouseEnter += (s, e) => btnMinimize.BackColor = Color.DodgerBlue;
+            btnMinimize.MouseLeave += (s, e) => btnMinimize.BackColor = Color.CornflowerBlue;
+            btnMinimize.Click += (s, e) => this.WindowState = FormWindowState.Minimized;
+
+            btnMaximize.Paint += btnMaximize_Paint;
+            btnMaximize.MouseEnter += (s, e) => btnMaximize.BackColor = Color.DodgerBlue;
+            btnMaximize.MouseLeave += (s, e) => btnMaximize.BackColor = Color.CornflowerBlue;
+            btnMaximize.Click += (s, e) =>
+            {
+                this.WindowState = (this.WindowState == FormWindowState.Maximized)
+                    ? FormWindowState.Normal
+                    : FormWindowState.Maximized;
+            };
+        }
+
+        private void SetupFlatButton(System.Windows.Forms.Button btn, Color backColor)
+        {
+            btn.FlatStyle = FlatStyle.Flat;
+            btn.FlatAppearance.BorderSize = 0;
+            btn.BackColor = backColor;
+            btn.ForeColor = Color.White;
+            btn.Text = "";
+            btn.Width = 40;
+            btn.Height = 30;
+        }
+
+        private void btnMaximize_Click(object sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Maximized)
+                this.WindowState = FormWindowState.Normal;
+            else
+                this.WindowState = FormWindowState.Maximized;
+        }
+
+        private void btnMinimize_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+        }
+        public class NoBorderColorTable : ProfessionalColorTable
+        {
+            public override Color ToolStripBorder => Color.CornflowerBlue;  // Match background color
+            public override Color MenuBorder => Color.CornflowerBlue;        // Match background color
+            public override Color MenuItemBorder => Color.CornflowerBlue;    // Match background color
+        }
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_NCHITTEST = 0x84;
+            const int HTCLIENT = 1;
+            const int HTLEFT = 10;
+            const int HTRIGHT = 11;
+            const int HTTOP = 12;
+            const int HTTOPLEFT = 13;
+            const int HTTOPRIGHT = 14;
+            const int HTBOTTOM = 15;
+            const int HTBOTTOMLEFT = 16;
+            const int HTBOTTOMRIGHT = 17;
+
+            if (m.Msg == WM_NCHITTEST)
+            {
+                base.WndProc(ref m);
+                if ((int)m.Result == HTCLIENT)
+                {
+                    var cursor = this.PointToClient(Cursor.Position);
+                    int resizeArea = 10; // Edge thickness for resizing
+
+                    if (cursor.X < resizeArea && cursor.Y < resizeArea)
+                        m.Result = (IntPtr)HTTOPLEFT;
+                    else if (cursor.X > this.Width - resizeArea && cursor.Y < resizeArea)
+                        m.Result = (IntPtr)HTTOPRIGHT;
+                    else if (cursor.X < resizeArea && cursor.Y > this.Height - resizeArea)
+                        m.Result = (IntPtr)HTBOTTOMLEFT;
+                    else if (cursor.X > this.Width - resizeArea && cursor.Y > this.Height - resizeArea)
+                        m.Result = (IntPtr)HTBOTTOMRIGHT;
+                    else if (cursor.X < resizeArea)
+                        m.Result = (IntPtr)HTLEFT;
+                    else if (cursor.X > this.Width - resizeArea)
+                        m.Result = (IntPtr)HTRIGHT;
+                    else if (cursor.Y < resizeArea)
+                        m.Result = (IntPtr)HTTOP;
+                    else if (cursor.Y > this.Height - resizeArea)
+                        m.Result = (IntPtr)HTBOTTOM;
+                }
+                return;
+            }
+            base.WndProc(ref m);
+        }
+
     }
 }
 

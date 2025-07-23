@@ -1,0 +1,11 @@
+Instructions for ForcePush.bat
+
+1. Place the ForcePush.bat file anywhere on your computer (e.g., Desktop).
+2. Double-click ForcePush.bat.
+3. The script will:
+   - Navigate to your DispatchManager project folder.
+   - Show your current Git branch and status.
+   - Force push your local changes to the 'main' branch on GitHub, overwriting the remote.
+4. When the script finishes, press any key to close the window.
+
+NOTE: Be careful! This force push will overwrite the remote branch, removing any commits that were made on GitHub after your last local commit.
