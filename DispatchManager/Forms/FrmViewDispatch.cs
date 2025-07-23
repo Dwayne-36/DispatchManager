@@ -19,6 +19,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 
+
 namespace DispatchManager.Forms
 {
     public partial class FrmViewDispatch : Form
@@ -129,6 +130,7 @@ namespace DispatchManager.Forms
             menuStrip1.BackColor = panelTop.BackColor;
             menuStrip1.RenderMode = ToolStripRenderMode.System; // Avoid default gradient
             menuStrip1.Renderer = new ToolStripProfessionalRenderer(new NoBorderColorTable());
+            menuStrip1.MouseDown += panelTop_MouseDown;
 
             //btnClose.FlatStyle = FlatStyle.Flat;
             btnClose.FlatAppearance.BorderSize = 0;
@@ -156,7 +158,6 @@ namespace DispatchManager.Forms
 
         }
        
-
         private void FrmViewDispatch_Load(object sender, EventArgs e)
         {
             dtpDispatch.Visible = false;
@@ -246,7 +247,15 @@ namespace DispatchManager.Forms
             RegisterDispatchColoursNotification();
 
         }
-        
+        [DllImport("user32.dll")]
+        public static extern bool ReleaseCapture();
+
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+
+        private const int WM_NCLBUTTONDOWN = 0xA1;
+        private const int HTCAPTION = 0x2;
+
         private void RegisterDispatchNotification()
         {
             string connStr = ConfigurationManager.ConnectionStrings["HayloSync"].ConnectionString;
@@ -2811,6 +2820,14 @@ namespace DispatchManager.Forms
                 return;
             }
             base.WndProc(ref m);
+        }
+        private void panelTop_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+            }
         }
 
     }
