@@ -12,7 +12,7 @@ namespace DispatchManager
 {
     internal static class Program
     {
-        /// <summary>
+        /// <summary> 
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
@@ -33,7 +33,7 @@ namespace DispatchManager
             Session.CurrentUsername = "dwayne";
             Session.CurrentInitials = "DK";
             Session.CurrentFullName = "Dwayne Keast";
-            Session.IsAdmin = false;
+            Session.IsAdmin = true;
 
             Application.Run(new FrmViewDispatch());
 

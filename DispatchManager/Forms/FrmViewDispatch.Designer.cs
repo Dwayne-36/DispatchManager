@@ -40,15 +40,15 @@
             this.lblTo = new System.Windows.Forms.Label();
             this.tbSearch = new System.Windows.Forms.TextBox();
             this.lblSearch = new System.Windows.Forms.Label();
-            this.btnNewProject = new System.Windows.Forms.Button();
             this.lblTotal = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuEmployees = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuDeletedProjects = new System.Windows.Forms.ToolStripMenuItem();
-            this.lblLoggedInUser = new System.Windows.Forms.Label();
-            this.btnSetPrintArea = new System.Windows.Forms.Button();
-            this.btnPrint = new System.Windows.Forms.Button();
+            this.newProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setPrintAreaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.printToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.lblSelectionTotal = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).BeginInit();
             this.contextMenuGrid.SuspendLayout();
@@ -58,15 +58,12 @@
             // dgvSchedule
             // 
             this.dgvSchedule.AllowUserToAddRows = false;
-            this.dgvSchedule.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvSchedule.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvSchedule.ContextMenuStrip = this.contextMenuGrid;
-            this.dgvSchedule.Location = new System.Drawing.Point(1, 126);
+            this.dgvSchedule.Location = new System.Drawing.Point(1, 134);
             this.dgvSchedule.Name = "dgvSchedule";
             this.dgvSchedule.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvSchedule.Size = new System.Drawing.Size(1905, 863);
+            this.dgvSchedule.Size = new System.Drawing.Size(1154, 414);
             this.dgvSchedule.TabIndex = 0;
             // 
             // contextMenuGrid
@@ -101,7 +98,7 @@
             // 
             // dtpFrom
             // 
-            this.dtpFrom.Location = new System.Drawing.Point(86, 30);
+            this.dtpFrom.Location = new System.Drawing.Point(86, 55);
             this.dtpFrom.Name = "dtpFrom";
             this.dtpFrom.Size = new System.Drawing.Size(200, 20);
             this.dtpFrom.TabIndex = 1;
@@ -109,7 +106,7 @@
             // lblFrom
             // 
             this.lblFrom.AutoSize = true;
-            this.lblFrom.Location = new System.Drawing.Point(5, 34);
+            this.lblFrom.Location = new System.Drawing.Point(5, 59);
             this.lblFrom.Name = "lblFrom";
             this.lblFrom.Size = new System.Drawing.Size(66, 13);
             this.lblFrom.TabIndex = 2;
@@ -117,7 +114,7 @@
             // 
             // dtpTo
             // 
-            this.dtpTo.Location = new System.Drawing.Point(86, 57);
+            this.dtpTo.Location = new System.Drawing.Point(86, 82);
             this.dtpTo.Name = "dtpTo";
             this.dtpTo.Size = new System.Drawing.Size(200, 20);
             this.dtpTo.TabIndex = 3;
@@ -125,7 +122,7 @@
             // lblTo
             // 
             this.lblTo.AutoSize = true;
-            this.lblTo.Location = new System.Drawing.Point(15, 61);
+            this.lblTo.Location = new System.Drawing.Point(15, 86);
             this.lblTo.Name = "lblTo";
             this.lblTo.Size = new System.Drawing.Size(56, 13);
             this.lblTo.TabIndex = 4;
@@ -133,7 +130,7 @@
             // 
             // tbSearch
             // 
-            this.tbSearch.Location = new System.Drawing.Point(86, 83);
+            this.tbSearch.Location = new System.Drawing.Point(86, 108);
             this.tbSearch.Name = "tbSearch";
             this.tbSearch.Size = new System.Drawing.Size(200, 20);
             this.tbSearch.TabIndex = 5;
@@ -142,21 +139,11 @@
             // lblSearch
             // 
             this.lblSearch.AutoSize = true;
-            this.lblSearch.Location = new System.Drawing.Point(27, 88);
+            this.lblSearch.Location = new System.Drawing.Point(27, 113);
             this.lblSearch.Name = "lblSearch";
             this.lblSearch.Size = new System.Drawing.Size(44, 13);
             this.lblSearch.TabIndex = 6;
             this.lblSearch.Text = "Search:";
-            // 
-            // btnNewProject
-            // 
-            this.btnNewProject.Location = new System.Drawing.Point(465, 20);
-            this.btnNewProject.Name = "btnNewProject";
-            this.btnNewProject.Size = new System.Drawing.Size(185, 25);
-            this.btnNewProject.TabIndex = 8;
-            this.btnNewProject.Text = "New Project";
-            this.btnNewProject.UseVisualStyleBackColor = true;
-            this.btnNewProject.Click += new System.EventHandler(this.btnNewProject_Click);
             // 
             // lblTotal
             // 
@@ -164,7 +151,7 @@
             this.lblTotal.AutoSize = true;
             this.lblTotal.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTotal.ForeColor = System.Drawing.Color.Red;
-            this.lblTotal.Location = new System.Drawing.Point(1719, 1001);
+            this.lblTotal.Location = new System.Drawing.Point(970, 560);
             this.lblTotal.Name = "lblTotal";
             this.lblTotal.Size = new System.Drawing.Size(45, 17);
             this.lblTotal.TabIndex = 10;
@@ -172,11 +159,14 @@
             // 
             // menuStrip1
             // 
+            this.menuStrip1.Dock = System.Windows.Forms.DockStyle.None;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuOptions});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuOptions,
+            this.newProjectToolStripMenuItem,
+            this.printToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(8, 28);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1904, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(196, 24);
             this.menuStrip1.TabIndex = 11;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -192,52 +182,52 @@
             // menuEmployees
             // 
             this.menuEmployees.Name = "menuEmployees";
-            this.menuEmployees.Size = new System.Drawing.Size(180, 22);
+            this.menuEmployees.Size = new System.Drawing.Size(159, 22);
             this.menuEmployees.Text = "Employees";
             this.menuEmployees.Click += new System.EventHandler(this.menuEmployees_Click);
             // 
             // MenuDeletedProjects
             // 
             this.MenuDeletedProjects.Name = "MenuDeletedProjects";
-            this.MenuDeletedProjects.Size = new System.Drawing.Size(180, 22);
+            this.MenuDeletedProjects.Size = new System.Drawing.Size(159, 22);
             this.MenuDeletedProjects.Text = "Deleted Projects";
             this.MenuDeletedProjects.Click += new System.EventHandler(this.MenuDeletedProjects_Click);
             // 
-            // lblLoggedInUser
+            // newProjectToolStripMenuItem
             // 
-            this.lblLoggedInUser.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblLoggedInUser.AutoSize = true;
-            this.lblLoggedInUser.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblLoggedInUser.Location = new System.Drawing.Point(1646, 29);
-            this.lblLoggedInUser.Name = "lblLoggedInUser";
-            this.lblLoggedInUser.Size = new System.Drawing.Size(92, 13);
-            this.lblLoggedInUser.TabIndex = 12;
-            this.lblLoggedInUser.Text = "Logged in as...";
+            this.newProjectToolStripMenuItem.Name = "newProjectToolStripMenuItem";
+            this.newProjectToolStripMenuItem.Size = new System.Drawing.Size(83, 20);
+            this.newProjectToolStripMenuItem.Text = "New Project";
+            this.newProjectToolStripMenuItem.Click += new System.EventHandler(this.newProjectToolStripMenuItem_Click);
             // 
-            // btnSetPrintArea
+            // printToolStripMenuItem
             // 
-            this.btnSetPrintArea.Location = new System.Drawing.Point(1482, 25);
-            this.btnSetPrintArea.Name = "btnSetPrintArea";
-            this.btnSetPrintArea.Size = new System.Drawing.Size(80, 25);
-            this.btnSetPrintArea.TabIndex = 13;
-            this.btnSetPrintArea.Text = "Set Print Area";
-            this.btnSetPrintArea.UseVisualStyleBackColor = true;
-            this.btnSetPrintArea.Click += new System.EventHandler(this.btnSetPrintArea_Click);
+            this.printToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setPrintAreaToolStripMenuItem,
+            this.printToolStripMenuItem1});
+            this.printToolStripMenuItem.Name = "printToolStripMenuItem";
+            this.printToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.printToolStripMenuItem.Text = "Print";
             // 
-            // btnPrint
+            // setPrintAreaToolStripMenuItem
             // 
-            this.btnPrint.Location = new System.Drawing.Point(1482, 52);
-            this.btnPrint.Name = "btnPrint";
-            this.btnPrint.Size = new System.Drawing.Size(80, 25);
-            this.btnPrint.TabIndex = 14;
-            this.btnPrint.Text = "Print";
-            this.btnPrint.UseVisualStyleBackColor = true;
-            this.btnPrint.Click += new System.EventHandler(this.btnPrint_Click);
+            this.setPrintAreaToolStripMenuItem.Name = "setPrintAreaToolStripMenuItem";
+            this.setPrintAreaToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.setPrintAreaToolStripMenuItem.Text = "Set Print Area";
+            this.setPrintAreaToolStripMenuItem.Click += new System.EventHandler(this.setPrintAreaToolStripMenuItem_Click);
+            // 
+            // printToolStripMenuItem1
+            // 
+            this.printToolStripMenuItem1.Name = "printToolStripMenuItem1";
+            this.printToolStripMenuItem1.Size = new System.Drawing.Size(145, 22);
+            this.printToolStripMenuItem1.Text = "Print";
+            this.printToolStripMenuItem1.Click += new System.EventHandler(this.printToolStripMenuItem1_Click);
             // 
             // lblSelectionTotal
             // 
+            this.lblSelectionTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblSelectionTotal.AutoSize = true;
-            this.lblSelectionTotal.Location = new System.Drawing.Point(1604, 91);
+            this.lblSelectionTotal.Location = new System.Drawing.Point(842, 108);
             this.lblSelectionTotal.Name = "lblSelectionTotal";
             this.lblSelectionTotal.Size = new System.Drawing.Size(288, 13);
             this.lblSelectionTotal.TabIndex = 15;
@@ -247,13 +237,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1904, 1041);
+            this.ClientSize = new System.Drawing.Size(1155, 600);
             this.Controls.Add(this.lblSelectionTotal);
-            this.Controls.Add(this.btnPrint);
-            this.Controls.Add(this.btnSetPrintArea);
-            this.Controls.Add(this.lblLoggedInUser);
             this.Controls.Add(this.lblTotal);
-            this.Controls.Add(this.btnNewProject);
             this.Controls.Add(this.lblSearch);
             this.Controls.Add(this.tbSearch);
             this.Controls.Add(this.lblTo);
@@ -266,6 +252,16 @@
             this.Name = "FrmViewDispatch";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Haylo View";
+            this.Controls.SetChildIndex(this.menuStrip1, 0);
+            this.Controls.SetChildIndex(this.dgvSchedule, 0);
+            this.Controls.SetChildIndex(this.dtpFrom, 0);
+            this.Controls.SetChildIndex(this.lblFrom, 0);
+            this.Controls.SetChildIndex(this.dtpTo, 0);
+            this.Controls.SetChildIndex(this.lblTo, 0);
+            this.Controls.SetChildIndex(this.tbSearch, 0);
+            this.Controls.SetChildIndex(this.lblSearch, 0);
+            this.Controls.SetChildIndex(this.lblTotal, 0);
+            this.Controls.SetChildIndex(this.lblSelectionTotal, 0);
             ((System.ComponentModel.ISupportInitialize)(this.dgvSchedule)).EndInit();
             this.contextMenuGrid.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
@@ -284,19 +280,19 @@
         private System.Windows.Forms.Label lblTo;
         private System.Windows.Forms.TextBox tbSearch;
         private System.Windows.Forms.Label lblSearch;
-        private System.Windows.Forms.Button btnNewProject;
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem menuOptions;
-        private System.Windows.Forms.Label lblLoggedInUser;
         private System.Windows.Forms.ToolStripMenuItem menuEmployees;
         private System.Windows.Forms.ToolStripMenuItem MenuDeletedProjects;
         private System.Windows.Forms.ContextMenuStrip contextMenuGrid;
         private System.Windows.Forms.ToolStripMenuItem menuDeleteRow;
         private System.Windows.Forms.ToolStripMenuItem menuCopyRow;
         private System.Windows.Forms.ToolStripMenuItem MenuPurchaseOrder;
-        private System.Windows.Forms.Button btnSetPrintArea;
-        private System.Windows.Forms.Button btnPrint;
         private System.Windows.Forms.Label lblSelectionTotal;
+        private System.Windows.Forms.ToolStripMenuItem newProjectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem printToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setPrintAreaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem printToolStripMenuItem1;
     }
 }

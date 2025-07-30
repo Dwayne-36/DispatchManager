@@ -21,7 +21,8 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace DispatchManager.Forms
 {
-    public partial class FrmViewDispatch : Form
+    public partial class FrmViewDispatch : ModernForm
+    
     {
         private List<DispatchRecord> fullDispatchList = new List<DispatchRecord>();
         private Dictionary<Guid, Dictionary<string, string>> dispatchColors;
@@ -76,6 +77,19 @@ namespace DispatchManager.Forms
         {
             InitializeComponent();
 
+            //Make the form look good.
+            // Set initial form size
+            this.Size = new Size(1200, 800);  // Width x Height, adjust as needed
+            this.TitleBarColor = Color.ForestGreen; // Custom color
+            this.ButtonHoverColor = Color.ForestGreen;
+            this.CloseButtonHoverColor = Color.OrangeRed;
+            this.BorderColor = Color.ForestGreen; // Set custom border color
+            /*this.ShowMenuStrip = false;*/                  // Show/hide menu
+            this.ShowBorder = true; // Enable thin border
+            this.CustomMinimumSize = new Size(1000, 600);
+            this.BorderThickness = 2;
+            
+
             // ✅ Allow user to reorder columns
             dgvSchedule.AllowUserToOrderColumns = true;
 
@@ -97,7 +111,7 @@ namespace DispatchManager.Forms
             dgvSchedule.CellMouseDown += dgvSchedule_CellMouseDown;
 
             dgvSchedule.Paint += dgvSchedule_Paint;
-
+                       
             this.KeyPreview = true;
             this.KeyDown += FrmViewDispatch_KeyDown;
 
@@ -126,15 +140,21 @@ namespace DispatchManager.Forms
             //Optional: supress tooltips to reduce flicker
             dgvSchedule.ShowCellToolTips = false;
 
-            autoScrollTimer.Interval = 50; // scroll every 50ms
-            autoScrollTimer.Tick += AutoScrollTimer_Tick;
-
             dgvSchedule.MouseMove += dgvSchedule_MouseMove;
 
-
+            autoScrollTimer.Interval = 50; // scroll every 50ms
+            autoScrollTimer.Tick += AutoScrollTimer_Tick;
         }
         private void FrmViewDispatch_Load(object sender, EventArgs e)
         {
+
+            // Place menuStrip1 directly below the custom title bar
+            menuStrip1.Location = new System.Drawing.Point(2, this.TitleBarHeight);
+            menuStrip1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            menuStrip1.Dock = DockStyle.Top;
+
+
+            //adds date pickers to the form over the dispatch date
             dtpDispatch.Visible = false;
             dtpDispatch.Format = DateTimePickerFormat.Custom;
             dtpDispatch.CustomFormat = "d-MMM"; // This will format like 8-Jul
@@ -146,9 +166,6 @@ namespace DispatchManager.Forms
             // Load saved date settings
             dtpFrom.Value = Properties.Settings.Default.dtpFromDate;
             dtpTo.Value = Properties.Settings.Default.dtpToDate;
-
-            // Set the logged-in user label
-            lblLoggedInUser.Text = $"{Session.CurrentFullName} is logged in";
 
             // Load and store colors from database
             dispatchColors = DispatchData.GetDispatchColours();
@@ -172,13 +189,42 @@ namespace DispatchManager.Forms
 
             dgvSchedule.CellMouseClick += dgvSchedule_CellMouseClick;
 
-            //dgvSchedule.CellValueChanged += dgvSchedule_CellValueChanged;
-
             dgvSchedule.CurrentCellDirtyStateChanged += dgvSchedule_CurrentCellDirtyStateChanged;
 
             dgvSchedule.CellValueChanged += dgvSchedule_CellValueChanged;
-            
 
+            // Move DataGridView inside the border
+            this.Padding = new Padding(2);  // 2px padding on all sides
+
+            int bottomPadding = 40; // Extra space for the bottom label
+            dgvSchedule.Location = new System.Drawing.Point(2, dgvSchedule.Location.Y);
+            ResizeDataGridView();
+
+            // Ensure DataGridView resizes correctly when the form resizes
+            this.Resize += (s, ev) =>
+            {
+                ResizeDataGridView();
+            };
+
+            void ResizeDataGridView()
+            {
+                // Adjust DataGridView width and height
+                dgvSchedule.Width = this.ClientSize.Width - 6;
+                dgvSchedule.Height = this.ClientSize.Height - dgvSchedule.Location.Y - bottomPadding;
+
+                //// Reposition bottom labels (e.g., lblTotal)
+                //lblTotal.Top = dgvSchedule.Bottom + 5;
+                //lblTotal.Left = dgvSchedule.Left + 5; // Or center it if needed
+            }
+            //dgvSchedule.Width = this.ClientSize.Width - 6;   // 2px padding on both sides
+            //dgvSchedule.Height = this.ClientSize.Height - dgvSchedule.Location.Y - bottomPadding; ;
+
+            //// Make sure it resizes correctly when the form is resized
+            //this.Resize += (s, ev) =>
+            //{
+            //    dgvSchedule.Width = this.ClientSize.Width - 4;
+            //    dgvSchedule.Height = this.ClientSize.Height - dgvSchedule.Location.Y - 2;
+            //};
             dgvSchedule.EnableHeadersVisualStyles = false;
             dgvSchedule.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             dgvSchedule.ColumnHeadersDefaultCellStyle.SelectionBackColor = dgvSchedule.ColumnHeadersDefaultCellStyle.BackColor;
@@ -1747,14 +1793,7 @@ namespace DispatchManager.Forms
 
         private void btnNewProject_Click(object sender, EventArgs e)
         {
-            using (var newProjectForm = new FrmNewProject())
-            {
-                newProjectForm.ShowDialog();
-
-                // Optionally refresh the main view after closing
-                LoadScheduleData(); // Reload to reflect new project
-                RestoreColumnSettings(); // Keep column widths/order
-            }
+           
         }
 
 
@@ -2052,21 +2091,7 @@ namespace DispatchManager.Forms
 
         private void btnSetPrintArea_Click(object sender, EventArgs e)
         {
-            autoScrollTimer.Start();
-
-            isSelectingPrintArea = true;
-            selectedPrintCells.Clear();
-
-            dgvSchedule.SelectionMode = DataGridViewSelectionMode.CellSelect; // ✅ allows multi-cell drag
-            dgvSchedule.MultiSelect = true;
-
-            dgvSchedule.ClearSelection();
-            dgvSchedule.CurrentCell = null;
-
-            dashOffset = 0f;
-            antTimer.Start();
-
-            dgvSchedule.Invalidate();
+            
         }
        
 
@@ -2475,8 +2500,7 @@ namespace DispatchManager.Forms
 
         private void btnPrint_Click(object sender, EventArgs e)
         {
-            ExportSelectionToExcel();
-            ExitPrintAreaMode();
+           
         }
         private bool isTKeyHeld = false;
         private void dgvSchedule_MouseMove(object sender, MouseEventArgs e)
@@ -2572,7 +2596,42 @@ namespace DispatchManager.Forms
     }
 }
 
+        private void newProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var newProjectForm = new FrmNewProject())
+            {
+                newProjectForm.ShowDialog();
 
+                // Optionally refresh the main view after closing
+                LoadScheduleData(); // Reload to reflect new project
+                RestoreColumnSettings(); // Keep column widths/order
+            }
+        }
+
+        private void setPrintAreaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            autoScrollTimer.Start();
+
+            isSelectingPrintArea = true;
+            selectedPrintCells.Clear();
+
+            dgvSchedule.SelectionMode = DataGridViewSelectionMode.CellSelect; // ✅ allows multi-cell drag
+            dgvSchedule.MultiSelect = true;
+
+            dgvSchedule.ClearSelection();
+            dgvSchedule.CurrentCell = null;
+
+            dashOffset = 0f;
+            antTimer.Start();
+
+            dgvSchedule.Invalidate();
+        }
+
+        private void printToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            ExportSelectionToExcel();
+            ExitPrintAreaMode();
+        }
     }
 }
 

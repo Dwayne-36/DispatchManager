@@ -8,16 +8,28 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
+using System.Drawing;
 
 
 namespace DispatchManager.Forms
 {
-    public partial class FrmNewProject : Form
+    public partial class FrmNewProject : ModernForm
     {
         public FrmNewProject()
         {
             InitializeComponent();
 
+            //Make the form look good.
+            // Set initial form size
+            this.Size = new Size(400, 500);  // Width x Height, adjust as needed
+            this.TitleBarColor = Color.ForestGreen; // Custom color
+            this.ButtonHoverColor = Color.ForestGreen;
+            this.CloseButtonHoverColor = Color.OrangeRed;
+            this.BorderColor = Color.ForestGreen; // Set custom border color
+            /*this.ShowMenuStrip = false;*/                  // Show/hide menu
+            this.ShowBorder = true; // Enable thin border
+            this.CustomMinimumSize = new Size(400, 500);
+            this.BorderThickness = 2;
             this.Load += FrmNewProject_Load;
             this.tbProjectColour.Leave += tbProjectColour_Leave;
             this.btnAddKeyword.Click += btnAddKeyword_Click;

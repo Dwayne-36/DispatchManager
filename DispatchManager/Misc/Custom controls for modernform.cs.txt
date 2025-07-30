@@ -1,0 +1,8 @@
+this.TitleBarColor = Color.LimeGreen; // Custom color
+this.ButtonHoverColor = Color.LimeGreen;
+this.CloseButtonHoverColor = Color.OrangeRed;
+this.BorderColor = Color.LimeGreen; // Set custom border color
+/*this.ShowMenuStrip = false;*/                  // Show/hide menu
+this.ShowBorder = true; // Enable thin border
+this.CustomMinimumSize = new Size(800, 200);
+this.BorderThickness = 2;

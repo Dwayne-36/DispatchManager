@@ -1,0 +1,143 @@
+using System;
+using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+
+namespace DispatchManager.Forms
+{
+    public partial class ModernForm : Form
+    {
+        public Color TitleBarColor { get; set; } = Color.LimeGreen;
+        public Color ButtonHoverColor { get; set; } = Color.LimeGreen;
+        public Color CloseButtonHoverColor { get; set; } = Color.OrangeRed;
+        public Color BorderColor { get; set; } = Color.LimeGreen;
+        public int BorderThickness { get; set; } = 2;
+        public Size CustomMinimumSize { get; set; } = new Size(1000, 600);
+        public bool ShowBorder { get; set; } = true;
+
+        private Panel titleBar;
+        private Button btnClose;
+        private Button btnMinimize;
+        private Button btnMaximize;
+        private bool isMaximized = false;
+
+        public ModernForm()
+        {
+            InitializeComponent();
+            InitializeModernForm();
+        }
+
+        private void InitializeModernForm()
+        {
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.MinimumSize = CustomMinimumSize;
+            this.BackColor = Color.White;
+
+            // Title Bar
+            titleBar = new Panel
+            {
+                Height = 30,
+                Dock = DockStyle.Top,
+                BackColor = TitleBarColor
+            };
+            titleBar.MouseDown += TitleBar_MouseDown;
+            this.Controls.Add(titleBar);
+
+            // Close Button
+            btnClose = new Button
+            {
+                Text = "X",
+                Dock = DockStyle.Right,
+                Width = 45,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnClose.FlatAppearance.BorderSize = 0;
+            btnClose.ForeColor = Color.White;
+            btnClose.BackColor = TitleBarColor;
+            btnClose.MouseEnter += (s, e) => btnClose.BackColor = CloseButtonHoverColor;
+            btnClose.MouseLeave += (s, e) => btnClose.BackColor = TitleBarColor;
+            btnClose.Click += (s, e) => this.Close();
+            titleBar.Controls.Add(btnClose);
+
+            // Maximize Button
+            btnMaximize = new Button
+            {
+                Text = "□",
+                Dock = DockStyle.Right,
+                Width = 45,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnMaximize.FlatAppearance.BorderSize = 0;
+            btnMaximize.ForeColor = Color.White;
+            btnMaximize.BackColor = TitleBarColor;
+            btnMaximize.MouseEnter += (s, e) => btnMaximize.BackColor = ButtonHoverColor;
+            btnMaximize.MouseLeave += (s, e) => btnMaximize.BackColor = TitleBarColor;
+            btnMaximize.Click += BtnMaximize_Click;
+            titleBar.Controls.Add(btnMaximize);
+
+            // Minimize Button
+            btnMinimize = new Button
+            {
+                Text = "_",
+                Dock = DockStyle.Right,
+                Width = 45,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnMinimize.FlatAppearance.BorderSize = 0;
+            btnMinimize.ForeColor = Color.White;
+            btnMinimize.BackColor = TitleBarColor;
+            btnMinimize.MouseEnter += (s, e) => btnMinimize.BackColor = ButtonHoverColor;
+            btnMinimize.MouseLeave += (s, e) => btnMinimize.BackColor = TitleBarColor;
+            btnMinimize.Click += (s, e) => this.WindowState = FormWindowState.Minimized;
+            titleBar.Controls.Add(btnMinimize);
+
+            this.Padding = new Padding(BorderThickness);
+        }
+
+        private void BtnMaximize_Click(object sender, EventArgs e)
+        {
+            if (isMaximized)
+            {
+                this.WindowState = FormWindowState.Normal;
+                this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
+                isMaximized = false;
+            }
+            else
+            {
+                this.WindowState = FormWindowState.Maximized;
+                isMaximized = true;
+            }
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            if (ShowBorder)
+            {
+                using (var pen = new Pen(BorderColor, BorderThickness))
+                {
+                    e.Graphics.DrawRectangle(pen, 0, 0, this.Width - 1, this.Height - 1);
+                }
+            }
+        }
+
+        [DllImport("user32.dll")]
+        public static extern bool ReleaseCapture();
+
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+
+        private const int WM_NCLBUTTONDOWN = 0xA1;
+        private const int HTCAPTION = 0x2;
+
+        private void TitleBar_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+            }
+        }
+    }
+}
